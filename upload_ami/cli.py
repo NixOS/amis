@@ -38,31 +38,33 @@ def upload_ami(nix_store_path, s3_bucket, regions):
     snapshot_import_task = snapshot_import_tasks['ImportSnapshotTasks'][0]
     snapshot_id = snapshot_import_task['SnapshotTaskDetail']['SnapshotId']
 
-    # TODO: delete s3 object
-
-    if image_info['system'] == 'x86_64-linux':
-        architecture = 'x86_64'
-    elif image_info['system'] == 'aarch64-linux':
-        architecture = 'arm64'
+    describe_images = ec2.describe_images(Owners=['self'], Filters=[{'Name': 'name', 'Values': [image_name]}])
+    if len(describe_images['Images']) != 0:
+        image_id = describe_images['Images'][0]['ImageId']
     else:
-        raise Exception('Unknown system: ' + image_info['system'])
+        if image_info['system'] == 'x86_64-linux':
+            architecture = 'x86_64'
+        elif image_info['system'] == 'aarch64-linux':
+            architecture = 'arm64'
+        else:
+            raise Exception('Unknown system: ' + image_info['system'])
 
-    logging.info(f'Registering image {image_name} with snapshot {snapshot_id}')
-    register_image = ec2.register_image(
-        Name=image_name,
-        Architecture=architecture,
-        BootMode=image_info['boot_mode'],
-        BlockDeviceMappings=[{
-            'DeviceName': '/dev/xvda',
-            # TODO: VolumeType default to gp3?
-            'Ebs': { 'SnapshotId': snapshot_id },
-        }],
-        RootDeviceName='/dev/xvda',
-        VirtualizationType='hvm',
-        EnaSupport=True,
-        SriovNetSupport='simple',
-    )
-    ec2.get_waiter('image_available').wait(ImageIds=[register_image['ImageId']])
+        logging.info(f'Registering image {image_name} with snapshot {snapshot_id}')
+        register_image = ec2.register_image(
+            Name=image_name,
+            Architecture=architecture,
+            BootMode=image_info['boot_mode'],
+            BlockDeviceMappings=[{
+                'DeviceName': '/dev/xvda',
+                'Ebs': { 'SnapshotId': snapshot_id },
+            }],
+            RootDeviceName='/dev/xvda',
+            VirtualizationType='hvm',
+            EnaSupport=True,
+            SriovNetSupport='simple',
+        )
+        image_id = register_image['ImageId']
+    ec2.get_waiter('image_available').wait(ImageIds=[image_id])
 
     image_ids = {}
     for region in regions:
