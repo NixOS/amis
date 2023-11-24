@@ -2,6 +2,7 @@ import json
 import hashlib
 import logging
 import boto3
+import botocore
 
 def upload_ami(nix_store_path, s3_bucket, regions):
     with open(nix_store_path + '/nix-support/image-info.json', 'r') as f:
@@ -12,13 +13,17 @@ def upload_ami(nix_store_path, s3_bucket, regions):
     ec2 = boto3.client('ec2')
     s3 = boto3.client('s3')
 
-    logging.info(f'Uploading {image_info["file"]} to s3://{s3_bucket}/{image_name}')
-    s3.upload_file(image_info['file'], s3_bucket, image_name)
-    s3.get_waiter('object_exists').wait(Bucket=s3_bucket, Key=image_name)
+    try:
+        logging.info(f'Checking if s3://{s3_bucket}/{image_name} exists')
+        s3.head_object(Bucket=s3_bucket, Key=image_name)
+    except botocore.exceptions.ClientError as e:
+        logging.info(f'Uploading {image_info["file"]} to s3://{s3_bucket}/{image_name}')
+        s3.upload_file(image_info['file'], s3_bucket, image_name)
+        s3.get_waiter('object_exists').wait(Bucket=s3_bucket, Key=image_name)
 
-    client_token = hashlib.sha256(image_name.encode()).hexdigest()
 
     logging.info(f'Importing s3://{s3_bucket}/{image_name} to EC2')
+    client_token = hashlib.sha256(image_name.encode()).hexdigest()
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
             'Format': 'VHD',
