@@ -80,9 +80,6 @@ def upload_ami(nix_store_path, s3_bucket, regions):
     image_ids = {}
 
     def copy_image(image_id, image_name, source_region, target_region):
-        client_token = hashlib.sha256(
-            (image_id + source_region + target_region + image_name).encode()
-        ).hexdigest()
         ec2r = boto3.client("ec2", region_name=target_region)
         logging.info(
             f"Copying image {image_id} from {source_region} to {target_region}"
