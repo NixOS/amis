@@ -16,7 +16,7 @@ def upload_ami(nix_store_path, s3_bucket, regions):
     s3.upload_file(image_info['file'], s3_bucket, image_name)
     s3.get_waiter('object_exists').wait(Bucket=s3_bucket, Key=image_name)
 
-    client_token = hashlib.sha256(image_name).hexdigest()
+    client_token = hashlib.sha256(image_name.encode()).hexdigest()
 
     logging.info(f'Importing s3://{s3_bucket}/{image_name} to EC2')
     snapshot_import_task = ec2.import_snapshot(
