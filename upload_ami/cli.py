@@ -103,6 +103,8 @@ def upload_ami(nix_store_path, s3_bucket, regions):
             )
         )
 
+    image_ids[source_region] = image_id
+
     print(json.dumps(image_ids))
 
 
