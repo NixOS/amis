@@ -3,8 +3,8 @@ locals {
 }
 
 variable "repo" {
-    type = string
-    default = "arianvp/amis"
+  type    = string
+  default = "arianvp/amis"
 }
 
 resource "aws_iam_openid_connect_provider" "github_actions" {
@@ -44,5 +44,5 @@ resource "aws_iam_role" "deploy" {
 }
 
 output "deploy_role_arn" {
-  value = aws_iam_role.deploy.arn 
+  value = aws_iam_role.deploy.arn
 }
