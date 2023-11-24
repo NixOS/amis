@@ -23,6 +23,5 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::686862074153:role/deploy 
           aws-region: eu-central-1
-      - run: |
-          nix build .#legacyAmazonImage
-          nix develop --command python3 ./upload_ami/cli.py  ./result images20231124161256194400000001 us-east-1
+      - run: nix build .#legacyAmazonImage
+      - run: nix develop --command python3 ./upload_ami/cli.py  ./result images20231124161256194400000001 us-east-1
