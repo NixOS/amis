@@ -94,7 +94,14 @@ def upload_ami(nix_store_path, s3_bucket, regions):
         return (target_region, copy_image["ImageId"])
 
     with ThreadPoolExecutor() as executor:
-        image_ids = dict(executor.map( lambda target_region: copy_image( image_id, image_name, source_region, target_region), regions))
+        image_ids = dict(
+            executor.map(
+                lambda target_region: copy_image(
+                    image_id, image_name, source_region, target_region
+                ),
+                regions,
+            )
+        )
 
     print(json.dumps(image_ids))
 
