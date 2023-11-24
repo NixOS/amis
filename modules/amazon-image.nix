@@ -8,6 +8,7 @@ in
     (modulesPath + "/image/repart.nix")
   ];
 
+  image.repart.name = "amazonImage";
   image.repart.partitions = {
     "00-esp" = {
       contents = {
@@ -39,16 +40,12 @@ in
         Label = "nixos";
         Format = "ext4";
         Minimize = "guess";
-        AutoResize = "yes";
       };
     };
   };
 
   systemd.repart.partitions = {
-    "01-root" = {
-      Type = "root";
-      AutoResize = "yes";
-    };
+    "01-root" = { Type = "root"; };
   };
 
   fileSystems = {
