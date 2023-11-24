@@ -11,6 +11,15 @@
     {
       nixosModules.amazonImage = ./modules/amazon-image.nix;
 
+
+      packages = lib.genAttrs self.lib.supportedSystems (system: {
+        legacyAmazonImage = (lib.nixosSystem {
+          pkgs = nixpkgs.legacyPackages.${system};
+          inherit system;
+          modules = [ (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix") ];
+        }).config.system.build.amazonImage;
+      });
+
       # systems that amazon supports
       lib.supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
 
@@ -27,7 +36,10 @@
 
       devShells = lib.genAttrs self.lib.supportedSystems (system: {
         default = let pkgs = nixpkgs.legacyPackages.${system}; in pkgs.mkShell {
-          nativeBuildInputs = [ pkgs.awscli2 pkgs.opentofu ];
+          nativeBuildInputs = [
+            pkgs.awscli2 pkgs.opentofu
+            (pkgs.python3.withPackages (p: [p.boto3 p.botocore]))
+          ];
         };
       });
 
