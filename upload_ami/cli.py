@@ -91,6 +91,9 @@ def upload_ami(nix_store_path, s3_bucket, regions):
             ClientToken=image_id,
         )
         ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
+        logging.info(
+            f"Finished image {image_id} from {source_region} to {target_region}"
+        )
         return (target_region, copy_image["ImageId"])
 
     with ThreadPoolExecutor() as executor:
