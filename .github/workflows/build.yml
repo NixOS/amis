@@ -1,3 +1,5 @@
+permissions:
+  id-token: write
 on:
   pull_request:
   push:
