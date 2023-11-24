@@ -26,7 +26,7 @@ def upload_ami(nix_store_path, s3_bucket, regions):
         },
         ClientToken=client_token
     )
-    ec2.get_waiter('snapshot_imported').wait(ImportTaskIds=snapshot_import_task['ImportTaskId'])
+    ec2.get_waiter('snapshot_imported').wait(ImportTaskIds=[snapshot_import_task['ImportTaskId']])
 
     snapshot_import_tasks = ec2.describe_import_snapshot_tasks(ImportTaskIds=[snapshot_import_task['ImportTaskId']])
     assert len(snapshot_import_tasks['ImportSnapshotTasks']) != 0
