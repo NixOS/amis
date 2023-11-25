@@ -81,13 +81,17 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             BlockDeviceMappings=[
                 {
                     "DeviceName": "/dev/xvda",
-                    "Ebs": {"SnapshotId": snapshot_id},
+                    "Ebs": {
+                        "SnapshotId": snapshot_id,
+                        "VolumeType": "gp3",
+                    },
                 }
             ],
             RootDeviceName="/dev/xvda",
             VirtualizationType="hvm",
             EnaSupport=True,
             SriovNetSupport="simple",
+            TpmSupport="2.0" if architecture == "x86_64" else None,
         )
         image_id = register_image["ImageId"]
 
@@ -104,6 +108,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     This function is idempotent because image_id is unique and we use it
     as the client_token for the copy_image task
     """
+
     def copy_image(image_id, image_name, source_region, target_region):
         """
         Copy image to target_region
@@ -174,7 +179,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
-    parser.add_argument("--image-info", help="Path to image info",  required=True)
+    parser.add_argument("--image-info", help="Path to image info", required=True)
     parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--region", nargs="+", help="Regions to upload to")
     parser.add_argument("--debug", action="store_true")
