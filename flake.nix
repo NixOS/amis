@@ -19,9 +19,9 @@
           modules = [
             (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
             { ec2.efi = true; amazonImage.sizeMB = "auto"; }
-            ({config,...}:{
+            ({ config, ... }: {
               system.stateVersion = config.system.nixos.release;
-              system.nixos.versionSuffix =  lib.mkForce
+              system.nixos.versionSuffix = lib.mkForce
                 ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
             })
           ];
