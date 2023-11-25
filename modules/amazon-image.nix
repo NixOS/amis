@@ -12,6 +12,8 @@ in
   image.repart.partitions = {
     "00-esp" = {
       contents = {
+        "/EFI/systemd/systemd-boot${efiArch}.efi".source =
+          "${pkgs.systemd}/lib/systemd/boot/efi/systemd-boot${efiArch}.efi";
         "/EFI/BOOT/BOOT${lib.toUpper efiArch}.EFI".source =
           "${pkgs.systemd}/lib/systemd/boot/efi/systemd-boot${efiArch}.efi";
 
@@ -35,6 +37,7 @@ in
       };
     };
     "01-root" = {
+      storePaths = [ config.system.build.toplevel ];
       repartConfig = {
         Type = "root";
         Label = "nixos";

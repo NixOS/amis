@@ -11,6 +11,12 @@
     {
       nixosModules.amazonImage = ./modules/amazon-image.nix;
 
+      nixosModules.version = { config, ... }: {
+        system.stateVersion = config.system.nixos.release;
+        system.nixos.versionSuffix = lib.mkForce
+          ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
+      };
+
 
       packages = lib.genAttrs self.lib.supportedSystems (system: {
         legacyAmazonImage = (lib.nixosSystem {
@@ -19,11 +25,7 @@
           modules = [
             (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
             { ec2.efi = true; amazonImage.sizeMB = "auto"; }
-            ({ config, ... }: {
-              system.stateVersion = config.system.nixos.release;
-              system.nixos.versionSuffix = lib.mkForce
-                ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
-            })
+            self.nixosModules.version
           ];
         }).config.system.build.amazonImage;
       });
@@ -35,7 +37,10 @@
         (system: lib.nixosSystem {
           pkgs = nixpkgs.legacyPackages.${system};
           inherit system;
-          modules = [ self.nixosModules.amazonImage ];
+          modules = [
+            self.nixosModules.amazonImage
+            self.nixosModules.version
+          ];
         });
 
       checks = lib.genAttrs self.lib.supportedSystems (system: {
