@@ -150,7 +150,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     return image_ids
 
 
-def upload_ami(image_info_path, s3_bucket, regions):
+def upload_ami(image_info, s3_bucket, regions):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -159,8 +159,6 @@ def upload_ami(image_info_path, s3_bucket, regions):
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
-    with open(image_info_path, "r") as f:
-        image_info = json.load(f)
 
     image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
     image_file = image_info["file"]
@@ -175,6 +173,32 @@ def upload_ami(image_info_path, s3_bucket, regions):
     print(json.dumps(image_ids))
 
 
+def cleanup_ami(image_name, region):
+    ec2 = boto3.client("ec2", region_name=region)
+    describe_images = ec2.describe_images(
+        Owners=["self"], Filters=[{"Name": "name", "Values": [image_name]}]
+    )
+
+    if len(describe_images["Images"]) == 0:
+        return
+    
+    image_id = describe_images["Images"][0]["ImageId"]
+    snapshot_id = describe_images["Images"][0]["BlockDeviceMappings"][0]["Ebs"]["SnapshotId"]
+
+    ec2.deregister_image(ImageId=image_id)
+    # TODO: Not fully idempotent because we can crash  between deregistering the image and deleting the snapshot
+    ec2.delete_snapshot(SnapshotId=snapshot_id)
+
+def cleanup(image_info, s3_bucket, regions):
+    s3 = boto3.client("s3")
+
+    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
+
+    s3.delete_object(Bucket=s3_bucket, Key=image_name)
+
+    for region in regions:
+        cleanup_ami(image_name, region)
+
 if __name__ == "__main__":
     import argparse
 
@@ -183,9 +207,16 @@ if __name__ == "__main__":
     parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--region", nargs="+", help="Regions to upload to")
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--cleanup", action="store_true")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=level)
 
-    upload_ami(args.image_info, args.s3_bucket, args.region)
+    with open(args.image_info, "r") as f:
+        image_info = json.load(f)
+
+    upload_ami(image_info, args.s3_bucket, args.region)
+
+    if args.cleanup:
+        cleanup(image_info, args.s3_bucket, args.region)
