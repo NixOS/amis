@@ -109,7 +109,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     as the client_token for the copy_image task
     """
 
-    def copy_image(image_id, image_name, source_region, target_region):
+    def copy_image(image_id, image_name, source_region, target_region_name):
         """
         Copy image to target_region
 
@@ -120,9 +120,9 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         script a few months later?
 
         """
-        ec2r = boto3.client("ec2", region_name=target_region)
+        ec2r = boto3.client("ec2", region_name=target_region_name)
         logging.info(
-            f"Copying image {image_id} from {source_region} to {target_region['RegionName']}"
+            f"Copying image {image_id} from {source_region} to {target_region_name}"
         )
         copy_image = ec2r.copy_image(
             SourceImageId=image_id,
@@ -132,9 +132,9 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         )
         ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
         logging.info(
-            f"Finished image {image_id} from {source_region} to {target_region}"
+            f"Finished image {image_id} from {source_region} to {target_region_name}"
         )
-        return (target_region, copy_image["ImageId"])
+        return (target_region_name, copy_image["ImageId"])
 
     with ThreadPoolExecutor() as executor:
         image_ids = dict(
