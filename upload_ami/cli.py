@@ -122,7 +122,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         """
         ec2r = boto3.client("ec2", region_name=target_region)
         logging.info(
-            f"Copying image {image_id} from {source_region} to {target_region}"
+            f"Copying image {image_id} from {source_region} to {target_region['RegionName']}"
         )
         copy_image = ec2r.copy_image(
             SourceImageId=image_id,
@@ -140,7 +140,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         image_ids = dict(
             executor.map(
                 lambda target_region: copy_image(
-                    image_id, image_name, source_region, target_region
+                    image_id, image_name, source_region, target_region['RegionName']
                 ),
                 target_regions,
             )
@@ -150,7 +150,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     return image_ids
 
 
-def upload_ami(image_info, s3_bucket, regions):
+def upload_ami(image_info, s3_bucket):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -166,6 +166,9 @@ def upload_ami(image_info, s3_bucket, regions):
     upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
     snapshot_id = import_snapshot(ec2, s3_bucket, image_name)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
+
+    regions = ec2.describe_regions()["Regions"]
+
     image_ids = copy_image_to_regions(
         image_id, image_name, ec2.meta.region_name, regions
     )
@@ -199,31 +202,12 @@ def cleanup(image_info, s3_bucket, regions):
     for region in regions:
         cleanup_ami(image_name, region)
 
-def smoke_test(image_id, region):
-    ec2 = boto3.client("ec2", region_name=region)
-
-    # TODO per architecture
-    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t2.micro", ClientToken=image_id)
-    instance_id = run_instances["Instances"][0]["InstanceId"]
-    # TODO: How does  this handle idempotency and terminated instances?
-    ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
-
-    console_output = ec2.get_console_output(InstanceId=instance_id)
-    # TODO: Make assertions about  the console output
-    print(console_output["Output"])
-
-    ec2.terminate_instances(InstanceIds=[instance_id])
-    ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
-
-
-
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
     parser.add_argument("--image-info", help="Path to image info", required=True)
     parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
-    parser.add_argument("--region", nargs="+", help="Regions to upload to")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     args = parser.parse_args()
@@ -236,11 +220,7 @@ if __name__ == "__main__":
 
     image_ids =  {}
     if args.cleanup:
-        cleanup(image_info, args.s3_bucket, args.region)
+        cleanup(image_info, args.s3_bucket)
     else:
-        image_ids = upload_ami(image_info, args.s3_bucket, args.region)
+        image_ids = upload_ami(image_info, args.s3_bucket)
         print(json.dumps(image_ids))
-
-    for region , image_id in image_ids.items():
-
-        pass
