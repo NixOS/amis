@@ -47,6 +47,7 @@ in
     };
   };
 
+  systemd.repart.enable = true;
   systemd.repart.partitions = {
     "01-root" = { Type = "root"; };
   };

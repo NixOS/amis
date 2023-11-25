@@ -27,11 +27,17 @@
       "-F",
       "raw",
       tmp_disk_image.name,
+      "4G",
     ])
 
     # Set NIX_DISK_IMAGE so that the qemu script finds the right disk image.
     os.environ['NIX_DISK_IMAGE'] = tmp_disk_image.name
 
+    machine.wait_for_unit("systemd-repart.service")
+    systemd_repart_logs = machine.succeed("journalctl --unit systemd-repart.service")
+    assert "Growing existing partition 1." in systemd_repart_logs
+
     bootctl_status = machine.succeed("bootctl status")
+
   '';
 }
