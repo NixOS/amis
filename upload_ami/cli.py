@@ -8,6 +8,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 def upload_to_s3_if_not_exists(s3, bucket, key, file):
+    """
+    Upload file to S3 if it doesn't exist yet
+
+    This function is idempotent.
+    """
     try:
         logging.info(f"Checking if s3://{bucket}/{key} exists")
         s3.head_object(Bucket=bucket, Key=key)
@@ -50,6 +55,11 @@ def import_snapshot(ec2, s3_bucket, image_name):
 
 
 def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
+    """
+    Register image if it doesn't exist yet
+
+    This function is idempotent because image_name is unique
+    """
     describe_images = ec2.describe_images(
         Owners=["self"], Filters=[{"Name": "name", "Values": [image_name]}]
     )
@@ -86,7 +96,25 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
 
 
 def copy_image_to_regions(image_id, image_name, source_region, target_regions):
+    """
+    Copy image to all target regions
+
+    Copies to all regions in parallel and waits for all of them to finish
+
+    This function is idempotent because image_id is unique and we use it
+    as the client_token for the copy_image task
+    """
     def copy_image(image_id, image_name, source_region, target_region):
+        """
+        Copy image to target_region
+
+        This function is idempotent because image_id is unique and we use it as
+        the client_token for the copy_image task.
+
+        TODO: How long can we rely on the client_token? E.g. what happens if I rerun this
+        script a few months later?
+
+        """
         ec2r = boto3.client("ec2", region_name=target_region)
         logging.info(
             f"Copying image {image_id} from {source_region} to {target_region}"
@@ -118,6 +146,11 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
 
 
 def upload_ami(image_info_path, s3_bucket, regions):
+    """
+    Upload NixOS AMI to AWS and return the image ids for each region
+
+    This function is idempotent because all the functions it calls are idempotent.
+    """
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
