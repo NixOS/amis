@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name:  Legacy Amazon Image
     runs-on: ${{ matrix.system[0] }}
     strategy:
       matrix:
@@ -18,13 +19,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
-      - run: nix flake check --system ${{ matrix.system[1] }}
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::686862074153:role/deploy 
           aws-region: eu-central-1
       - name: Build AMI
-        run: nix build .#legacyAmazonImage
+        run: nix build .#legacyAmazonImage --system ${{ matrix.system[1] }}
       - name: Upload AMIs
         run: |
           nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --region us-east-1 us-east-2
