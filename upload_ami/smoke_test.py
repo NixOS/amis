@@ -5,22 +5,21 @@ def smoke_test(image_id, region):
     ec2 = boto3.client("ec2", region_name=region)
 
     # TODO per architecture
-    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t3.micro", MinCount=1, MaxCount=1)
-    logging.info(run_instances)
+    logging.info("Starting instance")
+    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t3a.nano", MinCount=1, MaxCount=1)
 
     instance_id = run_instances["Instances"][0]["InstanceId"]
 
     # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
-    ec2.get_waiter("instance_status_ok").wait(InstanceIds=[instance_id])
+    logging.info(f"Waiting for instance {instance_id} to be running")
+    ec2.get_waiter("running").wait(InstanceIds=[instance_id])
 
     console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
-    while not console_output.get("Output"):
-        logging.info("Waiting for console output")
-        time.sleep(5)
-        console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
-    # TODO: Make assertions about  the console output
-    print(console_output.get("Output"))
+    # TODO: Make assertions about the console output
+    output = console_output.get("Output")
+    print(output)
 
+    logging.info(f"Terminating instance {instance_id}")
     ec2.terminate_instances(InstanceIds=[instance_id])
     ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
 

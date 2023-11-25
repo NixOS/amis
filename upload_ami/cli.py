@@ -90,6 +90,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             RootDeviceName="/dev/xvda",
             VirtualizationType="hvm",
             EnaSupport=True,
+            ImdsSupport="v2.0",
             SriovNetSupport="simple",
             TpmSupport="v2.0" if architecture == "x86_64" else None,
         )
