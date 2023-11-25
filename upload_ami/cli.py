@@ -150,7 +150,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     return image_ids
 
 
-def upload_ami(image_info, s3_bucket):
+def upload_ami(image_info, s3_bucket, copy_to_regions):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -169,9 +169,13 @@ def upload_ami(image_info, s3_bucket):
 
     regions = ec2.describe_regions()["Regions"]
 
-    image_ids = copy_image_to_regions(
-        image_id, image_name, ec2.meta.region_name, regions
-    )
+    image_ids = {}
+    image_ids[ec2.meta.region_name] = image_id
+
+    if copy_to_regions:
+        image_ids.update(copy_image_to_regions(
+            image_id, image_name, ec2.meta.region_name, regions
+        ))
     return image_ids
 
 
@@ -192,15 +196,17 @@ def cleanup_ami(image_name, region):
     # TODO: Not fully idempotent because we can crash  between deregistering the image and deleting the snapshot
     ec2.delete_snapshot(SnapshotId=snapshot_id)
 
-def cleanup(image_info, s3_bucket, regions):
+def cleanup(image_info, s3_bucket):
     s3 = boto3.client("s3")
 
     image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
 
     s3.delete_object(Bucket=s3_bucket, Key=image_name)
 
+    regions = boto3.client("ec2").describe_regions()["Regions"]
+
     for region in regions:
-        cleanup_ami(image_name, region)
+        cleanup_ami(image_name, region["RegionName"])
 
 if __name__ == "__main__":
     import argparse
@@ -210,6 +216,7 @@ if __name__ == "__main__":
     parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
+    parser.add_argument("--copy-to-regions", action="store_true")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
@@ -222,5 +229,5 @@ if __name__ == "__main__":
     if args.cleanup:
         cleanup(image_info, args.s3_bucket)
     else:
-        image_ids = upload_ami(image_info, args.s3_bucket)
+        image_ids = upload_ami(image_info, args.s3_bucket, args.copy_to_regions)
         print(json.dumps(image_ids))

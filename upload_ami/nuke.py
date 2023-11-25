@@ -18,9 +18,9 @@ def nuke():
             logging.info(f"Deregistering {image['ImageId']}")
             ec2r.deregister_image(ImageId=image["ImageId"])
 
-        for image in images["Images"]:
-            logging.info(f"Deleting {image['SnapshotId']}")
-            ec2r.delete_snapshot(SnapshotId=image["SnapshotId"])
+            logging.info(f"Deleting {image['BlockDeviceMappings'][0]['Ebs']['SnapshotId']}")
+            ec2r.delete_snapshot(SnapshotId=image["BlockDeviceMappings"][0]["Ebs"]["SnapshotId"])
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
