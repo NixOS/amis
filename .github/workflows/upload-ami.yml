@@ -1,9 +1,7 @@
 permissions:
   id-token: write
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 jobs:
   upload-legacy-image:
     name:  Legacy Amazon Image
