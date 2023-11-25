@@ -169,8 +169,8 @@ def upload_ami(image_info, s3_bucket, regions):
     image_ids = copy_image_to_regions(
         image_id, image_name, ec2.meta.region_name, regions
     )
+    return image_ids
 
-    print(json.dumps(image_ids))
 
 
 def cleanup_ami(image_name, region):
@@ -199,6 +199,24 @@ def cleanup(image_info, s3_bucket, regions):
     for region in regions:
         cleanup_ami(image_name, region)
 
+def smoke_test(image_id, region):
+    ec2 = boto3.client("ec2", region_name=region)
+
+    # TODO per architecture
+    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t2.micro", ClientToken=image_id)
+    instance_id = run_instances["Instances"][0]["InstanceId"]
+    # TODO: How does  this handle idempotency and terminated instances?
+    ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
+
+    console_output = ec2.get_console_output(InstanceId=instance_id)
+    # TODO: Make assertions about  the console output
+    print(console_output["Output"])
+
+    ec2.terminate_instances(InstanceIds=[instance_id])
+    ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
+
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -216,7 +234,13 @@ if __name__ == "__main__":
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
-    upload_ami(image_info, args.s3_bucket, args.region)
-
+    image_ids =  {}
     if args.cleanup:
         cleanup(image_info, args.s3_bucket, args.region)
+    else:
+        image_ids = upload_ami(image_info, args.s3_bucket, args.region)
+        print(json.dumps(image_ids))
+
+    for region , image_id in image_ids.items():
+
+        pass
