@@ -3,6 +3,7 @@ import hashlib
 import logging
 import boto3
 import botocore
+import botocore.exceptions
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -112,13 +113,16 @@ def upload_ami(nix_store_path, s3_bucket, regions):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
-    parser.add_argument("nix_store_path", help="Path to nix store")
-    parser.add_argument("s3_bucket", help="S3 bucket to upload to")
-    parser.add_argument("regions", nargs="+", help="Regions to upload to")
+    parser.add_argument("--nix-store-path", help="Path to nix store")
+    parser.add_argument("--bucket", help="S3 bucket to upload to")
+    parser.add_argument("--region", nargs="+", help="Regions to upload to")
+    parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
+
+    level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=level)
 
     upload_ami(args.nix_store_path, args.s3_bucket, args.regions)
