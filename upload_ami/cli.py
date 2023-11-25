@@ -7,23 +7,24 @@ import botocore.exceptions
 from concurrent.futures import ThreadPoolExecutor
 
 
-def upload_ami(nix_store_path, s3_bucket, regions):
-    with open(nix_store_path + "/nix-support/image-info.json", "r") as f:
-        image_info = json.load(f)
-
-    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
-
-    ec2 = boto3.client("ec2")
-    s3 = boto3.client("s3")
-
+def upload_to_s3_if_not_exists(s3, bucket, key, file):
     try:
-        logging.info(f"Checking if s3://{s3_bucket}/{image_name} exists")
-        s3.head_object(Bucket=s3_bucket, Key=image_name)
+        logging.info(f"Checking if s3://{bucket}/{key} exists")
+        s3.head_object(Bucket=bucket, Key=key)
     except botocore.exceptions.ClientError as e:
-        logging.info(f'Uploading {image_info["file"]} to s3://{s3_bucket}/{image_name}')
-        s3.upload_file(image_info["file"], s3_bucket, image_name)
-        s3.get_waiter("object_exists").wait(Bucket=s3_bucket, Key=image_name)
+        logging.info(f"Uploading {file} to s3://{bucket}/{key}")
+        s3.upload_file(file, bucket, key)
+        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
 
+
+def import_snapshot(ec2, s3_bucket, image_name):
+    """
+    Import snapshot from S3 and wait for it to finish
+
+    This function is idempotent by using the image_name as the client token
+
+    Returns the snapshot id
+    """
     logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
     client_token = hashlib.sha256(image_name.encode()).hexdigest()
     snapshot_import_task = ec2.import_snapshot(
@@ -42,13 +43,13 @@ def upload_ami(nix_store_path, s3_bucket, regions):
     )
     assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
     snapshot_import_task = snapshot_import_tasks["ImportSnapshotTasks"][0]
-    snapshot_id = snapshot_import_task["SnapshotTaskDetail"]["SnapshotId"]
+    return snapshot_import_task["SnapshotTaskDetail"]["SnapshotId"]
 
+
+def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
     describe_images = ec2.describe_images(
         Owners=["self"], Filters=[{"Name": "name", "Values": [image_name]}]
     )
-
-    source_region = ec2.meta.region_name
     if len(describe_images["Images"]) != 0:
         image_id = describe_images["Images"][0]["ImageId"]
     else:
@@ -76,10 +77,12 @@ def upload_ami(nix_store_path, s3_bucket, regions):
             SriovNetSupport="simple",
         )
         image_id = register_image["ImageId"]
+
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
+    return image_id
 
-    image_ids = {}
 
+def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     def copy_image(image_id, image_name, source_region, target_region):
         ec2r = boto3.client("ec2", region_name=target_region)
         logging.info(
@@ -103,11 +106,30 @@ def upload_ami(nix_store_path, s3_bucket, regions):
                 lambda target_region: copy_image(
                     image_id, image_name, source_region, target_region
                 ),
-                regions,
+                target_regions,
             )
         )
 
     image_ids[source_region] = image_id
+    return image_ids
+
+
+def upload_ami(image_info_path, s3_bucket, regions):
+    ec2 = boto3.client("ec2")
+    s3 = boto3.client("s3")
+
+    with open(image_info_path, "r") as f:
+        image_info = json.load(f)
+
+    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
+    image_file = image_info["file"]
+
+    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
+    snapshot_id = import_snapshot(ec2, s3_bucket, image_name)
+    image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
+    image_ids = copy_image_to_regions(
+        image_id, image_name, ec2.meta.region_name, regions
+    )
 
     print(json.dumps(image_ids))
 
@@ -116,8 +138,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
-    parser.add_argument("--nix-store-path", help="Path to nix store")
-    parser.add_argument("--bucket", help="S3 bucket to upload to")
+    parser.add_argument("--image-info", help="Path to image info",  required=True)
+    parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--region", nargs="+", help="Regions to upload to")
     parser.add_argument("--debug", action="store_true")
     args = parser.parse_args()
@@ -125,4 +147,4 @@ if __name__ == "__main__":
     level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=level)
 
-    upload_ami(args.nix_store_path, args.s3_bucket, args.regions)
+    upload_ami(args.image_info, args.s3_bucket, args.region)
