@@ -47,5 +47,9 @@
         };
       });
 
+      hydraJobs = import (nixpkgs + "/nixos/release.nix") {
+        inherit nixpkgs;
+      };
+
     };
 }
