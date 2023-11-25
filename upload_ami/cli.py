@@ -91,7 +91,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             VirtualizationType="hvm",
             EnaSupport=True,
             SriovNetSupport="simple",
-            TpmSupport="2.0" if architecture == "x86_64" else None,
+            TpmSupport="v2.0" if architecture == "x86_64" else None,
         )
         image_id = register_image["ImageId"]
 
