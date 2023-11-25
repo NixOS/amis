@@ -1,0 +1,17 @@
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  check:
+    runs-on: ${{ matrix.system[0] }}
+    strategy:
+      matrix:
+        system:
+          - [ubuntu-latest, x86_64-linux]
+          # TODO Graviton ARM
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v7
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - run: nix flake check --system ${{ matrix.system[1] }}

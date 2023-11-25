@@ -1,13 +1,11 @@
 permissions:
   id-token: write
 on:
-  pull_request:
   push:
     branches:
       - main
-
 jobs:
-  build:
+  upload-legacy-image:
     name:  Legacy Amazon Image
     runs-on: ${{ matrix.system[0] }}
     strategy:
