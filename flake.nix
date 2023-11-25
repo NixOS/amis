@@ -18,7 +18,7 @@
           inherit system;
           modules = [
             (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
-            { ec2.efi = true; }
+            { ec2.efi = true; amazonImage.sizeMB = "auto"; }
           ];
         }).config.system.build.amazonImage;
       });
