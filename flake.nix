@@ -50,6 +50,10 @@
             inherit system;
             modules = [
               (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
+              {
+                boot.loader.grub.enable = false;
+                boot.loader.systemd-boot.enable = true;
+              }
               { ec2.efi = true; amazonImage.sizeMB = "auto"; }
               self.nixosModules.version
             ];
