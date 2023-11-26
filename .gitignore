@@ -2,3 +2,4 @@ result*
 .terraform
 .direnv
 .vscode
+.nixos-test-history

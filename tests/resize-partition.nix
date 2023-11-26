@@ -2,12 +2,9 @@
   name = "resize-partition";
 
   nodes.machine = { lib, config, pkgs, ... }: {
-    imports = [ ../modules/amazon-image.nix ];
     virtualisation.directBoot.enable = false;
     virtualisation.mountHostNixStore = false;
     virtualisation.useEFIBoot = true;
-
-    networking.hostName = lib.mkForce "";
   };
 
   testScript = { nodes, ... }: ''
