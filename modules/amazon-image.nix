@@ -8,7 +8,14 @@ in
     (modulesPath + "/image/repart.nix")
   ];
 
-  image.repart.name = "amazonImage";
+  system.build.imageInfo = pkgs.writers.writeJSON "image-info.json" {
+    label = config.system.nixos.label;
+    system = pkgs.stdenv.hostPlatform.system;
+    format = "raw";
+    file = "${config.system.build.image}/image.raw";
+  };
+
+  image.repart.name = "${config.system.nixos.distroId}-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
   image.repart.partitions = {
     "00-esp" = {
       contents = {
@@ -17,6 +24,7 @@ in
         "/EFI/BOOT/BOOT${lib.toUpper efiArch}.EFI".source =
           "${pkgs.systemd}/lib/systemd/boot/efi/systemd-boot${efiArch}.efi";
 
+        # TODO: nixos-generation-1.conf
         "/loader/entries/nixos.conf".source = pkgs.writeText "nixos.conf" ''
           title NixOS
           linux /EFI/nixos/kernel.efi

@@ -22,7 +22,7 @@ def upload_to_s3_if_not_exists(s3, bucket, key, file):
         s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
 
 
-def import_snapshot(ec2, s3_bucket, image_name):
+def import_snapshot(ec2, s3_bucket, image_name, image_format):
     """
     Import snapshot from S3 and wait for it to finish
 
@@ -37,7 +37,7 @@ def import_snapshot(ec2, s3_bucket, image_name):
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
-            "Format": "VHD",
+            "Format": image_format,
             "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
         },
         ClientToken=client_token,
@@ -141,7 +141,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         image_ids = dict(
             executor.map(
                 lambda target_region: copy_image(
-                    image_id, image_name, source_region, target_region['RegionName']
+                    image_id, image_name, source_region, target_region["RegionName"]
                 ),
                 target_regions,
             )
@@ -160,12 +160,11 @@ def upload_ami(image_info, s3_bucket, copy_to_regions):
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
-
     image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
     image_file = image_info["file"]
 
     upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
-    snapshot_id = import_snapshot(ec2, s3_bucket, image_name)
+    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_info["format"])
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
@@ -174,11 +173,10 @@ def upload_ami(image_info, s3_bucket, copy_to_regions):
     image_ids[ec2.meta.region_name] = image_id
 
     if copy_to_regions:
-        image_ids.update(copy_image_to_regions(
-            image_id, image_name, ec2.meta.region_name, regions
-        ))
+        image_ids.update(
+            copy_image_to_regions(image_id, image_name, ec2.meta.region_name, regions)
+        )
     return image_ids
-
 
 
 def cleanup_ami(image_name, region):
@@ -189,13 +187,16 @@ def cleanup_ami(image_name, region):
 
     if len(describe_images["Images"]) == 0:
         return
-    
+
     image_id = describe_images["Images"][0]["ImageId"]
-    snapshot_id = describe_images["Images"][0]["BlockDeviceMappings"][0]["Ebs"]["SnapshotId"]
+    snapshot_id = describe_images["Images"][0]["BlockDeviceMappings"][0]["Ebs"][
+        "SnapshotId"
+    ]
 
     ec2.deregister_image(ImageId=image_id)
     # TODO: Not fully idempotent because we can crash  between deregistering the image and deleting the snapshot
     ec2.delete_snapshot(SnapshotId=snapshot_id)
+
 
 def cleanup(image_info, s3_bucket):
     s3 = boto3.client("s3")
@@ -208,6 +209,7 @@ def cleanup(image_info, s3_bucket):
 
     for region in regions:
         cleanup_ami(image_name, region["RegionName"])
+
 
 if __name__ == "__main__":
     import argparse
@@ -226,7 +228,7 @@ if __name__ == "__main__":
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
-    image_ids =  {}
+    image_ids = {}
     if args.cleanup:
         cleanup(image_info, args.s3_bucket)
     else:

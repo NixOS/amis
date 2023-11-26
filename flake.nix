@@ -35,6 +35,16 @@
             };
             vendorHash = "sha256-T45abGVoiwxAEO60aPH3hUqiH6ON3aRhkrOFcOi+Bm8=";
           };
+
+          amazonImageInfo = (lib.nixosSystem {
+            pkgs = nixpkgs.legacyPackages.${system};
+            inherit system;
+            modules = [
+              self.nixosModules.amazonImage
+              self.nixosModules.version
+            ];
+          }).config.system.build.imageInfo;
+
           legacyAmazonImage = (lib.nixosSystem {
             inherit pkgs;
             inherit system;
@@ -49,15 +59,6 @@
       # systems that amazon supports
       lib.supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
 
-      nixosConfigurations = lib.genAttrs self.lib.supportedSystems
-        (system: lib.nixosSystem {
-          pkgs = nixpkgs.legacyPackages.${system};
-          inherit system;
-          modules = [
-            self.nixosModules.amazonImage
-            self.nixosModules.version
-          ];
-        });
 
       checks = lib.genAttrs self.lib.supportedSystems (system:
         let
