@@ -23,4 +23,4 @@ jobs:
         run: nix build .#amazonImageInfo --system ${{ matrix.system[1] }}
       - name: Upload AMIs
         run: |
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
+          nix develop --command python3 ./upload_ami/cli.py --image-info ./result --s3-bucket images20231124161256194400000001
