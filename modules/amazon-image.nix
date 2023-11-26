@@ -13,6 +13,7 @@ in
     system = pkgs.stdenv.hostPlatform.system;
     format = "raw";
     file = "${config.system.build.image}/image.raw";
+    boot_mode = "uefi";
   };
 
   image.repart.name = "${config.system.nixos.distroId}-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
