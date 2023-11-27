@@ -9,15 +9,6 @@ in
     ./amazon-profile.nix
   ];
 
-
-  system.build.imageInfo = pkgs.writers.writeJSON "image-info.json" {
-    label = config.system.nixos.label;
-    system = pkgs.stdenv.hostPlatform.system;
-    format = "raw";
-    file = "${config.system.build.image}/image.raw";
-    boot_mode = "uefi";
-  };
-
   system.build.amazonImage =
     # For some reason amazon doesn't like RAW files???
     pkgs.runCommand "amazon-image" { } ''
