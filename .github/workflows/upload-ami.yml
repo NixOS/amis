@@ -20,7 +20,7 @@ jobs:
           role-to-assume: arn:aws:iam::686862074153:role/deploy 
           aws-region: eu-central-1
       - name: Build AMI
-        run: nix build .#legacyAmazonImage --system ${{ matrix.system[1] }}
+        run: nix build .#nixosConfigurations.legacyAmazonImage-${{ matrix.system[1] }}.config.system.build.amazonImage
       - name: Upload AMIs
         run: |
           nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
