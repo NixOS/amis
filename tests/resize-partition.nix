@@ -5,6 +5,7 @@
     virtualisation.directBoot.enable = false;
     virtualisation.mountHostNixStore = false;
     virtualisation.useEFIBoot = true;
+    virtualisation.fileSystems = lib.mkForce {};
   };
 
   testScript = { nodes, ... }: ''
