@@ -10,7 +10,6 @@ in
   ];
 
   system.build.amazonImage =
-    # For some reason amazon doesn't like RAW files???
     pkgs.runCommand "amazon-image" { } ''
       mkdir -p $out
       mkdir -p $out/nix-support
