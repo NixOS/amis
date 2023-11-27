@@ -18,6 +18,21 @@ in
     boot_mode = "uefi";
   };
 
+  system.build.amazonImage =
+    # For some reason amazon doesn't like RAW files???
+    pkgs.runCommand "amazon-image" { } ''
+      mkdir -p $out
+      mkdir -p $out/nix-support
+      ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/image.raw $out/image.vhd
+      cat <<EOF > $out/nix-support/image-info.json
+      {
+        "label": "${config.system.nixos.label}",
+        "system": "${pkgs.stdenv.hostPlatform.system}",
+        "file": "$out/image.vhd"
+      }
+      EOF
+    '';
+
   image.repart.name = "${config.system.nixos.distroId}-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
   image.repart.partitions = {
     "00-esp" = {

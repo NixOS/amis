@@ -22,8 +22,7 @@ jobs:
           aws-region: eu-central-1
       - name: Build AMI
         run: |
-          nix build .#nixosConfigurations.amazonImage-x64_64-linux.config.system.build.imageInfo
+          nix build .#nixosConfigurations.amazonImage-x64_64-linux.config.system.build.amazonImage
       - name: Upload AMIs
         run: |
-          # nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result --s3-bucket images20231124161256194400000001
+          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
