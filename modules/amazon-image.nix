@@ -51,11 +51,11 @@ in
           options init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}
         '';
 
-        "/EFI/nixos/kernel.efi".source = "${config.system.build.kernel}/${config.system.boot.loader.kernelFile}";
-        # "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
+        "/EFI/nixos/kernel.efi".source =
+          "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
 
-        "/EFI/nixos/initrd.efi".source = "${config.system.build.toplevel}/initrd";
-        # "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}";
+        "/EFI/nixos/initrd.efi".source =
+          "${config.system.build.initialRamdisk}/${config.system.boot.loader.initrdFile}";
       };
       repartConfig = {
         Type = "esp";
@@ -70,6 +70,7 @@ in
         Label = "nixos";
         Format = "ext4";
         Minimize = "guess";
+        GrowFileSystem = true;
       };
     };
   };
@@ -80,10 +81,6 @@ in
   };
 
   fileSystems = {
-    "/boot" = {
-      device = "/dev/disk/by-partlabel/ESP";
-      fsType = "vfat";
-    };
     "/" = {
       device = "/dev/disk/by-partlabel/nixos";
       fsType = "ext4";
