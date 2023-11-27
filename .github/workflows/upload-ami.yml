@@ -1,3 +1,4 @@
+name: Upload Legacy Amazon Image
 permissions:
   id-token: write
 on:
