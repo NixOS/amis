@@ -35,7 +35,7 @@ in
           options init=${config.system.build.toplevel}/init ${toString config.boot.kernelParams}
         '';
 
-        "/EFI/nixos/kernel.efi".source = "${config.system.build.kernel}/Image";
+        "/EFI/nixos/kernel.efi".source = "${config.system.build.kernel}/${config.system.boot.loader.kernelFile}";
         # "${config.boot.kernelPackages.kernel}/${config.system.boot.loader.kernelFile}";
 
         "/EFI/nixos/initrd.efi".source = "${config.system.build.toplevel}/initrd";
