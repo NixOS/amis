@@ -164,7 +164,8 @@ def upload_ami(image_info, s3_bucket, copy_to_regions):
     image_file = image_info["file"]
 
     upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
-    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_info["format"])
+    image_format = image_info.get("format") or "VHD"
+    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_format)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
