@@ -9,16 +9,18 @@
     let inherit (nixpkgs) lib; in
 
     {
-      nixosModules.amazonImage = ./modules/amazon-image.nix;
-      nixosModules.mock-imds = ./modules/mock-imds.nix;
-
-      nixosModules.version = { config, ... }: {
-        system.stateVersion = config.system.nixos.release;
-        # NOTE: This will cause an image to be built per commit.
-        system.nixos.versionSuffix = lib.mkForce
-          ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
+      nixosModules = {
+        amazonImage = ./modules/amazon-image.nix;
+        mock-imds = ./modules/mock-imds.nix;
+        version = { config, ... }: {
+          system.stateVersion = config.system.nixos.release;
+          # NOTE: This will cause an image to be built per commit.
+          system.nixos.versionSuffix = lib.mkForce
+            ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
+        };
       };
 
+      lib.supportedSystems = [ "x86_64-linux" ];
 
       packages = lib.genAttrs self.lib.supportedSystems (system:
         let pkgs = nixpkgs.legacyPackages.${system};
@@ -36,32 +38,31 @@
             vendorHash = "sha256-T45abGVoiwxAEO60aPH3hUqiH6ON3aRhkrOFcOi+Bm8=";
           };
 
-          amazonImageInfo = (lib.nixosSystem {
-            pkgs = nixpkgs.legacyPackages.${system};
-            inherit system;
-            modules = [
-              self.nixosModules.amazonImage
-              self.nixosModules.version
-            ];
-          }).config.system.build.imageInfo;
-
-          legacyAmazonImage = (lib.nixosSystem {
-            inherit pkgs;
-            inherit system;
-            modules = [
-              (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
-              {
-                boot.loader.grub.enable = false;
-                boot.loader.systemd-boot.enable = true;
-              }
-              { ec2.efi = true; amazonImage.sizeMB = "auto"; }
-              self.nixosModules.version
-            ];
-          }).config.system.build.amazonImage;
         });
 
-      # systems that amazon supports
-      lib.supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
+      nixosConfigurations = {
+        amazonImage-x64_64-linux = lib.nixosSystem rec {
+          pkgs = nixpkgs.legacyPackages.${system};
+          system = "x86_64-linux";
+          modules = [
+            self.nixosModules.amazonImage
+            self.nixosModules.version
+          ];
+        };
+        legacyAmazonImage-x86_64-linux = lib.nixosSystem rec {
+          pkgs = nixpkgs.legacyPackages.${system};
+          system = "x86_64-linux";
+          modules = [
+            (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
+            {
+              boot.loader.grub.enable = false;
+              boot.loader.systemd-boot.enable = true;
+            }
+            { ec2.efi = true; amazonImage.sizeMB = "auto"; }
+            self.nixosModules.version
+          ];
+        };
+      };
 
 
       checks = lib.genAttrs self.lib.supportedSystems (system:
@@ -72,6 +73,7 @@
             node.specialArgs.selfPackages = self.packages.${system};
             defaults = { name, ... }: {
               imports = [
+                self.nixosModules.version
                 self.nixosModules.amazonImage
                 self.nixosModules.mock-imds
               ];

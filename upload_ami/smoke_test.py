@@ -14,10 +14,17 @@ def smoke_test(image_id, region):
     logging.info(f"Waiting for instance {instance_id} to be running")
     ec2.get_waiter("running").wait(InstanceIds=[instance_id])
 
+
+    tries = 5
     console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
-    # TODO: Make assertions about the console output
     output = console_output.get("Output")
+    while output is None:
+        time.sleep(10)
+        logging.info(f"Waiting for console output to become available ({tries} tries left)")
+        console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
+        output = console_output.get("Output")
     print(output)
+
 
     logging.info(f"Terminating instance {instance_id}")
     ec2.terminate_instances(InstanceIds=[instance_id])
