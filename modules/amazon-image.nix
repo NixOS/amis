@@ -26,6 +26,7 @@ in
       ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/image.raw $out/image.vhd
       cat <<EOF > $out/nix-support/image-info.json
       {
+        "boot_mode": "uefi",
         "label": "${config.system.nixos.label}",
         "system": "${pkgs.stdenv.hostPlatform.system}",
         "file": "$out/image.vhd"
