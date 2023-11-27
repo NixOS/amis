@@ -1,4 +1,4 @@
-name: Upload Legacy Amazon Image
+name: Upload Amazon Image
 permissions:
   id-token: write
 on:
@@ -21,7 +21,10 @@ jobs:
           role-to-assume: arn:aws:iam::686862074153:role/deploy 
           aws-region: eu-central-1
       - name: Build AMI
-        run: nix build .#nixosConfigurations.legacyAmazonImage-${{ matrix.system[1] }}.config.system.build.amazonImage
+        run: |
+          nix build .#nixosConfigurations.amazonImage-${{ matrix.system[1] }}.config.system.build.imageInfo
+          # run: nix build .#nixosConfigurations.legacyAmazonImage-${{ matrix.system[1] }}.config.system.build.amazonImage
       - name: Upload AMIs
         run: |
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
+          # nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
+          nix develop --command python3 ./upload_ami/cli.py --image-info ./result--s3-bucket images20231124161256194400000001
