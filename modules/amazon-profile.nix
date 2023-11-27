@@ -1,7 +1,6 @@
-{ lib,  config, pkgs, ...}:
+{ lib, modulesPath, config, pkgs, ... }:
 {
-  # TODO remove after debugging
-  boot.kernelParams = [ "debug" "efi=debug"];
+  boot.kernelParams = [ "console=ttyS0,115200n8" ];
   boot.loader = {
     timeout = 10; # NOTE: For Debugging
     systemd-boot.enable = true;
