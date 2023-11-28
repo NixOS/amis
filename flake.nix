@@ -26,6 +26,8 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          ec2-instance-connect = pkgs.callPackage ./packages/ec2-instance-connect.nix {
+          };
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
             version = "1.11.2";
