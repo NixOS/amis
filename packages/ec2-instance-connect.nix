@@ -11,6 +11,7 @@
 , gawk
 , gnused
 }:
+# TODO: This currently fails with exit code 1 and no helpful error message.
 let
   src = fetchFromGitHub {
     # https://github.com/aws/aws-ec2-instance-connect-config
