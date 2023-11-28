@@ -7,6 +7,6 @@
   };
   services.openssh = {
     authorizedKeysCommandUser = "ec2-instance-connect";
-    authorizedKeysCommand = "${selfPackages.ec2-instance-connect}/bin/ec2-instance-connect %u %f";
+    authorizedKeysCommand = "${selfPackages.ec2-instance-connect}/bin/aws-ec2-instance-connect-config %u %f";
   };
 }
