@@ -10,7 +10,7 @@ in
   ];
 
   system.build.amazonImage =
-    pkgs.runCommand "amazon-image" { } ''
+    pkgs.runCommand config.system.build.image.name { } ''
       mkdir -p $out
       mkdir -p $out/nix-support
       ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/image.raw $out/image.vhd
