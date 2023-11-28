@@ -21,7 +21,7 @@ let
   };
 in
 buildFHSEnv {
-  name = "aws-ec2-instance-connect-config";
+  name = "eic_run_authorized_keys";
   runScript = "${src}/src/bin/eic_run_authorized_keys";
   targetPkgs = (p: with p; [
     coreutils
