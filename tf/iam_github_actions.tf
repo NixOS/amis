@@ -54,3 +54,7 @@ resource "aws_iam_role" "upload_ami" {
   assume_role_policy  = data.aws_iam_policy_document.assume_deploy.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
 }
+
+output "upload_ami_role_arn" {
+  value = aws_iam_role.upload_ami.arn
+}
