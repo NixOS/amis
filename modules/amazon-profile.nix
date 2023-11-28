@@ -1,5 +1,8 @@
 { lib, modulesPath, config, pkgs, ... }:
 {
+  # TODO: Remove after debugging
+  services.getty.autologinUser = "root";
+
   boot.kernelParams = [ "console=ttyS0,115200n8" ];
   boot.loader = {
     timeout = 10; # NOTE: For Debugging
