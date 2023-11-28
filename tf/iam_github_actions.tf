@@ -13,7 +13,7 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   thumbprint_list = ["ffffffffffffffffffffffffffffffffffffffff"]
 }
 
-data "aws_iam_policy_document" "github_actions" {
+data "aws_iam_policy_document" "assume_deploy" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
     effect  = "Allow"
@@ -32,17 +32,25 @@ data "aws_iam_policy_document" "github_actions" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.repo}:*"]
+      values   = ["repo:${var.repo}:ref/refs/heads/main"]
     }
   }
 }
 
 resource "aws_iam_role" "deploy" {
   name                = "deploy"
-  assume_role_policy  = data.aws_iam_policy_document.github_actions.json
+  assume_role_policy  = data.aws_iam_policy_document.assume_deploy.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
 }
 
 output "deploy_role_arn" {
   value = aws_iam_role.deploy.arn
+}
+
+
+# TODO: Tighten rules
+resource "aws_iam_role" "upload_ami" {
+  name                = "upload-ami"
+  assume_role_policy  = data.aws_iam_policy_document.assume_deploy.json
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
 }

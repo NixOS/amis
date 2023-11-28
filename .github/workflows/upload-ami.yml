@@ -18,7 +18,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::686862074153:role/deploy 
+          role-to-assume: arn:aws:iam::686862074153:role/upload-ami
           aws-region: eu-central-1
       - name: Build AMI
         run: |

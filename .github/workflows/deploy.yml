@@ -1,0 +1,25 @@
+name: Deploy
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v7
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::686862074153:role/deploy 
+          aws-region: eu-central-1
+      - name: init
+        run: |
+          cd tf
+          nix develop --command ./tofu-init.sh
+      - name: plan
+        run: nix develop --command tofu plan -out=tfplan
+      - name: apply
+        run: nix develop --command tofu apply tfplan
+

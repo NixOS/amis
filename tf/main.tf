@@ -13,6 +13,7 @@ resource "aws_s3_bucket" "images" {
   force_destroy = true
 }
 
+
 resource "aws_iam_role" "vmimport" {
   name               = "vmimport"
   assume_role_policy = <<EOF

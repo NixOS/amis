@@ -6,13 +6,13 @@ def smoke_test(image_id, region):
 
     # TODO per architecture
     logging.info("Starting instance")
-    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t3a.nano", MinCount=1, MaxCount=1)
+    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t3a.nano", MinCount=1, MaxCount=1, ClientToken=image_id)
 
     instance_id = run_instances["Instances"][0]["InstanceId"]
 
     # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
     logging.info(f"Waiting for instance {instance_id} to be running")
-    ec2.get_waiter("running").wait(InstanceIds=[instance_id])
+    ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
 
 
     tries = 5
