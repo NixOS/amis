@@ -10,6 +10,7 @@
 
     {
       nixosModules = {
+        ec2-instance-connect = ./modules/ec2-instance-connect.nix;
         amazonImage = ./modules/amazon-image.nix;
         mock-imds = ./modules/mock-imds.nix;
         version = { config, ... }: {
@@ -44,14 +45,17 @@
 
       nixosConfigurations = {
         amazonImage-x64_64-linux = lib.nixosSystem rec {
+          specialArgs.selfPackages = self.packages.${system};
           pkgs = nixpkgs.legacyPackages.${system};
           system = "x86_64-linux";
           modules = [
+            self.nixosModules.ec2-instance-connect
             self.nixosModules.amazonImage
             self.nixosModules.version
           ];
         };
         legacyAmazonImage-x86_64-linux = lib.nixosSystem rec {
+          specialArgs.selfPackages = self.packages.${system};
           pkgs = nixpkgs.legacyPackages.${system};
           system = "x86_64-linux";
           modules = [
