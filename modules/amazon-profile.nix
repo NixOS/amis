@@ -45,6 +45,7 @@
 
     serviceConfig = { Type = "oneshot"; };
 
+    # TODO: For some reason /public-keys/ returns a 404 shortly after boot.
     script = ''
       token=$(${pkgs.curl}/bin/curl --silent --show-error --fail-with-body --retry 20 --retry-connrefused  -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 60") || exit 1
       function imds {
