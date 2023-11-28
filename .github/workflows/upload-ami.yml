@@ -25,4 +25,4 @@ jobs:
           aws-region: eu-central-1
       - name: Upload AMIs
         run: |
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --build-number ${{ github.run_id}}
+          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --run-id ${{ github.run_id}}
