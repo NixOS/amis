@@ -16,8 +16,8 @@
         version = { config, ... }: {
           system.stateVersion = config.system.nixos.release;
           # NOTE: This will cause an image to be built per commit.
-          system.nixos.versionSuffix = lib.mkForce
-            ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
+          # system.nixos.versionSuffix = lib.mkForce
+          #  ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
         };
       };
 
@@ -27,8 +27,7 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          ec2-instance-connect = pkgs.callPackage ./packages/ec2-instance-connect.nix {
-          };
+          ec2-instance-connect = pkgs.callPackage ./packages/ec2-instance-connect.nix { };
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
             version = "1.11.2";

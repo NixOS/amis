@@ -4,8 +4,8 @@ permissions:
 on:
   workflow_dispatch:
 jobs:
-  upload-legacy-image:
-    name:  Legacy Amazon Image
+  upload-ng-image:
+    name: Next Generation Amazon Image
     runs-on: ${{ matrix.system[0] }}
     strategy:
       matrix:
@@ -25,4 +25,4 @@ jobs:
           aws-region: eu-central-1
       - name: Upload AMIs
         run: |
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001
+          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --build-number ${{ github.run_id}}

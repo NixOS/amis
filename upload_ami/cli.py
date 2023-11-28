@@ -1,6 +1,7 @@
 import json
 import hashlib
 import logging
+import os
 import boto3
 import botocore
 import botocore.exceptions
@@ -22,7 +23,7 @@ def upload_to_s3_if_not_exists(s3, bucket, key, file):
         s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
 
 
-def import_snapshot(ec2, s3_bucket, image_name, image_format):
+def import_snapshot(ec2, s3_bucket, image_file, image_format):
     """
     Import snapshot from S3 and wait for it to finish
 
@@ -30,15 +31,15 @@ def import_snapshot(ec2, s3_bucket, image_name, image_format):
 
     Returns the snapshot id
     """
-    logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
-    client_token = hashlib.sha256(image_name.encode()).hexdigest()
+    logging.info(f"Importing s3://{s3_bucket}/{image_file} to EC2")
+    client_token = hashlib.sha256(image_file.encode()).hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
     # thus if we can rely on the client token forever. E.g. what happens if I
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
             "Format": image_format,
-            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
+            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_file},
         },
         ClientToken=client_token,
     )
@@ -151,7 +152,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     return image_ids
 
 
-def upload_ami(image_info, s3_bucket, copy_to_regions):
+def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -160,12 +161,12 @@ def upload_ami(image_info, s3_bucket, copy_to_regions):
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
-    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
+    revision = "." + run_id if run_id else ""
+    image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
     image_file = image_info["file"]
-
-    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
+    upload_to_s3_if_not_exists(s3, s3_bucket, image_file, image_file)
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_format)
+    snapshot_id = import_snapshot(ec2, s3_bucket, image_file, image_format)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
@@ -221,6 +222,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
+    parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
@@ -233,5 +235,7 @@ if __name__ == "__main__":
     if args.cleanup:
         cleanup(image_info, args.s3_bucket)
     else:
-        image_ids = upload_ami(image_info, args.s3_bucket, args.copy_to_regions)
+        image_ids = upload_ami(
+            image_info, args.s3_bucket, args.copy_to_regions, args.run_id
+        )
         print(json.dumps(image_ids))
