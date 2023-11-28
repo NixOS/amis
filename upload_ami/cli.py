@@ -23,7 +23,7 @@ def upload_to_s3_if_not_exists(s3, bucket, key, file):
         s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
 
 
-def import_snapshot(ec2, s3_bucket, image_file, image_format):
+def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     """
     Import snapshot from S3 and wait for it to finish
 
@@ -31,15 +31,15 @@ def import_snapshot(ec2, s3_bucket, image_file, image_format):
 
     Returns the snapshot id
     """
-    logging.info(f"Importing s3://{s3_bucket}/{image_file} to EC2")
-    client_token = hashlib.sha256(image_file.encode()).hexdigest()
+    logging.info(f"Importing s3://{s3_bucket}/{s3_key} to EC2")
+    client_token = hashlib.sha256(s3_key.encode()).hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
     # thus if we can rely on the client token forever. E.g. what happens if I
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
             "Format": image_format,
-            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_file},
+            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": s3_key},
         },
         ClientToken=client_token,
     )
@@ -164,9 +164,12 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     revision = "." + run_id if run_id else ""
     image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
     image_file = image_info["file"]
-    upload_to_s3_if_not_exists(s3, s3_bucket, image_file, image_file)
+    s3_key = os.path.join(
+        os.path.basename(os.path.dirname(image_file)), os.path.basename(image_file)
+    )
+    upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot(ec2, s3_bucket, image_file, image_format)
+    snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
