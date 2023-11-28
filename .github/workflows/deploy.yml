@@ -1,4 +1,6 @@
 name: Deploy
+permissions:
+  id-token: write
 on:
   push:
     branches: 
@@ -19,7 +21,5 @@ jobs:
           cd tf
           nix develop --command ./tofu-init.sh
       - name: plan
-        run: nix develop --command tofu plan -out=tfplan
-      - name: apply
-        run: nix develop --command tofu apply tfplan
+        run: nix develop --command tofu plan
 
