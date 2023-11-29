@@ -11,7 +11,13 @@
     {
       nixosModules = {
         ec2-instance-connect = ./modules/ec2-instance-connect.nix;
+     
+        legacyAmazonProfile = nixpkgs + "nixos/modules/virtualisation/amazon-image.nix";
+        legacyAmazonImage = nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix";
+
+	amazonProfile = ./modules/amazon-profile.nix;
         amazonImage = ./modules/amazon-image.nix;
+
         mock-imds = ./modules/mock-imds.nix;
         version = { config, ... }: {
           system.stateVersion = config.system.nixos.release;
@@ -58,7 +64,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           system = "x86_64-linux";
           modules = [
-            (nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
+            self.nixosModules.legacyAmazonImage
             {
               boot.loader.grub.enable = false;
               boot.loader.systemd-boot.enable = true;
