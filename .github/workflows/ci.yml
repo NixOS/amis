@@ -8,14 +8,16 @@ on:
       - main
 jobs:
   check:
-    runs-on: ${{ matrix.system[0] }}
+    runs-on: ${{ matrix.runs-on.labels }}
     strategy:
       matrix:
-        system:
-          - [ubuntu-latest, x86_64-linux]
-          # TODO Graviton ARM
+        runs-on:
+          - labels: [ubuntu-latest]
+            system: x64_64-linux
+          - labels: [self-hosted, linux, ARM64]
+            system: aarch64-linux
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
-      - run: nix flake check --system ${{ matrix.system[1] }}
+      - run: nix flake check --system ${{ matrix.runs-on.system }}
