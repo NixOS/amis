@@ -7,7 +7,6 @@
     machine.start()
     machine.wait_for_unit("multi-user.target")
     machine.succeed("cat /home/ec2-user/.ssh/authorized_keys")
-    machine.succeed("false")
   '';
 
 }
