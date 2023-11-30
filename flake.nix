@@ -37,7 +37,7 @@
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
             version = "1.11.2";
-            noCheck = true; # check is flakey
+            doCheck = false; # check is flakey
             src = pkgs.fetchFromGitHub {
               owner = "aws";
               repo = "amazon-ec2-metadata-mock";
