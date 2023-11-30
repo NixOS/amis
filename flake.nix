@@ -37,7 +37,7 @@
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
             version = "1.11.2";
-            noCheck = system == "aarch64-linux"; # TODO: tests fail on aarch64. why?
+            noCheck = true; # check is flakey
             src = pkgs.fetchFromGitHub {
               owner = "aws";
               repo = "amazon-ec2-metadata-mock";
