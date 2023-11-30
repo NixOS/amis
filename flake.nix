@@ -27,7 +27,7 @@
         };
       };
 
-      lib.supportedSystems = [ "x86_64-linux" ];
+      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" ];
 
       packages = lib.genAttrs self.lib.supportedSystems (system:
         let pkgs = nixpkgs.legacyPackages.${system};
