@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
+        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
       - name: Build AMI
         run: |
           nix build .#nixosConfigurations.amazonImage-x64_64-linux.config.system.build.amazonImage

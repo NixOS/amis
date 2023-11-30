@@ -20,4 +20,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
+        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
       - run: nix flake check --system ${{ matrix.runs-on.system }}
