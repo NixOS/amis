@@ -18,7 +18,7 @@
         amazonProfile = ./modules/amazon-profile.nix;
         amazonImage = ./modules/amazon-image.nix;
 
-        mock-imds = ./modules/mock-imds.nixLegacy;
+        mock-imds = ./modules/mock-imds.nix;
         version = { config, ... }: {
           system.stateVersion = config.system.nixos.release;
           # NOTE: This will cause an image to be built per commit.
