@@ -21,5 +21,7 @@ jobs:
           cd tf
           nix develop --command ./tofu-init.sh
       - name: plan
-        run: nix develop --command tofu plan
+        run: |
+          cd tf
+          nix develop --command tofu plan
 
