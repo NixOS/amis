@@ -7,6 +7,7 @@ jobs:
   upload-ng-image:
     name: Next Generation Amazon Image
     runs-on: ${{ matrix.runs-on.labels }}
+    environment: images
     strategy:
       matrix:
         runs-on:
