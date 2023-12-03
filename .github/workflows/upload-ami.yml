@@ -3,6 +3,8 @@ permissions:
   id-token: write
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 jobs:
   upload-ng-image:
     name: Next Generation Amazon Image
