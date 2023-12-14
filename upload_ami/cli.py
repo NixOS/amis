@@ -76,7 +76,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
         tpmsupport = { }
-        if architecture == "x86_64":
+        if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
             tpmsupport['TpmSupport'] = "v2.0" 
         register_image = ec2.register_image(
             Name=image_name,
