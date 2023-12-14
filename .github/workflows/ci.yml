@@ -21,5 +21,8 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
         if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
+        #TODO: aarch64-linux build is crashing the runner
       - run: nix build .#amazonImage -L --system ${{ matrix.runs-on.system }}
+        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
       - run: nix flake check -L --system ${{ matrix.runs-on.system }}
+        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
