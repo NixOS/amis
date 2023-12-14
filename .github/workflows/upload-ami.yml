@@ -6,25 +6,23 @@ on:
   push:
     branches: [main]
 jobs:
-  upload-ng-image:
-    name: Next Generation Amazon Image
-    runs-on: ${{ matrix.runs-on.labels }}
+  upload-legacy-image:
+    name: Upload Legacy Amazon Image
+    runs-on: ubuntu-latest
     environment: images
     strategy:
       matrix:
-        runs-on:
-          - labels: [ubuntu-latest]
-            system: x64_64-linux
-          - labels: [self-hosted, linux, ARM64]
-            system: aarch64-linux
+        system:
+          - x86_64-linux
+          - aarch64-linux
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v7
       - uses: DeterminateSystems/magic-nix-cache-action@v2
-        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
-      - name: Build AMI
+      - name: Download AMI from Hydra
         run: |
-          nix build .#amazonImage
+          out=$(curl --location --silent --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
+          nix-store --realise $out --add-root ./result
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::686862074153:role/upload-ami
