@@ -13,7 +13,7 @@ jobs:
       matrix:
         runs-on:
           - labels: [ubuntu-latest]
-            system: x64_64-linux
+            system: x86_64-linux
           - labels: [self-hosted, linux, ARM64]
             system: aarch64-linux
     steps:
