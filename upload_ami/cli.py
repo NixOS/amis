@@ -75,6 +75,9 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             raise Exception("Unknown system: " + image_info["system"])
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
+        tpmsupport = { }
+        if architecture == "x86_64":
+            tpmsupport['TpmSupport'] = "v2.0" 
         register_image = ec2.register_image(
             Name=image_name,
             Architecture=architecture,
@@ -93,7 +96,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             EnaSupport=True,
             ImdsSupport="v2.0",
             SriovNetSupport="simple",
-            TpmSupport="v2.0" if architecture == "x86_64" else None,
+            **tpmsupport
         )
         image_id = register_image["ImageId"]
 
