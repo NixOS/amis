@@ -69,7 +69,8 @@ resource "aws_iam_role" "plan" {
   name               = "plan"
   assume_role_policy = data.aws_iam_policy_document.assume_plan.json
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/ReadOnlyAccess"
+    "arn:aws:iam::aws:policy/ReadOnlyAccess",
+    aws_iam_policy.state.arn,
   ]
 }
 
