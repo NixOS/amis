@@ -1,5 +1,6 @@
 name: Upload Amazon Image
 permissions:
+  contents: read
   id-token: write
 on:
   workflow_dispatch:

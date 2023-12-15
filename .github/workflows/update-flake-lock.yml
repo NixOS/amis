@@ -4,7 +4,9 @@ on:
   schedule:
     # daily
     - cron: "0 0 * * *"
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   update-flake-lock:
     runs-on: ubuntu-latest
