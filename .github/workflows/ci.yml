@@ -14,8 +14,8 @@ jobs:
         runs-on:
           - labels: [ubuntu-latest]
             system: x86_64-linux
-          - labels: [self-hosted, linux, ARM64]
-            system: aarch64-linux
+          # - labels: [self-hosted, linux, ARM64]
+          #  system: aarch64-linux
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@5620eb4af6b562c53e4d4628c0b6e4f9d9ae8612 # v7
