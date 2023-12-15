@@ -32,7 +32,10 @@ data "aws_iam_policy_document" "assume_plan" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.repo}:pull_request"]
+      values   = [
+        "repo:${var.repo}:pull_request",
+        "repo:${var.repo}:ref:refs/heads/main",
+        ]
     }
   }
 }
