@@ -103,7 +103,7 @@
           };
         });
 
-      devShells = lib.genAttrs self.lib.supportedSystems (system: {
+      devShells = lib.genAttrs ["x86_64-linux" "aarch64-darwin"] (system: {
         default = let pkgs = nixpkgs.legacyPackages.${system}; in pkgs.mkShell {
           nativeBuildInputs = [
             pkgs.awscli2
