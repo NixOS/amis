@@ -46,11 +46,12 @@ jobs:
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
         with:
           name: tfplan
-          path: tfplan
+          path: tf/tfplan
 
       - name: Create String Output
         id: tf-plan-string
         run: |
+          cd tf
           TERRAFORM_PLAN=$(nix develop --command tofu show -no-color tfplan)
           
           delimiter="$(openssl rand -hex 8)"
@@ -88,6 +89,7 @@ jobs:
         uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4 # v4
         with:
           name: tfplan
+          path: tf/tfplan
       - name: init
         run: |
           cd tf
