@@ -4,9 +4,15 @@ permissions:
   contents: read
 on:
   push:
+    paths:
+      - 'tf/**'
+      - '.github/workflows/deploy.yml'
     branches: 
       - main
   pull_request:
+    paths:
+      - 'tf/**'
+      - '.github/workflows/deploy.yml'
     branches: 
       - main
 jobs:
