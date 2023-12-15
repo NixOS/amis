@@ -37,10 +37,40 @@ data "aws_iam_policy_document" "assume_plan" {
   }
 }
 
+data "aws_iam_policy_document" "state" {
+  statement {
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+    ]
+    effect    = "Allow"
+    resources = [data.terraform_remote_state.state_backend.outputs.dynamodb_table_arn]
+  }
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+    ]
+    effect    = "Allow"
+    resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
+
+  }
+}
+
+
+resource "aws_iam_policy" "state" {
+  name   = "state"
+  policy = data.aws_iam_policy_document.state.json
+}
+
 resource "aws_iam_role" "plan" {
-  name                = "plan"
-  assume_role_policy  = data.aws_iam_policy_document.assume_plan.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
+  name               = "plan"
+  assume_role_policy = data.aws_iam_policy_document.assume_plan.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/ReadOnlyAccess"
+  ]
 }
 
 output "plan_role_arn" {
@@ -101,10 +131,10 @@ data "aws_iam_policy_document" "assume_upload_ami" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         "repo:${var.repo}:environment:images",
         "repo:${var.repo}:environment:amis",
-        ]
+      ]
     }
   }
 }

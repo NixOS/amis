@@ -8,6 +8,13 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+data "terraform_remote_state" "state_backend" {
+  backend = "local"
+  config = {
+    path = "./state-backend/terraform.tfstate"
+  }
+}
+
 resource "aws_s3_bucket" "images" {
   bucket_prefix = "images"
   force_destroy = true
