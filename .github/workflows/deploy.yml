@@ -34,7 +34,7 @@ jobs:
         id: plan
         run: |
           cd tf
-          nix develop --command tofu plan -detailed-exitcode -out tfplan  || export exitcode=$?
+          nix develop --command tofu plan -detailed-exitcode -out tfplan && export exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           if [ $exitcode -eq 1 ]; then
             exit 1
