@@ -32,7 +32,10 @@ data "aws_iam_policy_document" "assume_deploy" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.repo}:ref:refs/heads/main"]
+      values = [
+        "repo:${var.repo}:ref:refs/heads/main",
+        "repo:${var.repo}:environment:images",
+      ]
     }
   }
 }
