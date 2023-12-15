@@ -34,8 +34,10 @@ jobs:
         id: plan
         run: |
           cd tf
+          set +e
           nix shell --inputs-from . nixpkgs#opentofu --command tofu plan -detailed-exitcode -out tfplan
           export exitcode=$?
+          set -e
           echo "exitcode=$exitcode" >> "$GITHUB_OUTPUT"
           if [ $exitcode -eq 1 ]; then
             exit 1
