@@ -4,12 +4,13 @@ on:
   schedule:
     # daily
     - cron: "0 0 * * *"
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 jobs:
   update-flake-lock:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
