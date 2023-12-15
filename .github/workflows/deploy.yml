@@ -7,8 +7,12 @@ on:
     branches: 
       - main
 jobs:
-  deploy:
+  plan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
@@ -24,5 +28,29 @@ jobs:
       - name: plan
         run: |
           cd tf
-          nix develop --command tofu plan
+          nix develop --command tofu plan -detailed-exitcode -out tfplan  || export exitcode=$?
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          if [ $exitcode -eq 1 ]; then
+            exit 1
+          else 
+            exit 0
+          fi
+      - name: publish plan
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
+        with:
+          name: tfplan
+          path: tfplan
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment: infra
+    steps:
+      - name: init
+        run: |
+          cd tf
+          nix develop --command ./tofu-init.sh
+      - name: apply
+        run: |
+          cd tf
+          nix develop --command tofu apply
 
