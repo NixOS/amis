@@ -137,6 +137,7 @@ data "aws_iam_policy_document" "assume_upload_ami" {
       variable = "token.actions.githubusercontent.com:sub"
       values = [
         "repo:${var.repo}:environment:images",
+        "repo:${var.repo}:environment:amis",
       ]
     }
   }
