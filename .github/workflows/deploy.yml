@@ -29,12 +29,12 @@ jobs:
       - name: init
         run: |
           cd tf
-          nix develop --command ./tofu-init.sh
+          nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
       - name: plan
         id: plan
         run: |
           cd tf
-          nix develop --command tofu plan -detailed-exitcode -out tfplan && export exitcode=$?
+          nix shell --inputs-from . nixpkgs#opentofu --command tofu plan -detailed-exitcode -out tfplan && export exitcode=$?
           echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
           if [ $exitcode -eq 1 ]; then
             exit 1
@@ -52,7 +52,7 @@ jobs:
         id: tf-plan-string
         run: |
           cd tf
-          TERRAFORM_PLAN=$(nix develop --command tofu show -no-color tfplan)
+          TERRAFORM_PLAN=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu show -no-color tfplan)
           
           delimiter="$(openssl rand -hex 8)"
           echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
@@ -93,9 +93,9 @@ jobs:
       - name: init
         run: |
           cd tf
-          nix develop --command ./tofu-init.sh
+          nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
       - name: apply
         run: |
           cd tf
-          nix develop --command tofu apply -auto-approve tfplan
+          nix shell --inputs-from . nixpkgs#opentofu --command tofu apply -auto-approve tfplan
 
