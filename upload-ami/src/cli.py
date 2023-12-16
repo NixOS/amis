@@ -218,8 +218,7 @@ def cleanup(image_info, s3_bucket):
     for region in regions:
         cleanup_ami(image_name, region["RegionName"])
 
-
-if __name__ == "__main__":
+def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
@@ -245,3 +244,6 @@ if __name__ == "__main__":
             image_info, args.s3_bucket, args.copy_to_regions, args.run_id
         )
         print(json.dumps(image_ids))
+
+if __name__ == "__main__":
+    main()

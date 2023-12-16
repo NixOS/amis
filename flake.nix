@@ -46,6 +46,7 @@
             };
             vendorHash = "sha256-T45abGVoiwxAEO60aPH3hUqiH6ON3aRhkrOFcOi+Bm8=";
           };
+          upload-ami = pkgs.python3Packages.callPackage ./upload-ami {};
 
           amazonImage = (nixpkgs.lib.nixosSystem {
             specialArgs.selfPackages = self.packages.${system};

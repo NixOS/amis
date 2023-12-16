@@ -2,7 +2,8 @@ import logging
 import boto3
 
 
-def nuke():
+def main():
+    logging.basicConfig(level=logging.INFO)
     ec2 = boto3.client("ec2", region_name="us-east-1")
 
     regions = ec2.describe_regions()["Regions"]
@@ -23,5 +24,4 @@ def nuke():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    nuke()
+    main()
