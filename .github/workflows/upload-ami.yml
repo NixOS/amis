@@ -29,5 +29,4 @@ jobs:
           role-to-assume: arn:aws:iam::686862074153:role/upload-ami
           aws-region: eu-central-1
       - name: Upload AMIs
-        run: |
-          nix develop --command python3 ./upload_ami/cli.py --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --run-id ${{ github.run_id}}
+        run: nix run .#upload-ami -- --image-info ./result/nix-support/image-info.json --s3-bucket images20231124161256194400000001 --run-id ${{ github.run_id}}
