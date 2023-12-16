@@ -75,9 +75,9 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             raise Exception("Unknown system: " + image_info["system"])
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
-        tpmsupport = { }
+        tpmsupport = {}
         if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-            tpmsupport['TpmSupport'] = "v2.0" 
+            tpmsupport["TpmSupport"] = "v2.0"
         register_image = ec2.register_image(
             Name=image_name,
             Architecture=architecture,
@@ -96,13 +96,21 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
             EnaSupport=True,
             ImdsSupport="v2.0",
             SriovNetSupport="simple",
-            **tpmsupport
+            **tpmsupport,
         )
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
     return image_id
 
+def make_image_public(ec2, image_id: str):
+    """
+    Set launch permissions for image
+    """
+    ec2.modify_image_attribute(
+        ImageId=image_id,
+        LaunchPermission={"Add": [{"Group": "all"}]},
+    )
 
 def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     """
@@ -139,6 +147,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         logging.info(
             f"Finished image {image_id} from {source_region} to {target_region_name}"
         )
+        make_image_public(ec2r, copy_image["ImageId"])
         return (target_region_name, copy_image["ImageId"])
 
     with ThreadPoolExecutor() as executor:
@@ -153,6 +162,8 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
 
     image_ids[source_region] = image_id
     return image_ids
+
+
 
 
 def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
@@ -174,6 +185,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
+    make_image_public(ec2, image_id)
 
     regions = ec2.describe_regions()["Regions"]
 
