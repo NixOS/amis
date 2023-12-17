@@ -77,7 +77,6 @@ data "aws_iam_policy_document" "state" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:HeadObject",
       "s3:PutObject",
       "s3:DeleteObject",
     ]
@@ -99,7 +98,7 @@ data "aws_iam_policy_document" "write_state" {
 
 resource "aws_iam_policy" "write_state" {
   name   = "write-state"
-  policy = data.aws_iam_policy_document.write_state.json
+  policy = data.aws_iam_policy_document.write_state.json 
 }
 
 resource "aws_iam_policy" "state" {
@@ -224,7 +223,7 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:HeadObject",
+      "s3:GetObject",
       "s3:PutObject",
     ]
     resources = ["${aws_s3_bucket.images.arn}/*"]
