@@ -38,9 +38,11 @@ def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
+            "Description": s3_key,
             "Format": image_format,
             "UserBucket": {"S3Bucket": s3_bucket, "S3Key": s3_key},
         },
+        Description=s3_key,
         ClientToken=client_token,
     )
     ec2.get_waiter("snapshot_imported").wait(
@@ -154,8 +156,14 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     image_ids[source_region] = image_id
     return image_ids
 
+def get_name(image_info, prefix, run_id):
+    revision = "." + run_id if run_id else ""
+    image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
+    image_name = prefix + image_name if prefix else image_name
+    return image_name
 
-def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
+
+def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -164,8 +172,6 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
-    revision = "." + run_id if run_id else ""
-    image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
     image_file = image_info["file"]
     s3_key = os.path.join(
         os.path.basename(os.path.dirname(image_file)), os.path.basename(image_file)
@@ -173,6 +179,8 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
+
+    image_name  = get_name(image_info, prefix, run_id)
     image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
@@ -186,38 +194,6 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
         )
     return image_ids
 
-
-def cleanup_ami(image_name, region):
-    ec2 = boto3.client("ec2", region_name=region)
-    describe_images = ec2.describe_images(
-        Owners=["self"], Filters=[{"Name": "name", "Values": [image_name]}]
-    )
-
-    if len(describe_images["Images"]) == 0:
-        return
-
-    image_id = describe_images["Images"][0]["ImageId"]
-    snapshot_id = describe_images["Images"][0]["BlockDeviceMappings"][0]["Ebs"][
-        "SnapshotId"
-    ]
-
-    ec2.deregister_image(ImageId=image_id)
-    # TODO: Not fully idempotent because we can crash  between deregistering the image and deleting the snapshot
-    ec2.delete_snapshot(SnapshotId=snapshot_id)
-
-
-def cleanup(image_info, s3_bucket):
-    s3 = boto3.client("s3")
-
-    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
-
-    s3.delete_object(Bucket=s3_bucket, Key=image_name)
-
-    regions = boto3.client("ec2").describe_regions()["Regions"]
-
-    for region in regions:
-        cleanup_ami(image_name, region["RegionName"])
-
 def main():
     import argparse
 
@@ -227,6 +203,7 @@ def main():
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
+    parser.add_argument("--prefix", help="Prefix to prepend to image name")
     parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
 
@@ -237,13 +214,10 @@ def main():
         image_info = json.load(f)
 
     image_ids = {}
-    if args.cleanup:
-        cleanup(image_info, args.s3_bucket)
-    else:
-        image_ids = upload_ami(
-            image_info, args.s3_bucket, args.copy_to_regions, args.run_id
-        )
-        print(json.dumps(image_ids))
+    image_ids = upload_ami(
+        image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id
+    )
+    print(json.dumps(image_ids))
 
 if __name__ == "__main__":
     main()
