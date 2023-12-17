@@ -32,11 +32,11 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::686862074153:role/plan 
           aws-region: eu-central-1
-      - name: init
+      - name: Init
         run: |
           cd tf
           nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
-      - name: plan
+      - name: Plan
         id: plan
         run: |
           cd tf
@@ -51,13 +51,13 @@ jobs:
             exit 0
           fi
 
-      - name: publish plan
+      - name: Publish plan
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
         with:
           name: tfplan
           path: tf/tfplan
 
-      - name: Create String Output
+      - name: Create string output
         id: tf-plan-string
         run: |
           cd tf
@@ -94,7 +94,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::686862074153:role/deploy
           aws-region: eu-central-1
-      - name: download plan
+      - name: Download plan
         uses: actions/download-artifact@7a1cd3216ca9260cd8022db641d960b1db4d1be4 # v4
         with:
           name: tfplan
@@ -103,7 +103,7 @@ jobs:
         run: |
           cd tf
           nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
-      - name: apply
+      - name: Apply plan
         run: |
           cd tf
           nix shell --inputs-from . nixpkgs#opentofu --command tofu apply -auto-approve tfplan
