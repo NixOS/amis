@@ -6,6 +6,7 @@ import logging
 
 def smoke_test(image_id, region):
     ec2 = boto3.client("ec2", region_name=region)
+    print(image_id)
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
     assert len(images["Images"]) == 1
