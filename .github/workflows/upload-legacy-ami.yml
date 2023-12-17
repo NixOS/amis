@@ -42,13 +42,8 @@ jobs:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
           aws-region: ${{ env.AWS_REGION }}
 
-      # NOTE: We do not pass run-id as we're not  building the image ourselves
-      # and we thus need to poll hydra periodically.  Including the run-id would
-      # cause us to register  the same snapshot as an image over and over again
-      # for each run.
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
-        if: false
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
@@ -61,13 +56,25 @@ jobs:
       - name: Smoke test
         id: smoke_test
         # NOTE: make sure smoke test isn't cancelled. Such that instance gets cleaned up.
-        if: always()
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}"
+          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id"
 
+      - name: Clean up smoke test
+        if: ${{ cancelled() }}
+        run: |
+          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
+          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+          run_id='${{ github.run_id }}'
+          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id" --cancel
+      
+
+      # NOTE: We do not pass run-id as we're not  building the image ourselves
+      # and we thus need to poll hydra periodically.  Including the run-id would
+      # cause us to register  the same snapshot as an image over and over again
+      # for each run.
       - name: Upload AMIs to all available regions
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'

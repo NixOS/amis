@@ -4,7 +4,7 @@ import argparse
 import logging
 
 
-def smoke_test(image_id, region, run_id):
+def smoke_test(image_id, region, run_id, cancel):
     ec2 = boto3.client("ec2", region_name=region)
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
@@ -30,23 +30,22 @@ def smoke_test(image_id, region, run_id):
 
     instance_id = run_instances["Instances"][0]["InstanceId"]
 
-
-    # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
-    logging.info(f"Waiting for instance {instance_id} to be running")
-    ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
-
     try:
-        tries = 5
-        console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
-        output = console_output.get("Output")
-        while output is None:
-            time.sleep(10)
-            logging.info(
-                f"Waiting for console output to become available ({tries} tries left)"
-            )
+        if not cancel:
+            # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
+            logging.info(f"Waiting for instance {instance_id} to be running")
+            ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
+            tries = 5
             console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
             output = console_output.get("Output")
-        print(output)
+            while output is None:
+                time.sleep(10)
+                logging.info(
+                    f"Waiting for console output to become available ({tries} tries left)"
+                )
+                console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
+                output = console_output.get("Output")
+            print(output)
     finally:
         logging.info(f"Terminating instance {instance_id}")
         ec2.terminate_instances(InstanceIds=[instance_id])
@@ -60,9 +59,10 @@ def main():
     parser.add_argument("--image-id", required=True)
     parser.add_argument("--region", required=True)
     parser.add_argument("--run-id", required=False)
+    parser.add_argument("--cancel", action="store_true", required=False)
     args = parser.parse_args()
 
-    smoke_test(args.image_id, args.region, args.run_id)
+    smoke_test(args.image_id, args.region, args.run_id, args.cancel)
 
 
 if __name__ == "__main__":
