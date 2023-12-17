@@ -49,6 +49,8 @@ data "aws_iam_policy_document" "assume_plan" {
       values = [
         "repo:${var.repo}:pull_request",
         "repo:${var.repo}:ref:refs/heads/main",
+        "repo:${var.repo}:environment:images",
+        "repo:${var.repo}:environment:infra",
       ]
     }
   }
@@ -81,6 +83,43 @@ resource "aws_iam_policy" "state" {
   name   = "state"
   policy = data.aws_iam_policy_document.state.json
 }
+
+data "aws_iam_policy_document" "assume_state" {
+  source_policy_documents = [data.aws_iam_policy_document.assume_AdministratorAccess.json]
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = aws_iam_openid_connect_provider.github_actions.client_id_list
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values = [
+        "repo:${var.repo}:environment:infra",
+        "repo:${var.repo}:environment:images",
+        "repo:${var.repo}:ref:refs/heads/main",
+        "repo:${var.repo}:pull_request",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "state" {
+  name                = "state"
+  assume_role_policy  = data.aws_iam_policy_document.assume_state.json
+  managed_policy_arns = [aws_iam_policy.state.arn]
+}
+
 
 resource "aws_iam_role" "plan" {
   name               = "plan"
