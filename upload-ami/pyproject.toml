@@ -11,3 +11,4 @@ dependencies = [
 [project.scripts]
 upload-ami = "upload_ami.cli:main"
 nuke = "upload_ami.nuke:main"
+smoke-test = "upload_ami.smoke_test:main"

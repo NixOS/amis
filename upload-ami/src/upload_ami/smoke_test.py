@@ -1,5 +1,7 @@
 import boto3
 import time
+import argparse
+import logging
 
 def smoke_test(image_id, region):
     ec2 = boto3.client("ec2", region_name=region)
@@ -31,9 +33,7 @@ def smoke_test(image_id, region):
     ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
 
 
-if __name__ == "__main__":
-    import argparse
-    import logging
+def main():
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser()
@@ -42,3 +42,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     smoke_test(args.image_id, args.region)
+
+
+if __name__ == "__main__":
+    main()

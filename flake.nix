@@ -72,6 +72,18 @@
           }).config.system.build.amazonImage;
 
         });
+      
+      apps = lib.genAttrs self.lib.supportedSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system}; in {
+          nuke = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/nuke";
+          };
+          smoke-test = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/smoke-test";
+          };
+        });
 
 
       # TODO: unfortunately I don't have access to a aarch64-linux hardware with virtualisation support

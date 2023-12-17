@@ -11,11 +11,6 @@ def main():
     for region in regions:
         ec2r = boto3.client("ec2", region_name=region["RegionName"])
         logging.info(f"Nuking {region['RegionName']}")
-        images = ec2r.describe_images(
-            Owners=["self"], Filters=[{"Name": "name", "Values": ["nixos-*"]}]
-        )
-
-
         snapshots = ec2r.describe_snapshots(OwnerIds=["self"])
         for snapshot in snapshots["Snapshots"]:
 
