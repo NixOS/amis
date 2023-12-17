@@ -72,6 +72,7 @@ data "aws_iam_policy_document" "state" {
     actions = [
       "s3:ListBucket",
       "s3:GetObject",
+      "s3:HeadObject",
     ]
     resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
 
