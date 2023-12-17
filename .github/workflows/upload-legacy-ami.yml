@@ -34,7 +34,7 @@ jobs:
         id: download_ami
         run: |
           out=$(curl --location --silent --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
-          nix-store --realise $out --add-root ./result
+          nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
       - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
