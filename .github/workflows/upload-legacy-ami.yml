@@ -63,25 +63,29 @@ jobs:
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
         run: |
+          image_info="${{ steps.download_ami.outputs.image_info }}"
+          images_bucket="${{ steps.get_bucket_name.outputs.images_bucket }}"
           image_ids=$(nix run .#upload-ami -- \
-            --image-info "${{ steps.download_ami.outputs.image_info }}" \
+            --image-info "$image_info" \
             --prefix "staging-legacy/" \
-            --s3-bucket "${{ steps.get_bucket_name.outputs.images_bucket }}")
+            --s3-bucket "$images_bucket" \
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test
         id: smoke_test
         run: |
-          image_ids=${{ steps.upload_smoke_test_ami.outputs.image_ids }}
+          image_ids="${{ steps.upload_smoke_test_ami.outputs.image_ids }}"
           image_id=$(echo  "$amis" | jq -r '.["${{ env.AWS_REGION }}"]')
           nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}"
 
       - name: Upload AMIs to all available regions
         run: |
+          image_info="${{ steps.download_ami.outputs.image_info }}"
+          images_bucket="${{ steps.get_bucket_name.outputs.images_bucket }}"
           image_ids=$(nix run .#upload-ami -- \
-            --image-info "${{ steps.download_ami.outputs.image_info }} \
+            --image-info "$image_info" \
             --prefix "legacy/" \
-            --s3-bucket "${{ steps.get_bucket_name.outputs.images_bucket }}" \
+            --s3-bucket "$images_bucket" \
             --copy-to-regions)
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
 
