@@ -46,24 +46,28 @@ jobs:
       # and we thus need to poll hydra periodically.  Including the run-id would
       # cause us to register  the same snapshot as an image over and over again
       # for each run.
-      - name: Upload Smoke test AMI
-        id: upload_smoke_test_ami
-        run: |
-          image_info='${{ steps.download_ami.outputs.image_info }}'
-          images_bucket='${{ vars.IMAGES_BUCKET }}'
-          image_ids=$(nix run .#upload-ami -- \
-            --image-info "$image_info" \
-            --prefix "staging-legacy/" \
-            --s3-bucket "$images_bucket")
-          echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke test
-        id: smoke_test
-        run: |
-          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
-          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
-          run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id"
+      # TODO: Find a way to make this work without dangling instances
+      # - name: Upload Smoke test AMI
+      #   id: upload_smoke_test_ami
+      #   if: false
+      #   run: |
+      #     image_info='${{ steps.download_ami.outputs.image_info }}'
+      #     images_bucket='${{ vars.IMAGES_BUCKET }}'
+      #     image_ids=$(nix run .#upload-ami -- \
+      #       --image-info "$image_info" \
+      #       --prefix "staging-legacy/" \
+      #       --s3-bucket "$images_bucket")
+      #     echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
+
+      # - name: Smoke test
+      #   id: smoke_test
+      #   run: |
+      #     image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
+      #     image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+      #     run_id='${{ github.run_id }}'
+      #     run_number='${{ github.run_number }}'
+      #     nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id" --run-number "$run_number"
 
       - name: Upload AMIs to all available regions
         run: |
@@ -75,7 +79,3 @@ jobs:
             --s3-bucket "$images_bucket" \
             --copy-to-regions)
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
-
-      - name: 
-
-
