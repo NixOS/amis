@@ -4,9 +4,8 @@ import argparse
 import logging
 
 
-def smoke_test(image_id, region):
+def smoke_test(image_id, region, run_id):
     ec2 = boto3.client("ec2", region_name=region)
-    print(image_id)
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
     assert len(images["Images"]) == 1
@@ -25,11 +24,12 @@ def smoke_test(image_id, region):
         InstanceType=instance_type,
         MinCount=1,
         MaxCount=1,
-        ClientToken=image_id,
+        ClientToken=image_id + run_id if run_id else image_id,
         InstanceMarketOptions={"MarketType": "spot"},
     )
 
     instance_id = run_instances["Instances"][0]["InstanceId"]
+
 
     # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
     logging.info(f"Waiting for instance {instance_id} to be running")
@@ -58,9 +58,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image-id", required=True)
     parser.add_argument("--region", required=True)
+    parser.add_argument("--run-id", required=False)
     args = parser.parse_args()
 
-    smoke_test(args.image_id, args.region)
+    smoke_test(args.image_id, args.region, args.run_id)
 
 
 if __name__ == "__main__":

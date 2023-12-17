@@ -62,7 +62,8 @@ jobs:
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
-          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}"
+          run_id='${{ github.run_id }}'
+          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id"
 
       - name: Upload AMIs to all available regions
         run: |
@@ -74,5 +75,7 @@ jobs:
             --s3-bucket "$images_bucket" \
             --copy-to-regions)
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
+
+      - name: 
 
 
