@@ -68,17 +68,39 @@ data "aws_iam_policy_document" "state" {
     resources = [data.terraform_remote_state.state_backend.outputs.dynamodb_table_arn]
   }
   statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
+
+  }
+  statement {
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
       "s3:GetObject",
       "s3:HeadObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
     ]
-    resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
+    resources = ["${data.terraform_remote_state.state_backend.outputs.bucket_arn}/*"]
 
   }
 }
 
+data "aws_iam_policy_document" "write_state" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = ["${data.terraform_remote_state.state_backend.outputs.bucket_arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "write_state" {
+  name   = "write-state"
+  policy = data.aws_iam_policy_document.write_state.json
+}
 
 resource "aws_iam_policy" "state" {
   name   = "state"
@@ -128,6 +150,7 @@ resource "aws_iam_role" "plan" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
     aws_iam_policy.state.arn,
+    aws_iam_policy.write_state.arn,
   ]
 }
 
@@ -213,6 +236,12 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeImportSnapshotTasks",
       "ec2:DescribeSnapshots",
       "ec2:DeleteSnapshot",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "ec2:DescribeImages",
       "ec2:RegisterImage",
       "ec2:DeregisterImage",
