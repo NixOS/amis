@@ -6,9 +6,25 @@ import logging
 def smoke_test(image_id, region):
     ec2 = boto3.client("ec2", region_name=region)
 
-    # TODO per architecture
+    images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
+    assert len(images["Images"]) == 1
+    image = images["Images"][0]
+    architecture = image["Architecture"]
+    if  architecture == "x86_64":
+        instance_type = "t3a.nano"
+    elif architecture == "arm64":
+        instance_type = "t4g.nano"
+    else:
+        raise Exception("Unknown architecture: " + architecture)
+
     logging.info("Starting instance")
-    run_instances = ec2.run_instances(ImageId=image_id, InstanceType="t3a.nano", MinCount=1, MaxCount=1, ClientToken=image_id)
+    run_instances = ec2.run_instances(
+        ImageId=image_id,
+        InstanceType=instance_type
+        MinCount=1,
+        MaxCount=1,
+        ClientToken=image_id,
+    )
 
     instance_id = run_instances["Instances"][0]["InstanceId"]
 
