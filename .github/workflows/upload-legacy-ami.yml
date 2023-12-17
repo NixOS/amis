@@ -64,7 +64,7 @@ jobs:
         id: upload_smoke_test_ami
         run: |
           image_ids=$(nix run .#upload-ami -- \
-            --image-info "${{ steps.download_ami.outputs.image_info }} \
+            --image-info "${{ steps.download_ami.outputs.image_info }}" \
             --prefix "staging-legacy/" \
             --s3-bucket "${{ steps.get_bucket_name.outputs.images_bucket }}")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
