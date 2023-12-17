@@ -72,7 +72,7 @@ jobs:
       - name: Smoke test
         id: smoke_test
         run: |
-          image_ids=${{ steps.upload_smoke_test_ami.outputs.image_ids }}}
+          image_ids=${{ steps.upload_smoke_test_ami.outputs.image_ids }}
           image_id=$(echo  "$amis" | jq -r '.["${{ env.AWS_REGION }}"]')
           nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}"
 

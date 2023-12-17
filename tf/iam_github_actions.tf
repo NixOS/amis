@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "write_state" {
 
 resource "aws_iam_policy" "write_state" {
   name   = "write-state"
-  policy = data.aws_iam_policy_document.write_state.json 
+  policy = data.aws_iam_policy_document.write_state.json
 }
 
 resource "aws_iam_policy" "state" {
@@ -247,6 +247,15 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeRegions",
       "ec2:CopyImage",
       "ec2:ModifyImageAttribute",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:RunInstances",
+      "ec2:DescribeInstances",
+      "ec2:TerminateInstances",
     ]
     resources = ["*"]
   }
