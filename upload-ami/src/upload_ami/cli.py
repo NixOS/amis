@@ -210,6 +210,9 @@ def main():
     level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=level)
 
+    sts = boto3.client("sts")
+    logging.info(sts.get_caller_identity())
+
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
