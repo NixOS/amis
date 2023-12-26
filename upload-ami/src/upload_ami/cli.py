@@ -32,7 +32,9 @@ def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     Returns the snapshot id
     """
     logging.info(f"Importing s3://{s3_bucket}/{s3_key} to EC2")
-    client_token = hashlib.sha256(s3_key.encode()).hexdigest()
+    client_token_hash = hashlib.sha256(s3_key.encode())
+    client_token_hash.update("x".encode())
+    client_token = client_token_hash.hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
     # thus if we can rely on the client token forever. E.g. what happens if I
     # run a task with the same client token a few months later?
