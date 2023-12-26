@@ -148,9 +148,10 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         ec2r.get_waiter("image_available").wait(
             ImageIds=[copy_image["ImageId"]])
         logging.info(
-            f"Finished image {image_id} from {source_region} to {target_region_name}"
+            f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
         )
         ec2r.modify_image_attribute(
+            ImageId=copy_image["ImageId"],
             Attribute="launchPermission",
             LaunchPermission={"Add": [{"Group": "all"}]},
         )
