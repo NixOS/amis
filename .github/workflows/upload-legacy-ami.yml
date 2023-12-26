@@ -26,9 +26,6 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       - uses: DeterminateSystems/magic-nix-cache-action@8a218f9e264e9c3803c9a1ee1c30d8e4ab55be63 # v2
-
-      - name: For all regions disable-image-block-public-access
-        run: nix run .#disable-image-block-public-access
       # NOTE: We download the AMI from Hydra instead of building it ourselves
       # because aarch64 is currently not supported by AWS EC2 and the legacy
       # image builder requires nested virtualization.
@@ -43,6 +40,9 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: For all regions disable-image-block-public-access
+        run: nix run .#disable-image-block-public-access
 
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
