@@ -41,7 +41,7 @@ jobs:
         run: |
           cd tf
           set +e
-          nix shell --inputs-from . nixpkgs#opentofu --command tofu plan -detailed-exitcode -out tfplan
+          nix shell --inputs-from . nixpkgs#opentofu --command tofu plan -var "repo=$GITHUB_REPOSITORY" -detailed-exitcode -out tfplan
           export exitcode=$?
           set -e
           echo "exitcode=$exitcode" >> "$GITHUB_OUTPUT"
@@ -61,24 +61,24 @@ jobs:
         id: tf-plan-string
         run: |
           cd tf
-          TERRAFORM_PLAN=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu show -no-color tfplan)
-          
+          plan=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu show -no-color tfplan)
           delimiter="$(openssl rand -hex 8)"
-          echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-          echo "## Plan Output" >> $GITHUB_OUTPUT
-          echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo '```terraform' >> $GITHUB_OUTPUT
-          echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
-          echo '```' >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          echo "${delimiter}" >> $GITHUB_OUTPUT
+          cat <<EOF >> "$GITHUB_OUTPUT"
+          summary<<${delimiter}
+          ## Plan Output
+          <details><summary>Click to expand</summary>
+          \`\`\`terraform
+          ${plan}
+          \`\`\`
+          </details>
+          ${delimiter}
+          EOF
 
       - name: Publish Terraform Plan to Task Summary
         env:
           SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
         run: |
-          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+          echo "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
 
 
   apply:
