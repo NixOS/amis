@@ -1,6 +1,5 @@
 variable "repo" {
   type    = string
-  default = "arianvp/amis"
 }
 
 resource "aws_iam_openid_connect_provider" "github_actions" {
