@@ -201,8 +201,8 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id)
 
-    regions = ec2.describe_regions()["Regions"]
-    regions.remove(ec2.meta.region_name)
+    regions = filter(lambda x: x["RegionName"] !=
+                     ec2.meta.region_name, ec2.describe_regions()["Regions"])
 
     image_ids = {}
     image_ids[ec2.meta.region_name] = image_id
