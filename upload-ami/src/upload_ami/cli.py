@@ -105,6 +105,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
     ec2.modify_image_attribute(
+        ImageId=image_id,
         Attribute="launchPermission",
         LaunchPermission={"Add": [{"Group": "all"}]},
     )
