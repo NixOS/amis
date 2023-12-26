@@ -62,6 +62,7 @@ jobs:
         run: |
           cd tf
           plan=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu show -no-color tfplan)
+          delimiter="$(openssl rand -hex 8)"
           cat <<EOF >> "$GITHUB_OUTPUT"
           summary<<${delimiter}
           ## Plan Output
