@@ -76,10 +76,11 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
         else:
             raise Exception("Unknown system: " + image_info["system"])
 
-        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
-        tpmsupport = { }
+        logging.info(
+            f"Registering image {image_name} with snapshot {snapshot_id}")
+        tpmsupport = {}
         if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-            tpmsupport['TpmSupport'] = "v2.0" 
+            tpmsupport['TpmSupport'] = "v2.0"
         register_image = ec2.register_image(
             Name=image_name,
             Architecture=architecture,
@@ -103,6 +104,10 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
+    ec2.modify_image_attribute(
+        Attribute="launchPermission",
+        LaunchPermission={"Add": [{"Group": "all"}]},
+    )
     return image_id
 
 
@@ -137,9 +142,14 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
             Name=image_name,
             ClientToken=image_id,
         )
-        ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
+        ec2r.get_waiter("image_available").wait(
+            ImageIds=[copy_image["ImageId"]])
         logging.info(
             f"Finished image {image_id} from {source_region} to {target_region_name}"
+        )
+        ec2r.modify_image_attribute(
+            Attribute="launchPermission",
+            LaunchPermission={"Add": [{"Group": "all"}]},
         )
         return (target_region_name, copy_image["ImageId"])
 
@@ -156,9 +166,11 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     image_ids[source_region] = image_id
     return image_ids
 
+
 def get_name(image_info, prefix, run_id):
     revision = "." + run_id if run_id else ""
-    image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
+    image_name = "nixos-" + image_info["label"] + \
+        revision + "-" + image_info["system"]
     image_name = prefix + image_name if prefix else image_name
     return image_name
 
@@ -174,14 +186,16 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
 
     image_file = image_info["file"]
     s3_key = os.path.join(
-        os.path.basename(os.path.dirname(image_file)), os.path.basename(image_file)
+        os.path.basename(os.path.dirname(image_file)
+                         ), os.path.basename(image_file)
     )
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
 
-    image_name  = get_name(image_info, prefix, run_id)
-    image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
+    image_name = get_name(image_info, prefix, run_id)
+    image_id = register_image_if_not_exists(
+        ec2, image_name, image_info, snapshot_id)
 
     regions = ec2.describe_regions()["Regions"]
 
@@ -190,16 +204,20 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
 
     if copy_to_regions:
         image_ids.update(
-            copy_image_to_regions(image_id, image_name, ec2.meta.region_name, regions)
+            copy_image_to_regions(image_id, image_name,
+                                  ec2.meta.region_name, regions)
         )
     return image_ids
+
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
-    parser.add_argument("--image-info", help="Path to image info", required=True)
-    parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
+    parser.add_argument(
+        "--image-info", help="Path to image info", required=True)
+    parser.add_argument(
+        "--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
@@ -221,6 +239,7 @@ def main():
         image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id
     )
     print(json.dumps(image_ids))
+
 
 if __name__ == "__main__":
     main()
