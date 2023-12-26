@@ -157,7 +157,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         )
         return (target_region_name, copy_image["ImageId"])
 
-    with ThreadPoolExecutor(max_workers=len(target_regions)) as executor:
+    with ThreadPoolExecutor(max_workers=32) as executor:
         image_ids = dict(
             executor.map(
                 lambda target_region: copy_image(
