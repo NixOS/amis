@@ -27,7 +27,7 @@
         };
       };
 
-      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" ];
+      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" ];
 
       packages = lib.genAttrs self.lib.supportedSystems (system:
         let pkgs = nixpkgs.legacyPackages.${system}; in {
@@ -80,6 +80,10 @@
           smoke-test = {
             type = "app";
             program = "${self.packages.${system}.upload-ami}/bin/smoke-test";
+          };
+          disable-image-block-public-access = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/disable-image-block-public-access";  
           };
         });
 

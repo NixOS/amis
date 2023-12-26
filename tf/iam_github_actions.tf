@@ -247,6 +247,7 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeRegions",
       "ec2:CopyImage",
       "ec2:ModifyImageAttribute",
+      "ec2:DisableImageBlockPublicAccess"
     ]
     resources = ["*"]
   }
