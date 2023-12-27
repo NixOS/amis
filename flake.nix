@@ -27,12 +27,10 @@
         };
       };
 
-      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" ];
+      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" ];
 
       packages = lib.genAttrs self.lib.supportedSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
+        let pkgs = nixpkgs.legacyPackages.${system}; in {
           ec2-instance-connect = pkgs.callPackage ./packages/ec2-instance-connect.nix { };
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
@@ -46,7 +44,7 @@
             };
             vendorHash = "sha256-T45abGVoiwxAEO60aPH3hUqiH6ON3aRhkrOFcOi+Bm8=";
           };
-          upload-ami = pkgs.python3Packages.callPackage ./upload-ami {};
+          upload-ami = pkgs.python3Packages.callPackage ./upload-ami { };
 
           amazonImage = (nixpkgs.lib.nixosSystem {
             specialArgs.selfPackages = self.packages.${system};
@@ -71,6 +69,22 @@
             ];
           }).config.system.build.amazonImage;
 
+        });
+
+      apps = lib.genAttrs self.lib.supportedSystems (system:
+        let pkgs = nixpkgs.legacyPackages.${system}; in {
+          nuke = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/nuke";
+          };
+          smoke-test = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/smoke-test";
+          };
+          disable-image-block-public-access = {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/disable-image-block-public-access";  
+          };
         });
 
 
@@ -104,7 +118,7 @@
           };
         });
 
-      devShells = lib.genAttrs ["x86_64-linux" "aarch64-darwin"] (system: {
+      devShells = lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ] (system: {
         default = let pkgs = nixpkgs.legacyPackages.${system}; in pkgs.mkShell {
           nativeBuildInputs = [
             pkgs.awscli2

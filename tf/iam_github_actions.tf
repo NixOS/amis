@@ -49,6 +49,8 @@ data "aws_iam_policy_document" "assume_plan" {
       values = [
         "repo:${var.repo}:pull_request",
         "repo:${var.repo}:ref:refs/heads/main",
+        "repo:${var.repo}:environment:images",
+        "repo:${var.repo}:environment:infra",
       ]
     }
   }
@@ -66,21 +68,80 @@ data "aws_iam_policy_document" "state" {
     resources = [data.terraform_remote_state.state_backend.outputs.dynamodb_table_arn]
   }
   statement {
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
+
+  }
+  statement {
     effect = "Allow"
     actions = [
-      "s3:ListBucket",
       "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
     ]
-    resources = [data.terraform_remote_state.state_backend.outputs.bucket_arn]
+    resources = ["${data.terraform_remote_state.state_backend.outputs.bucket_arn}/*"]
 
   }
 }
 
+data "aws_iam_policy_document" "write_state" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+    resources = ["${data.terraform_remote_state.state_backend.outputs.bucket_arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "write_state" {
+  name   = "write-state"
+  policy = data.aws_iam_policy_document.write_state.json
+}
 
 resource "aws_iam_policy" "state" {
   name   = "state"
   policy = data.aws_iam_policy_document.state.json
 }
+
+data "aws_iam_policy_document" "assume_state" {
+  source_policy_documents = [data.aws_iam_policy_document.assume_AdministratorAccess.json]
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = aws_iam_openid_connect_provider.github_actions.client_id_list
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values = [
+        "repo:${var.repo}:environment:infra",
+        "repo:${var.repo}:environment:images",
+        "repo:${var.repo}:ref:refs/heads/main",
+        "repo:${var.repo}:pull_request",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "state" {
+  name                = "state"
+  assume_role_policy  = data.aws_iam_policy_document.assume_state.json
+  managed_policy_arns = [aws_iam_policy.state.arn]
+}
+
 
 resource "aws_iam_role" "plan" {
   name               = "plan"
@@ -88,6 +149,7 @@ resource "aws_iam_role" "plan" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
     aws_iam_policy.state.arn,
+    aws_iam_policy.write_state.arn,
   ]
 }
 
@@ -161,7 +223,7 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:HeadObject",
+      "s3:GetObject",
       "s3:PutObject",
     ]
     resources = ["${aws_s3_bucket.images.arn}/*"]
@@ -173,12 +235,29 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeImportSnapshotTasks",
       "ec2:DescribeSnapshots",
       "ec2:DeleteSnapshot",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "ec2:DescribeImages",
       "ec2:RegisterImage",
       "ec2:DeregisterImage",
       "ec2:DescribeRegions",
       "ec2:CopyImage",
       "ec2:ModifyImageAttribute",
+      "ec2:DisableImageBlockPublicAccess"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:RunInstances",
+      "ec2:DescribeInstances",
+      "ec2:GetConsoleOutput",
+      "ec2:TerminateInstances",
     ]
     resources = ["*"]
   }

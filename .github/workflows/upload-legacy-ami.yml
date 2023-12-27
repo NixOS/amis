@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0' 
+env:
+  AWS_REGION: eu-central-1
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
@@ -22,7 +24,6 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       - uses: DeterminateSystems/magic-nix-cache-action@8a218f9e264e9c3803c9a1ee1c30d8e4ab55be63 # v2
-
       # NOTE: We download the AMI from Hydra instead of building it ourselves
       # because aarch64 is currently not supported by AWS EC2 and the legacy
       # image builder requires nested virtualization.
@@ -30,28 +31,57 @@ jobs:
         id: download_ami
         run: |
           out=$(curl --location --silent --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
-          nix-store --realise $out --add-root ./result
-          echo "::set-output name=image_info::$out/nix-support/image-info.json"
+          nix-store --realise "$out" --add-root ./result
+          echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
       - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
-          aws-region: eu-central-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name:  Get S3 bucket name
-        id: get_bucket_name
+      - name: For all regions disable-image-block-public-access
+        run: nix run .#disable-image-block-public-access
+
+      - name: Upload Smoke test AMI
+        id: upload_smoke_test_ami
         run: |
-          cd tf
-          nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
-          images_bucket=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu output -raw images_bucket)
-          echo "::set-output name=images_bucket::$images_bucket"
+          image_info='${{ steps.download_ami.outputs.image_info }}'
+          images_bucket='${{ vars.IMAGES_BUCKET }}'
+          image_ids=$(nix run .#upload-ami -- \
+            --image-info "$image_info" \
+            --prefix "staging-legacy/" \
+            --s3-bucket "$images_bucket")
+          echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test
+        id: smoke_test
+        # NOTE: make sure smoke test isn't cancelled. Such that instance gets cleaned up.
+        run: |
+          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
+          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+          run_id='${{ github.run_id }}'
+          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id"
+
+      - name: Clean up smoke test
+        if: ${{ cancelled() }}
+        run: |
+          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
+          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+          run_id='${{ github.run_id }}'
+          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id" --cancel
+      
 
       # NOTE: We do not pass run-id as we're not  building the image ourselves
       # and we thus need to poll hydra periodically.  Including the run-id would
       # cause us to register  the same snapshot as an image over and over again
       # for each run.
-      - name: Upload AMIs.
+      - name: Upload AMIs to all available regions
         run: |
-          nix run .#upload-ami -- \
-            --image-info "${{ steps.download_ami.outputs.image_info }} \
-            --s3-bucket "${{ steps.get_bucket_name.outputs.images_bucket }}"
+          image_info='${{ steps.download_ami.outputs.image_info }}'
+          images_bucket='${{ vars.IMAGES_BUCKET }}'
+          image_ids=$(nix run .#upload-ami -- \
+            --image-info "$image_info" \
+            --prefix "legacy/" \
+            --s3-bucket "$images_bucket" \
+            --copy-to-regions)
+          echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"

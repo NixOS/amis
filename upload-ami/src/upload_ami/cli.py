@@ -32,15 +32,19 @@ def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     Returns the snapshot id
     """
     logging.info(f"Importing s3://{s3_bucket}/{s3_key} to EC2")
-    client_token = hashlib.sha256(s3_key.encode()).hexdigest()
+    client_token_hash = hashlib.sha256(s3_key.encode())
+    client_token_hash.update("x".encode())
+    client_token = client_token_hash.hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
     # thus if we can rely on the client token forever. E.g. what happens if I
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
+            "Description": s3_key,
             "Format": image_format,
             "UserBucket": {"S3Bucket": s3_bucket, "S3Key": s3_key},
         },
+        Description=s3_key,
         ClientToken=client_token,
     )
     ec2.get_waiter("snapshot_imported").wait(
@@ -74,10 +78,11 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
         else:
             raise Exception("Unknown system: " + image_info["system"])
 
-        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
-        tpmsupport = { }
+        logging.info(
+            f"Registering image {image_name} with snapshot {snapshot_id}")
+        tpmsupport = {}
         if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-            tpmsupport['TpmSupport'] = "v2.0" 
+            tpmsupport['TpmSupport'] = "v2.0"
         register_image = ec2.register_image(
             Name=image_name,
             Architecture=architecture,
@@ -101,6 +106,11 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
+    ec2.modify_image_attribute(
+        ImageId=image_id,
+        Attribute="launchPermission",
+        LaunchPermission={"Add": [{"Group": "all"}]},
+    )
     return image_id
 
 
@@ -135,13 +145,19 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
             Name=image_name,
             ClientToken=image_id,
         )
-        ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
+        ec2r.get_waiter("image_available").wait(
+            ImageIds=[copy_image["ImageId"]])
         logging.info(
-            f"Finished image {image_id} from {source_region} to {target_region_name}"
+            f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
+        )
+        ec2r.modify_image_attribute(
+            ImageId=copy_image["ImageId"],
+            Attribute="launchPermission",
+            LaunchPermission={"Add": [{"Group": "all"}]},
         )
         return (target_region_name, copy_image["ImageId"])
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=32) as executor:
         image_ids = dict(
             executor.map(
                 lambda target_region: copy_image(
@@ -155,7 +171,15 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
     return image_ids
 
 
-def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
+def get_name(image_info, prefix, run_id):
+    revision = "." + run_id if run_id else ""
+    image_name = "nixos-" + image_info["label"] + \
+        revision + "-" + image_info["system"]
+    image_name = prefix + image_name if prefix else image_name
+    return image_name
+
+
+def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -164,86 +188,63 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, run_id):
     ec2 = boto3.client("ec2")
     s3 = boto3.client("s3")
 
-    revision = "." + run_id if run_id else ""
-    image_name = "nixos-" + image_info["label"] + revision + "-" + image_info["system"]
     image_file = image_info["file"]
     s3_key = os.path.join(
-        os.path.basename(os.path.dirname(image_file)), os.path.basename(image_file)
+        os.path.basename(os.path.dirname(image_file)
+                         ), os.path.basename(image_file)
     )
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
-    image_id = register_image_if_not_exists(ec2, image_name, image_info, snapshot_id)
 
-    regions = ec2.describe_regions()["Regions"]
+    image_name = get_name(image_info, prefix, run_id)
+    image_id = register_image_if_not_exists(
+        ec2, image_name, image_info, snapshot_id)
+
+    regions = filter(lambda x: x["RegionName"] !=
+                     ec2.meta.region_name, ec2.describe_regions()["Regions"])
 
     image_ids = {}
     image_ids[ec2.meta.region_name] = image_id
 
     if copy_to_regions:
         image_ids.update(
-            copy_image_to_regions(image_id, image_name, ec2.meta.region_name, regions)
+            copy_image_to_regions(image_id, image_name,
+                                  ec2.meta.region_name, regions)
         )
     return image_ids
 
-
-def cleanup_ami(image_name, region):
-    ec2 = boto3.client("ec2", region_name=region)
-    describe_images = ec2.describe_images(
-        Owners=["self"], Filters=[{"Name": "name", "Values": [image_name]}]
-    )
-
-    if len(describe_images["Images"]) == 0:
-        return
-
-    image_id = describe_images["Images"][0]["ImageId"]
-    snapshot_id = describe_images["Images"][0]["BlockDeviceMappings"][0]["Ebs"][
-        "SnapshotId"
-    ]
-
-    ec2.deregister_image(ImageId=image_id)
-    # TODO: Not fully idempotent because we can crash  between deregistering the image and deleting the snapshot
-    ec2.delete_snapshot(SnapshotId=snapshot_id)
-
-
-def cleanup(image_info, s3_bucket):
-    s3 = boto3.client("s3")
-
-    image_name = "nixos-" + image_info["label"] + "-" + image_info["system"]
-
-    s3.delete_object(Bucket=s3_bucket, Key=image_name)
-
-    regions = boto3.client("ec2").describe_regions()["Regions"]
-
-    for region in regions:
-        cleanup_ami(image_name, region["RegionName"])
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
-    parser.add_argument("--image-info", help="Path to image info", required=True)
-    parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
+    parser.add_argument(
+        "--image-info", help="Path to image info", required=True)
+    parser.add_argument(
+        "--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
+    parser.add_argument("--prefix", help="Prefix to prepend to image name")
     parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=level)
 
+    sts = boto3.client("sts")
+    logging.info(sts.get_caller_identity())
+
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
     image_ids = {}
-    if args.cleanup:
-        cleanup(image_info, args.s3_bucket)
-    else:
-        image_ids = upload_ami(
-            image_info, args.s3_bucket, args.copy_to_regions, args.run_id
-        )
-        print(json.dumps(image_ids))
+    image_ids = upload_ami(
+        image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id
+    )
+    print(json.dumps(image_ids))
+
 
 if __name__ == "__main__":
     main()
