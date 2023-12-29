@@ -2,6 +2,9 @@ name: Upload Legacy Amazon Image
 permissions:
   contents: read
 on:
+  push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
   schedule:
@@ -77,7 +80,7 @@ jobs:
       # cause us to register  the same snapshot as an image over and over again
       # for each run.
       - name: Upload AMIs to all available regions
-        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+        if: github.ref == 'refs/heads/main' 
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
