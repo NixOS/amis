@@ -38,13 +38,14 @@ def smoke_test(image_id, region, run_id, cancel):
             tries = 5
             console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
             output = console_output.get("Output")
-            while output is None:
+            while not output and tries > 0:
                 time.sleep(10)
                 logging.info(
                     f"Waiting for console output to become available ({tries} tries left)"
                 )
                 console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
                 output = console_output.get("Output")
+                tries -= 1
             print(output)
     finally:
         logging.info(f"Terminating instance {instance_id}")
