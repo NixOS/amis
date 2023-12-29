@@ -2,6 +2,7 @@ name: Upload Legacy Amazon Image
 permissions:
   contents: read
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0' 
@@ -76,6 +77,7 @@ jobs:
       # cause us to register  the same snapshot as an image over and over again
       # for each run.
       - name: Upload AMIs to all available regions
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
@@ -83,5 +85,6 @@ jobs:
             --image-info "$image_info" \
             --prefix "legacy/" \
             --s3-bucket "$images_bucket" \
-            --copy-to-regions)
+            --copy-to-regions \
+            --public)
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
