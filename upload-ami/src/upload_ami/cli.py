@@ -59,7 +59,7 @@ def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     return snapshot_import_task["SnapshotTaskDetail"]["SnapshotId"]
 
 
-def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
+def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, public):
     """
     Register image if it doesn't exist yet
 
@@ -106,15 +106,16 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id):
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
-    ec2.modify_image_attribute(
-        ImageId=image_id,
-        Attribute="launchPermission",
-        LaunchPermission={"Add": [{"Group": "all"}]},
-    )
+    if public:
+        ec2.modify_image_attribute(
+            ImageId=image_id,
+            Attribute="launchPermission",
+            LaunchPermission={"Add": [{"Group": "all"}]},
+        )
     return image_id
 
 
-def copy_image_to_regions(image_id, image_name, source_region, target_regions):
+def copy_image_to_regions(image_id, image_name, source_region, target_regions, public):
     """
     Copy image to all target regions
 
@@ -150,11 +151,12 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions):
         logging.info(
             f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
         )
-        ec2r.modify_image_attribute(
-            ImageId=copy_image["ImageId"],
-            Attribute="launchPermission",
-            LaunchPermission={"Add": [{"Group": "all"}]},
-        )
+        if public:
+            ec2r.modify_image_attribute(
+                ImageId=copy_image["ImageId"],
+                Attribute="launchPermission",
+                LaunchPermission={"Add": [{"Group": "all"}]},
+            )
         return (target_region_name, copy_image["ImageId"])
 
     with ThreadPoolExecutor(max_workers=32) as executor:
@@ -179,7 +181,7 @@ def get_name(image_info, prefix, run_id):
     return image_name
 
 
-def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
+def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -199,7 +201,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
 
     image_name = get_name(image_info, prefix, run_id)
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id)
+        ec2, image_name, image_info, snapshot_id, public)
 
     regions = filter(lambda x: x["RegionName"] !=
                      ec2.meta.region_name, ec2.describe_regions()["Regions"])
@@ -210,7 +212,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id):
     if copy_to_regions:
         image_ids.update(
             copy_image_to_regions(image_id, image_name,
-                                  ec2.meta.region_name, regions)
+                                  ec2.meta.region_name, regions, public)
         )
     return image_ids
 
@@ -226,6 +228,7 @@ def main():
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
+    parser.add_argument("--public", action="store_true")
     parser.add_argument("--prefix", help="Prefix to prepend to image name")
     parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
@@ -241,7 +244,7 @@ def main():
 
     image_ids = {}
     image_ids = upload_ami(
-        image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id
+        image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id, args.public
     )
     print(json.dumps(image_ids))
 
