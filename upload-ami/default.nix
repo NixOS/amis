@@ -1,5 +1,6 @@
 { buildPythonApplication
 , python3Packages
+, lib
 }:
 
 let pyproject = builtins.fromTOML (builtins.readFile ./pyproject.toml);
@@ -16,4 +17,5 @@ buildPythonApplication {
   propagatedBuildInputs =
     map (name: python3Packages.${name}) pyproject.project.dependencies;
 
+  passthru.pyproject = pyproject;
 }

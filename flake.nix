@@ -72,24 +72,13 @@
         });
 
       apps = lib.genAttrs self.lib.supportedSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system}; in {
-          nuke = {
-            type = "app";
-            program = "${self.packages.${system}.upload-ami}/bin/nuke";
-          };
-          smoke-test = {
-            type = "app";
-            program = "${self.packages.${system}.upload-ami}/bin/smoke-test";
-          };
-          disable-image-block-public-access = {
-            type = "app";
-            program = "${self.packages.${system}.upload-ami}/bin/disable-image-block-public-access";  
-          };
-          enable-regions =  {
-            type = "app";
-            program = "${self.packages.${system}.upload-ami}/bin/enable-regions";  
-          };
-        });
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          upload-ami = self.packages.${system}.upload-ami;
+          mkApp = name: _: { type = "app"; program = "${upload-ami}/bin/${name}"; };
+        in
+          lib.mapAttrs mkApp self.packages.${system}.upload-ami.passthru.pyproject.project.scripts
+        );
 
 
       # TODO: unfortunately I don't have access to a aarch64-linux hardware with virtualisation support
