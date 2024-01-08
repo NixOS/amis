@@ -85,6 +85,10 @@
             type = "app";
             program = "${self.packages.${system}.upload-ami}/bin/disable-image-block-public-access";  
           };
+          enable-regions =  {
+            type = "app";
+            program = "${self.packages.${system}.upload-ami}/bin/enable-regions";  
+          };
         });
 
 
