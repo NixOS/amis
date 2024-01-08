@@ -25,11 +25,7 @@ def main():
                 continue
             logging.info(
                 f"Requesting quota increase for {region['RegionName']}")
-            servicequotas.request_service_quota_increase(
-                ServiceCode="ec2",
-                QuotaCode=service_quota['QuotaCode'],
-                DesiredValue=100,
-            )
+            servicequotas.request_service_quota_increase( ServiceCode="ec2", QuotaCode=service_quota['QuotaCode'], DesiredValue=100,)
         except Exception as e:
             logging.warn(e)
 
