@@ -29,6 +29,7 @@ jobs:
         with:
           sbom: ./sbom.cdx.json
       - name: Upload SARIF report
+        if: always()
         uses: github/codeql-action/upload-sarif@382a50a0284c0de445104889a9d6003acb4b3c1d # v2
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
