@@ -21,5 +21,14 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       - uses: DeterminateSystems/magic-nix-cache-action@8a218f9e264e9c3803c9a1ee1c30d8e4ab55be63 # v2
       - run: nix build .#amazonImage -L --system ${{ matrix.runs-on.system }}
-      - run: nix flake check -L --system ${{ matrix.runs-on.system }}
-        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
+      - name: Generate SBOM
+        run: nix run github:tiiuae/sbomnix -- ./result
+      - name: Scan SBOM
+        uses: anchore/scan-action@v3
+        id: scan
+        with:
+          sbom: ./sbom.cdx.json
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
