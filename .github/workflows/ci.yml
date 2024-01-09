@@ -29,9 +29,9 @@ jobs:
         with:
           sbom: ./sbom.cdx.json
       - name: Mangle SARIF
+        if: always()
         run:
           jq '(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= "file:./result"' ${{ steps.scan.outputs.sarif }} > ./result.sarif
-
 
       - name: Upload SARIF report
         if: always()
