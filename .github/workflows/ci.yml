@@ -24,11 +24,11 @@ jobs:
       - name: Generate SBOM
         run: nix run github:tiiuae/sbomnix -- ./result
       - name: Scan SBOM
-        uses: anchore/scan-action@v3
+        uses: anchore/scan-action@1d59d90b47fc11ff8f97822da6c25eec888f81cf # v3 
         id: scan
         with:
           sbom: ./sbom.cdx.json
       - name: Upload SARIF report
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@382a50a0284c0de445104889a9d6003acb4b3c1d # v2
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
