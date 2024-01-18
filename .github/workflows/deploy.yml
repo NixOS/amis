@@ -52,7 +52,7 @@ jobs:
           fi
 
       - name: Publish plan
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4
+        uses: actions/upload-artifact@694cdabd8bdb0f10b2cea11669e1bf5453eed0a6 # v4
         with:
           name: tfplan
           path: tf/tfplan
