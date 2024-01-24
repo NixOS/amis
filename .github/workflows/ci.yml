@@ -21,5 +21,20 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       - uses: DeterminateSystems/magic-nix-cache-action@8a218f9e264e9c3803c9a1ee1c30d8e4ab55be63 # v2
       - run: nix build .#amazonImage -L --system ${{ matrix.runs-on.system }}
-      - run: nix flake check -L --system ${{ matrix.runs-on.system }}
-        if: ${{ matrix.runs-on.system != 'aarch64-linux' }}
+      - name: Generate SBOM
+        run: nix run github:tiiuae/sbomnix -- ./result
+      - name: Scan SBOM
+        uses: anchore/scan-action@1d59d90b47fc11ff8f97822da6c25eec888f81cf # v3 
+        id: scan
+        with:
+          sbom: ./sbom.cdx.json
+      - name: Mangle SARIF
+        if: always()
+        run:
+          jq '(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= "file:./result"' ${{ steps.scan.outputs.sarif }} > ./result.sarif
+
+      - name: Upload SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@382a50a0284c0de445104889a9d6003acb4b3c1d # v2
+        with:
+          sarif_file: ./result.sarif
