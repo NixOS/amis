@@ -40,6 +40,7 @@
 
   systemd.services.ec2-metadata = {
     description = "Fetch EC2 metadata and set up ssh keys for ec2-user";
+    wants =  [ "network-online.target" ];
     after = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
 

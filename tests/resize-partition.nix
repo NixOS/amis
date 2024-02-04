@@ -21,7 +21,7 @@
       "-f",
       "qcow2",
       "-b",
-      "${nodes.machine.system.build.image}/image.raw",
+      "${nodes.machine.system.build.image}/${nodes.machine.image.repart.imageFile}",
       "-F",
       "raw",
       tmp_disk_image.name,
