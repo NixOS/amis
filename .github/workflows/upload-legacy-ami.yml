@@ -34,7 +34,8 @@ jobs:
       - name: Download AMI from Hydra
         id: download_ami
         run: |
-          out=$(curl --location --silent --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
+          set -o pipefail
+          out=$(curl --location --silent --fail-with-body --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
