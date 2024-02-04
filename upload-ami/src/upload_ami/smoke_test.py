@@ -35,6 +35,7 @@ def smoke_test(image_id, region, run_id, cancel):
             # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
             logging.info(f"Waiting for instance {instance_id} to be running")
             ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
+            ec2.get_waiter("instance_status_ok").wait(InstanceIds=[instance_id])
             tries = 5
             console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
             output = console_output.get("Output")
