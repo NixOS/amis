@@ -20,6 +20,11 @@ You might get rate-limited so need to wait and rerun until all finish:
 botocore.errorfactory.TooManyRequestsException: An error occurred (TooManyRequestsException) when calling the EnableRegion operation (reached max retries: 4): This request has exceeded the quota for 'Number of concurrent region-opt requests for an account'. Consider retrying the operation later once some requests have been completed.
 ```
 
+Now wait until all regions are enabled. You can use:
+```
+aws account list-regions --region-opt-status-contains ENABLING
+```
+
 Then request a quota increase for the number of AMIs you want to publish.
 This will create support tickets in all regions.  You can check the status
 of the tickets in the AWS console. It might take a few days for the tickets
