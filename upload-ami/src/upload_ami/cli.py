@@ -188,15 +188,16 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
     s3 = boto3.client("s3")
 
     image_file = image_info["file"]
+    label = image_info["label"]
     base_name = os.path.basename(os.path.dirname(image_file))
     file_name = os.path.basename(image_file)
-    s3_key = os.path.join(base_name, file_name)
+    s3_key = label
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
 
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
 
-    image_name = prefix + base_name + ("." + run_id if run_id else "")
+    image_name = prefix + label + ("." + run_id if run_id else "")
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public)
 
