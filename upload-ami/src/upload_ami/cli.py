@@ -189,15 +189,14 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
 
     image_file = image_info["file"]
     label = image_info["label"]
-    base_name = os.path.basename(os.path.dirname(image_file))
-    file_name = os.path.basename(image_file)
-    s3_key = label
+    system = image_info["system"]
+    image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
+    s3_key = image_name
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
 
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
 
-    image_name = prefix + label + ("." + run_id if run_id else "")
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public)
 
@@ -212,6 +211,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
             copy_image_to_regions(image_id, image_name,
                                   ec2.meta.region_name, regions, public)
         )
+    
     return image_ids
 
 
