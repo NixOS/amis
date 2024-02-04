@@ -256,6 +256,7 @@ data "aws_iam_policy_document" "upload_ami" {
     actions = [
       "ec2:RunInstances",
       "ec2:DescribeInstances",
+      "ec2:DescribeInstanceStatus",
       "ec2:GetConsoleOutput",
       "ec2:TerminateInstances",
     ]
