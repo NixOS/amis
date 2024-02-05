@@ -82,7 +82,7 @@
                     const regionCell = row.querySelector("td.region")
                     regionCell.textContent = image.Region || "eu-central-1"
 
-                    const architectureCell = row.querySelector("td.architecture code")
+                    const architectureCell = row.querySelector("td.architecture")
                     architectureCell.textContent = image.Architecture
 
                     const creationDateCell = row.querySelector("td.creation-date")
@@ -91,7 +91,7 @@
                     const nameCell = row.querySelector("td.name")
                     nameCell.textContent = image.Name
 
-                    const imageIdCell = row.querySelector("td.image-id code")
+                    const imageIdCell = row.querySelector("td.image-id")
                     imageIdCell.textContent = image.ImageId
 
                     tbody.appendChild(row)
@@ -197,20 +197,6 @@
 
     <p>Here are the latest NixOS images available in the Amazon cloud.</p>
     <p>NixOS images are published under AWS Account ID 3283237582</p>
-    <pre>
-aws ec2 describe-images --owners 3283237582 --filters "Name=name,Values=nixos/23.11*,Name=architecture,Values=x86_64"</pre>
-
-    <pre>
-data "aws_ami" "nixos" {
-  owners = [""]
-  most_recent = true
-  filter {
-    name = "name"
-    values = ["nixos/*"]
-  }
-}
-    </pre>
-
     <table id="images-table">
         <thead>
             <tr>
@@ -249,10 +235,10 @@ data "aws_ami" "nixos" {
             <template id="row-template">
                 <tr>
                     <td class="region"></td>
-                    <td class="architecture"><code></code></td>
+                    <td class="architecture"></td>
                     <td class="name"></td>
                     <td class="creation-date"></td>
-                    <td class="image-id"><code></code></td>
+                    <td class="image-id"></td>
                 </tr>
             </template>
         </tbody>
