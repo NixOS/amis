@@ -54,7 +54,7 @@ jobs:
           images_bucket='${{ vars.IMAGES_BUCKET }}'
           image_ids=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
-            --prefix "smoketest/" \
+            --prefix "smoketest/nixos-" \
             --s3-bucket "$images_bucket")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
 
@@ -87,7 +87,7 @@ jobs:
           images_bucket='${{ vars.IMAGES_BUCKET }}'
           image_ids=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
-            --prefix "nixos/" \
+            --prefix "nixos-" \
             --s3-bucket "$images_bucket" \
             --copy-to-regions \
             --public)
