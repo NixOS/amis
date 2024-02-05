@@ -59,7 +59,7 @@
                     throw new Error("Failed to fetch images")
                 }
                 /**
-                 * @type {AWSImages}
+                 * @type {Record<string, AWSImages>}
                  */
                 const images = await response.json()
 
@@ -75,26 +75,30 @@
 
                 const tbody = imagesTable.tBodies[0]
 
-                for (const image of images.Images) {
-                    const row = rowTemplate.content.cloneNode(true)
-                    const cells = row.querySelectorAll("td")
+                for (const [region, images_] of Object.entries(images)) {
+                    console.log(region, images_)
+                    for (const image of images_) {
+                        const row = rowTemplate.content.cloneNode(true)
+                        const cells = row.querySelectorAll("td")
 
-                    const regionCell = row.querySelector("td.region")
-                    regionCell.textContent = image.Region || "eu-central-1"
+                        const regionCell = row.querySelector("td.region")
+                        regionCell.textContent = region
 
-                    const architectureCell = row.querySelector("td.architecture")
-                    architectureCell.textContent = image.Architecture
+                        const architectureCell = row.querySelector("td.architecture")
+                        architectureCell.textContent = image.Architecture
 
-                    const creationDateCell = row.querySelector("td.creation-date")
-                    creationDateCell.textContent = image.CreationDate
+                        const creationDateCell = row.querySelector("td.creation-date")
+                        creationDateCell.textContent = image.CreationDate
 
-                    const nameCell = row.querySelector("td.name")
-                    nameCell.textContent = image.Name
+                        const nameCell = row.querySelector("td.name")
+                        nameCell.textContent = image.Name
 
-                    const imageIdCell = row.querySelector("td.image-id")
-                    imageIdCell.textContent = image.ImageId
+                        const imageIdCell = row.querySelector("td.image-id")
+                        imageIdCell.textContent = image.ImageId
 
-                    tbody.appendChild(row)
+                        tbody.appendChild(row)
+                    }
+
                 }
 
 
@@ -103,22 +107,22 @@
                  * @type {NodeListOf<HTMLInputElement>}
                  */
                 const searchInputs = document.querySelectorAll("input[type=search]")
-
                 for (const searchInput of searchInputs) {
                     searchInput.addEventListener("input", function () {
-                        const value = this.value.toLowerCase()
-                        const className = this.className
-                        const rows = tbody.querySelectorAll("tr")
-
-                        for (const row of rows) {
-                            const cell = row.getElementsByClassName(className)[0]
-                            const text = cell.textContent.toLowerCase()
-
-                            if (text.includes(value)) {
-                                row.style.display = ""
-                            } else {
-                                row.style.display = "none"
+                        for (const row of tbody.rows) {
+                            let shouldHide = false
+                            for (const cell of row.cells) {
+                                const category = cell.className
+                                const searchInput = document.querySelector(`input[type=search].${category}`)
+                                if (!searchInput) {
+                                    continue
+                                }
+                                if (!cell.textContent.toLowerCase().includes(searchInput.value.toLowerCase())) {
+                                    shouldHide = true
+                                    break
+                                }
                             }
+                            row.hidden = shouldHide
                         }
                     })
                 }
