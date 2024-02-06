@@ -59,7 +59,7 @@ def import_snapshot(ec2, s3_bucket, s3_key, image_format):
     return snapshot_import_task["SnapshotTaskDetail"]["SnapshotId"]
 
 
-def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, public):
+def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, public, imdsv2_support, tpmv2_support):
     """
     Register image if it doesn't exist yet
 
@@ -80,13 +80,15 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, publi
 
         logging.info(
             f"Registering image {image_name} with snapshot {snapshot_id}")
-        tpmsupport = {}
+        extra = {}
 
         # TODO(arianvp): Not all instance types support TPM 2.0 yet. We should
         # upload two images, one with and one without TPM 2.0 support.
 
-        # if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-        #    tpmsupport['TpmSupport'] = "v2.0"
+        if tpmv2_support and architecture == "x86_64" and image_info["boot_mode"] == "uefi":
+            extra['TpmSupport'] = "v2.0"
+        if imdsv2_support:
+            extra['ImdsSupport'] = "v2.0"
 
         register_image = ec2.register_image(
             Name=image_name,
@@ -106,7 +108,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, publi
             EnaSupport=True,
             ImdsSupport="v2.0",
             SriovNetSupport="simple",
-            **tpmsupport
+            **extra
         )
         image_id = register_image["ImageId"]
 
@@ -178,7 +180,15 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions, p
     return image_ids
 
 
-def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
+def upload_ami(
+        image_info: dict[str, str],
+        s3_bucket: str,
+        copy_to_regions: str,
+        prefix: str,
+        run_id: str,
+        public: bool,
+        imdsv2_support: bool,
+        tpmv2_support: bool):
     """
     Upload NixOS AMI to AWS and return the image ids for each region
 
@@ -190,7 +200,8 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
     image_file = image_info["file"]
     label = image_info["label"]
     system = image_info["system"]
-    image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
+    image_name = prefix + label + "-" + \
+        system + ("." + run_id if run_id else "")
     s3_key = image_name
     upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
 
@@ -198,7 +209,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
     snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
 
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id, public)
+        ec2, image_name, image_info, snapshot_id, public, imdsv2_support, tpmv2_support)
 
     regions = filter(lambda x: x["RegionName"] !=
                      ec2.meta.region_name, ec2.describe_regions()["Regions"])
@@ -211,7 +222,7 @@ def upload_ami(image_info, s3_bucket, copy_to_regions, prefix, run_id, public):
             copy_image_to_regions(image_id, image_name,
                                   ec2.meta.region_name, regions, public)
         )
-    
+
     return image_ids
 
 
@@ -227,6 +238,8 @@ def main():
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
     parser.add_argument("--public", action="store_true")
+    parser.add_argument("--tpmv2-support", action="store_true")
+    parser.add_argument("--imdsv2-support", action="store_true")
     parser.add_argument("--prefix", help="Prefix to prepend to image name")
     parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
@@ -242,8 +255,10 @@ def main():
 
     image_ids = {}
     image_ids = upload_ami(
-        image_info, args.s3_bucket, args.copy_to_regions, args.prefix, args.run_id, args.public
+        image_info, args.s3_bucket, args.copy_to_regions, args.prefix,
+        args.run_id, args.public, args.imdsv2_support, args.tpmv2_support
     )
+
     print(json.dumps(image_ids))
 
 
