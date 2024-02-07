@@ -95,7 +95,7 @@ jobs:
           role-to-assume: arn:aws:iam::686862074153:role/deploy
           aws-region: eu-central-1
       - name: Download plan
-        uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4
+        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4
         with:
           name: tfplan
           path: tf
