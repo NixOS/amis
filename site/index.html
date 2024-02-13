@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>NixOS Amazon Images / AMIs</title>
     <style>
         table {
             border-collapse: collapse;
@@ -52,6 +52,7 @@
                  * @property {string} ImageId
                  * @property {string} Region
                  * @property {string} Name
+                 * @property {string} OwnerId
                  */
 
                 const response = await fetch("images.json")
@@ -62,6 +63,9 @@
                  * @type {Record<string, AWSImages>}
                  */
                 const images = await response.json()
+
+                const ownerId = images["us-east-1"].Images[0].OwnerId
+                document.querySelector("#owner-id").textContent = ownerId
 
                 /** 
                  * @type {HTMLTemplateElement}
@@ -77,7 +81,7 @@
 
                 for (const [region, images_] of Object.entries(images)) {
                     console.log(region, images_)
-                    for (const image of images_) {
+                    for (const image of images_.Images) {
                         const row = rowTemplate.content.cloneNode(true)
                         const cells = row.querySelectorAll("td")
 
@@ -197,10 +201,10 @@
 </head>
 
 <body>
-    <h1>Amazon Images</h1>
+    <h1>Amazon Images / AMIs</h1>
 
     <p>Here are the latest NixOS images available in the Amazon cloud.</p>
-    <p>NixOS images are published under AWS Account ID 3283237582</p>
+    <p>NixOS images are published under AWS Account ID <span id="owner-id"></span> </p>
     <table id="images-table">
         <thead>
             <tr>
@@ -216,14 +220,11 @@
                     <datalist class="architecture" id="architectures-datalist">
                     </datalist>
                 </th>
-                <th class="name" aria-sort="descending">
+                <th class="name">
                     <label for="search-name">Name</label>
                     <input type="search" class="name" placeholder="Name">
                     <datalist class="name" id="names-datalist">
                     </datalist>
-                    <button class="sort">
-                        <span>▼</span>
-                    </button>
                 </th>
                 <th class="creation-date" aria-sort="descending">
                     Creation date

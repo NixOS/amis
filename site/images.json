@@ -1,4 +1,5 @@
 {
+    "us-east-1": {
         "Images": [
             {
                 "Architecture": "x86_64",
@@ -192,1484 +193,1485 @@
                     }
                 ],
                 "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2023-12-29T14:01:51.000Z",
-            "ImageId": "ami-0ddb7ad164c465bda",
-            "ImageLocation": "686862074153/staging-legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-07e15443309d5b2c6",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2023-12-29T14:01:51.000Z",
+                "ImageId": "ami-0ddb7ad164c465bda",
+                "ImageLocation": "686862074153/staging-legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-07e15443309d5b2c6",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-07T00:18:49.000Z",
-            "ImageId": "ami-091c9193a1e27aabb",
-            "ImageLocation": "686862074153/staging-legacy/8nl6s1rml097lmg9y3lmpsp3w0cvwakq-nixos-amazon-image-23.11.2596.c1be43e8e837-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0300f52ee283310ed",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-07T00:18:49.000Z",
+                "ImageId": "ami-091c9193a1e27aabb",
+                "ImageLocation": "686862074153/staging-legacy/8nl6s1rml097lmg9y3lmpsp3w0cvwakq-nixos-amazon-image-23.11.2596.c1be43e8e837-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0300f52ee283310ed",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/8nl6s1rml097lmg9y3lmpsp3w0cvwakq-nixos-amazon-image-23.11.2596.c1be43e8e837-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2023-12-29T15:56:07.000Z",
-            "ImageId": "ami-0afe3279b964d89d9",
-            "ImageLocation": "686862074153/staging-legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-07e15443309d5b2c6",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/8nl6s1rml097lmg9y3lmpsp3w0cvwakq-nixos-amazon-image-23.11.2596.c1be43e8e837-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2023-12-29T15:56:07.000Z",
+                "ImageId": "ami-0afe3279b964d89d9",
+                "ImageLocation": "686862074153/staging-legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-07e15443309d5b2c6",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-24T15:54:48.000Z",
-            "ImageId": "ami-00e749f3b4121a01f",
-            "ImageLocation": "686862074153/staging-legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-04154f8b63fe07c35",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-24T15:54:48.000Z",
+                "ImageId": "ami-00e749f3b4121a01f",
+                "ImageLocation": "686862074153/staging-legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-04154f8b63fe07c35",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-01T19:57:33.000Z",
-            "ImageId": "ami-076fb87351aed60f7",
-            "ImageLocation": "686862074153/staging-legacy/0009nk8zmagibgxgha6bbny2b9c08zgd-nixos-amazon-image-23.11.2413.32f63574c85f-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0aabdd4d6e2822ed6",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-01T19:57:33.000Z",
+                "ImageId": "ami-076fb87351aed60f7",
+                "ImageLocation": "686862074153/staging-legacy/0009nk8zmagibgxgha6bbny2b9c08zgd-nixos-amazon-image-23.11.2413.32f63574c85f-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0aabdd4d6e2822ed6",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/0009nk8zmagibgxgha6bbny2b9c08zgd-nixos-amazon-image-23.11.2413.32f63574c85f-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-24T15:57:09.000Z",
-            "ImageId": "ami-0c19f8d3c1629ed6c",
-            "ImageLocation": "686862074153/legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0b2ee0c12109c94ae",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/0009nk8zmagibgxgha6bbny2b9c08zgd-nixos-amazon-image-23.11.2413.32f63574c85f-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-24T15:57:09.000Z",
+                "ImageId": "ami-0c19f8d3c1629ed6c",
+                "ImageLocation": "686862074153/legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b2ee0c12109c94ae",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-24T15:57:09.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-02-04T00:17:47.000Z",
-            "ImageId": "ami-0d5ac131337f77b91",
-            "ImageLocation": "686862074153/staging-legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-09f1d9dfe2b3a86fe",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-24T15:57:09.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-02-04T00:17:47.000Z",
+                "ImageId": "ami-0d5ac131337f77b91",
+                "ImageLocation": "686862074153/staging-legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-09f1d9dfe2b3a86fe",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-17T21:18:50.000Z",
-            "ImageId": "ami-040741989bda0586f",
-            "ImageLocation": "686862074153/staging-legacy/wlr4lqdnwgxcfdb5dllri3lgqbrmzn67-nixos-amazon-image-23.11.2962.b8dd8be3c790-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-02eb099805709a2bd",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-17T21:18:50.000Z",
+                "ImageId": "ami-040741989bda0586f",
+                "ImageLocation": "686862074153/staging-legacy/wlr4lqdnwgxcfdb5dllri3lgqbrmzn67-nixos-amazon-image-23.11.2962.b8dd8be3c790-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-02eb099805709a2bd",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/wlr4lqdnwgxcfdb5dllri3lgqbrmzn67-nixos-amazon-image-23.11.2962.b8dd8be3c790-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-02-01T21:45:20.000Z",
-            "ImageId": "ami-05ad338b5684da91a",
-            "ImageLocation": "686862074153/staging-legacy/8i23mzmwn6h2w3nz2mg6bvrdbap5gzgf-nixos-amazon-image-23.11.3805.53fbe41cf76b-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0c1a7685c0831b107",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/wlr4lqdnwgxcfdb5dllri3lgqbrmzn67-nixos-amazon-image-23.11.2962.b8dd8be3c790-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-02-01T21:45:20.000Z",
+                "ImageId": "ami-05ad338b5684da91a",
+                "ImageLocation": "686862074153/staging-legacy/8i23mzmwn6h2w3nz2mg6bvrdbap5gzgf-nixos-amazon-image-23.11.3805.53fbe41cf76b-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0c1a7685c0831b107",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/8i23mzmwn6h2w3nz2mg6bvrdbap5gzgf-nixos-amazon-image-23.11.3805.53fbe41cf76b-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2023-12-29T15:55:53.000Z",
-            "ImageId": "ami-02129529c8d98472c",
-            "ImageLocation": "686862074153/staging-legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0201c93e52a15a688",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/8i23mzmwn6h2w3nz2mg6bvrdbap5gzgf-nixos-amazon-image-23.11.3805.53fbe41cf76b-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2023-12-29T15:55:53.000Z",
+                "ImageId": "ami-02129529c8d98472c",
+                "ImageLocation": "686862074153/staging-legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0201c93e52a15a688",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-14T00:20:19.000Z",
-            "ImageId": "ami-0e36029a46f2f9501",
-            "ImageLocation": "686862074153/legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-03696c4ad2775351e",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-14T00:20:19.000Z",
+                "ImageId": "ami-0e36029a46f2f9501",
+                "ImageLocation": "686862074153/legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03696c4ad2775351e",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-01-14T00:20:19.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2023-12-29T16:24:44.000Z",
-            "ImageId": "ami-014a76d45163221a2",
-            "ImageLocation": "686862074153/legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0201c93e52a15a688",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-01-14T00:20:19.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2023-12-29T16:24:44.000Z",
+                "ImageId": "ami-014a76d45163221a2",
+                "ImageLocation": "686862074153/legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0201c93e52a15a688",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2025-12-29T16:24:44.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-02-04T00:19:58.000Z",
-            "ImageId": "ami-05e4d7333d1da7793",
-            "ImageLocation": "686862074153/legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-09f1d9dfe2b3a86fe",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/apd0c7vd9j3bhpp1mlzgg8ddznvghm15-nixos-amazon-image-23.11.2217.d02d818f22c7-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2025-12-29T16:24:44.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-02-04T00:19:58.000Z",
+                "ImageId": "ami-05e4d7333d1da7793",
+                "ImageLocation": "686862074153/legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-09f1d9dfe2b3a86fe",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-02-04T00:19:58.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-23T21:48:51.000Z",
-            "ImageId": "ami-0af80ab4e7dc688e4",
-            "ImageLocation": "686862074153/staging-legacy/lv4dz27xp99rrmvz5w9ahxm6g77n6mxw-nixos-amazon-image-23.11.3409.d7f206b723e4-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-08226e9ec577648f2",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/frd22cfphxv4lxsl0p7wh5wknirxcyn1-nixos-amazon-image-23.11.3920.25e3d4c0d359-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-02-04T00:19:58.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-23T21:48:51.000Z",
+                "ImageId": "ami-0af80ab4e7dc688e4",
+                "ImageLocation": "686862074153/staging-legacy/lv4dz27xp99rrmvz5w9ahxm6g77n6mxw-nixos-amazon-image-23.11.3409.d7f206b723e4-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-08226e9ec577648f2",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/lv4dz27xp99rrmvz5w9ahxm6g77n6mxw-nixos-amazon-image-23.11.3409.d7f206b723e4-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-14T00:18:24.000Z",
-            "ImageId": "ami-0aef3926a0dae1139",
-            "ImageLocation": "686862074153/staging-legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-03696c4ad2775351e",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/lv4dz27xp99rrmvz5w9ahxm6g77n6mxw-nixos-amazon-image-23.11.3409.d7f206b723e4-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-14T00:18:24.000Z",
+                "ImageId": "ami-0aef3926a0dae1139",
+                "ImageLocation": "686862074153/staging-legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03696c4ad2775351e",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-28T00:23:04.000Z",
-            "ImageId": "ami-031be24fe3aa77afb",
-            "ImageLocation": "686862074153/legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0b30161beec07a534",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/njybrwjgql7qb0mla6pajgd02bzwr7c0-nixos-amazon-image-23.11.2874.a2fe8d21f667-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-28T00:23:04.000Z",
+                "ImageId": "ami-031be24fe3aa77afb",
+                "ImageLocation": "686862074153/legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b30161beec07a534",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-28T00:23:04.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-07T00:19:24.000Z",
-            "ImageId": "ami-068d448b805e8715a",
-            "ImageLocation": "686862074153/legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0428f2524038f9976",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-28T00:23:04.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-07T00:19:24.000Z",
+                "ImageId": "ami-068d448b805e8715a",
+                "ImageLocation": "686862074153/legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0428f2524038f9976",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-07T00:19:24.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-18T21:48:10.000Z",
-            "ImageId": "ami-018edd1252ae1b19c",
-            "ImageLocation": "686862074153/staging-legacy/2lkrm4jkc9yyrhwz5cb9m76g7w7453a3-nixos-amazon-image-23.11.3019.8bf65f17d807-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0adf63018ba4d55fe",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-07T00:19:24.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-18T21:48:10.000Z",
+                "ImageId": "ami-018edd1252ae1b19c",
+                "ImageLocation": "686862074153/staging-legacy/2lkrm4jkc9yyrhwz5cb9m76g7w7453a3-nixos-amazon-image-23.11.3019.8bf65f17d807-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0adf63018ba4d55fe",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/2lkrm4jkc9yyrhwz5cb9m76g7w7453a3-nixos-amazon-image-23.11.3019.8bf65f17d807-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-02-04T20:26:34.000Z",
-            "ImageId": "ami-01a2ffbf19d43162d",
-            "ImageLocation": "686862074153/smoketest/23.11.3920.25e3d4c0d359-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0d2ea260d2d7304d3",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/2lkrm4jkc9yyrhwz5cb9m76g7w7453a3-nixos-amazon-image-23.11.3019.8bf65f17d807-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-02-04T20:26:34.000Z",
+                "ImageId": "ami-01a2ffbf19d43162d",
+                "ImageLocation": "686862074153/smoketest/23.11.3920.25e3d4c0d359-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0d2ea260d2d7304d3",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "smoketest/23.11.3920.25e3d4c0d359-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-02-04T00:17:34.000Z",
-            "ImageId": "ami-063b33e5be43e328e",
-            "ImageLocation": "686862074153/staging-legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0b2bcb364208b2691",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "smoketest/23.11.3920.25e3d4c0d359-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-02-04T00:17:34.000Z",
+                "ImageId": "ami-063b33e5be43e328e",
+                "ImageLocation": "686862074153/staging-legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b2bcb364208b2691",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-14T00:18:47.000Z",
-            "ImageId": "ami-09f8229ade1b759df",
-            "ImageLocation": "686862074153/staging-legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-098dcab992f31bcb5",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-14T00:18:47.000Z",
+                "ImageId": "ami-09f8229ade1b759df",
+                "ImageLocation": "686862074153/staging-legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-098dcab992f31bcb5",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-21T00:17:43.000Z",
-            "ImageId": "ami-05c9f3f2be2e31059",
-            "ImageLocation": "686862074153/staging-legacy/1gj6imyc1s7w8aw02g9giijf2r368iy6-nixos-amazon-image-23.11.3326.d2003f2223cb-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-04f532906ee03ae4b",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-21T00:17:43.000Z",
+                "ImageId": "ami-05c9f3f2be2e31059",
+                "ImageLocation": "686862074153/staging-legacy/1gj6imyc1s7w8aw02g9giijf2r368iy6-nixos-amazon-image-23.11.3326.d2003f2223cb-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-04f532906ee03ae4b",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/1gj6imyc1s7w8aw02g9giijf2r368iy6-nixos-amazon-image-23.11.3326.d2003f2223cb-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-28T00:19:35.000Z",
-            "ImageId": "ami-0a198a1ca4bd1d669",
-            "ImageLocation": "686862074153/legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0f2fd9ee145fb17ff",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/1gj6imyc1s7w8aw02g9giijf2r368iy6-nixos-amazon-image-23.11.3326.d2003f2223cb-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-28T00:19:35.000Z",
+                "ImageId": "ami-0a198a1ca4bd1d669",
+                "ImageLocation": "686862074153/legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0f2fd9ee145fb17ff",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-01-28T00:19:35.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-01T19:57:30.000Z",
-            "ImageId": "ami-073dadb18c8aaecf5",
-            "ImageLocation": "686862074153/staging-legacy/jrzzpkw1ar2xj2y6vmb0a829ada27a88-nixos-amazon-image-23.11.2413.32f63574c85f-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0ae3c0fad52450491",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-01-28T00:19:35.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-01T19:57:30.000Z",
+                "ImageId": "ami-073dadb18c8aaecf5",
+                "ImageLocation": "686862074153/staging-legacy/jrzzpkw1ar2xj2y6vmb0a829ada27a88-nixos-amazon-image-23.11.2413.32f63574c85f-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0ae3c0fad52450491",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/jrzzpkw1ar2xj2y6vmb0a829ada27a88-nixos-amazon-image-23.11.2413.32f63574c85f-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-26T21:15:34.000Z",
-            "ImageId": "ami-0426c158bf1ddc513",
-            "ImageLocation": "686862074153/staging-legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0815a3f56fb56fbdd",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/jrzzpkw1ar2xj2y6vmb0a829ada27a88-nixos-amazon-image-23.11.2413.32f63574c85f-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-26T21:15:34.000Z",
+                "ImageId": "ami-0426c158bf1ddc513",
+                "ImageLocation": "686862074153/staging-legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0815a3f56fb56fbdd",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-10T21:14:53.000Z",
-            "ImageId": "ami-06dad9bb5f8481d93",
-            "ImageLocation": "686862074153/staging-legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-03cafc48e88c570be",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/n22q5d7p7iwj550cl5zv3j1d7wvbx37a-nixos-amazon-image-23.11.3496.a77ab169a83a-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-10T21:14:53.000Z",
+                "ImageId": "ami-06dad9bb5f8481d93",
+                "ImageLocation": "686862074153/staging-legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03cafc48e88c570be",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2023-12-29T14:01:50.000Z",
-            "ImageId": "ami-0e5adb942cca08c12",
-            "ImageLocation": "686862074153/staging-legacy/nixos-23.11.2217.d02d818f22c7-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0201c93e52a15a688",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2023-12-29T14:01:50.000Z",
+                "ImageId": "ami-0e5adb942cca08c12",
+                "ImageLocation": "686862074153/staging-legacy/nixos-23.11.2217.d02d818f22c7-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0201c93e52a15a688",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/nixos-23.11.2217.d02d818f22c7-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2025-12-29T14:01:50.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-10T22:15:12.000Z",
-            "ImageId": "ami-042b64ac73f4d3874",
-            "ImageLocation": "686862074153/legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0f821f2703d0b4406",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/nixos-23.11.2217.d02d818f22c7-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2025-12-29T14:01:50.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-10T22:15:12.000Z",
+                "ImageId": "ami-042b64ac73f4d3874",
+                "ImageLocation": "686862074153/legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0f821f2703d0b4406",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-01-10T22:15:12.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-10T21:14:29.000Z",
-            "ImageId": "ami-0e66100ae2d5d4b6e",
-            "ImageLocation": "686862074153/staging-legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0f821f2703d0b4406",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-01-10T22:15:12.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-10T21:14:29.000Z",
+                "ImageId": "ami-0e66100ae2d5d4b6e",
+                "ImageLocation": "686862074153/staging-legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0f821f2703d0b4406",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2023-12-29T14:57:18.000Z",
-            "ImageId": "ami-09a169384108ccd47",
-            "ImageLocation": "686862074153/legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-07e15443309d5b2c6",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/p9djkm5hl0pv4bhh3kcpc5kcw1gm2727-nixos-amazon-image-23.11.2774.3dc440faeee9-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2023-12-29T14:57:18.000Z",
+                "ImageId": "ami-09a169384108ccd47",
+                "ImageLocation": "686862074153/legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-07e15443309d5b2c6",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2025-12-29T14:57:18.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-17T21:18:51.000Z",
-            "ImageId": "ami-0c160a765be7f1142",
-            "ImageLocation": "686862074153/staging-legacy/w5bpjz2xk9z5ga8p153l6cm0z8s3hhxy-nixos-amazon-image-23.11.2962.b8dd8be3c790-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-080fe0ebf12d3139c",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/nixos-23.11.2217.d02d818f22c7-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2025-12-29T14:57:18.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-17T21:18:51.000Z",
+                "ImageId": "ami-0c160a765be7f1142",
+                "ImageLocation": "686862074153/staging-legacy/w5bpjz2xk9z5ga8p153l6cm0z8s3hhxy-nixos-amazon-image-23.11.2962.b8dd8be3c790-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-080fe0ebf12d3139c",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/w5bpjz2xk9z5ga8p153l6cm0z8s3hhxy-nixos-amazon-image-23.11.2962.b8dd8be3c790-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-02-04T00:18:48.000Z",
-            "ImageId": "ami-0ae44aafd6547ff6f",
-            "ImageLocation": "686862074153/legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0b2bcb364208b2691",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/w5bpjz2xk9z5ga8p153l6cm0z8s3hhxy-nixos-amazon-image-23.11.2962.b8dd8be3c790-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-02-04T00:18:48.000Z",
+                "ImageId": "ami-0ae44aafd6547ff6f",
+                "ImageLocation": "686862074153/legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b2bcb364208b2691",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-02-04T00:18:48.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2023-12-29T16:24:28.000Z",
-            "ImageId": "ami-0c7961a305be78dfd",
-            "ImageLocation": "686862074153/legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-07e15443309d5b2c6",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/acrpcd2gfysamy7hhadmxjsgbzyrkyfi-nixos-amazon-image-23.11.3920.25e3d4c0d359-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-02-04T00:18:48.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2023-12-29T16:24:28.000Z",
+                "ImageId": "ami-0c7961a305be78dfd",
+                "ImageLocation": "686862074153/legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-07e15443309d5b2c6",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2025-12-29T16:24:28.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-26T21:15:00.000Z",
-            "ImageId": "ami-0d26f8093256d13ea",
-            "ImageLocation": "686862074153/staging-legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-042a446c753ad380a",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/rwqn95ip2zd17cq25rh1al8iqkvr8niq-nixos-amazon-image-23.11.2217.d02d818f22c7-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2025-12-29T16:24:28.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-26T21:15:00.000Z",
+                "ImageId": "ami-0d26f8093256d13ea",
+                "ImageLocation": "686862074153/staging-legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-042a446c753ad380a",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-07T00:18:09.000Z",
-            "ImageId": "ami-02cae9018e152865e",
-            "ImageLocation": "686862074153/staging-legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0428f2524038f9976",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/4bj1qc4riziilfl2zvssb8dy693j7bsl-nixos-amazon-image-23.11.3496.a77ab169a83a-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-07T00:18:09.000Z",
+                "ImageId": "ami-02cae9018e152865e",
+                "ImageLocation": "686862074153/staging-legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0428f2524038f9976",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-23T21:49:06.000Z",
-            "ImageId": "ami-05d0bf593a43fa0ae",
-            "ImageLocation": "686862074153/staging-legacy/c71man15z4a5fwplbv2h9a433ayyw4l0-nixos-amazon-image-23.11.3409.d7f206b723e4-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-06161c07aea37d681",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/wjkblv8z6lx3l7ln62wnbd213c9hl0n0-nixos-amazon-image-23.11.2596.c1be43e8e837-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-23T21:49:06.000Z",
+                "ImageId": "ami-05d0bf593a43fa0ae",
+                "ImageLocation": "686862074153/staging-legacy/c71man15z4a5fwplbv2h9a433ayyw4l0-nixos-amazon-image-23.11.3409.d7f206b723e4-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-06161c07aea37d681",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/c71man15z4a5fwplbv2h9a433ayyw4l0-nixos-amazon-image-23.11.3409.d7f206b723e4-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-18T21:48:19.000Z",
-            "ImageId": "ami-00248cd5a71285afb",
-            "ImageLocation": "686862074153/staging-legacy/wiz5clvymbyy3f600jh1g6f7vz9x5k4k-nixos-amazon-image-23.11.3019.8bf65f17d807-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-07de89fcdd695560c",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/c71man15z4a5fwplbv2h9a433ayyw4l0-nixos-amazon-image-23.11.3409.d7f206b723e4-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-18T21:48:19.000Z",
+                "ImageId": "ami-00248cd5a71285afb",
+                "ImageLocation": "686862074153/staging-legacy/wiz5clvymbyy3f600jh1g6f7vz9x5k4k-nixos-amazon-image-23.11.3019.8bf65f17d807-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-07de89fcdd695560c",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/wiz5clvymbyy3f600jh1g6f7vz9x5k4k-nixos-amazon-image-23.11.3019.8bf65f17d807-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-10T22:14:38.000Z",
-            "ImageId": "ami-0224b873d5863f153",
-            "ImageLocation": "686862074153/legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-03cafc48e88c570be",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/wiz5clvymbyy3f600jh1g6f7vz9x5k4k-nixos-amazon-image-23.11.3019.8bf65f17d807-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-10T22:14:38.000Z",
+                "ImageId": "ami-0224b873d5863f153",
+                "ImageLocation": "686862074153/legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03cafc48e88c570be",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-10T22:14:38.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-24T15:55:22.000Z",
-            "ImageId": "ami-009b4ae364e3bae3e",
-            "ImageLocation": "686862074153/staging-legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
-            "ImageType": "machine",
-            "Public": false,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-0b2ee0c12109c94ae",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/x2s2f9qvcv965pnxfg9jkz2c8qvwpmia-nixos-amazon-image-23.11.2774.3dc440faeee9-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-10T22:14:38.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-24T15:55:22.000Z",
+                "ImageId": "ami-009b4ae364e3bae3e",
+                "ImageLocation": "686862074153/staging-legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
+                "ImageType": "machine",
+                "Public": false,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-0b2ee0c12109c94ae",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "staging-legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-14T00:20:34.000Z",
-            "ImageId": "ami-0331475b647ea1c23",
-            "ImageLocation": "686862074153/legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-098dcab992f31bcb5",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "staging-legacy/7lzq9i19qg2hwh8mdrcv0jbsi9p4al5q-nixos-amazon-image-23.11.3483.547c924c5407-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-14T00:20:34.000Z",
+                "ImageId": "ami-0331475b647ea1c23",
+                "ImageLocation": "686862074153/legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-098dcab992f31bcb5",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-14T00:20:34.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-02-04T21:43:00.000Z",
-            "ImageId": "ami-00d5555ea5675eb8a",
-            "ImageLocation": "686862074153/nixos/23.11.3920.25e3d4c0d359-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-06e39b9e415487fad",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/iyg03p4mna2xyak98zm3196iz88mc3q7-nixos-amazon-image-23.11.2874.a2fe8d21f667-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-14T00:20:34.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-02-04T21:43:00.000Z",
+                "ImageId": "ami-00d5555ea5675eb8a",
+                "ImageLocation": "686862074153/nixos/23.11.3920.25e3d4c0d359-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-06e39b9e415487fad",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "nixos/23.11.3920.25e3d4c0d359-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-02-04T21:43:00.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-01-24T15:55:48.000Z",
-            "ImageId": "ami-0c4cd09f33a7d66d8",
-            "ImageLocation": "686862074153/legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-04154f8b63fe07c35",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "nixos/23.11.3920.25e3d4c0d359-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-02-04T21:43:00.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-01-24T15:55:48.000Z",
+                "ImageId": "ami-0c4cd09f33a7d66d8",
+                "ImageLocation": "686862074153/legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-04154f8b63fe07c35",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-01-24T15:55:48.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "x86_64",
-            "CreationDate": "2024-02-04T21:42:54.000Z",
-            "ImageId": "ami-02c269b4a984acfce",
-            "ImageLocation": "686862074153/nixos/23.11.3920.25e3d4c0d359-x86_64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-002279cd3a3566618",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/isarnrvj477zpgr6k3l3791vyzxq9j34-nixos-amazon-image-23.11.3483.547c924c5407-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-01-24T15:55:48.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "x86_64",
+                "CreationDate": "2024-02-04T21:42:54.000Z",
+                "ImageId": "ami-02c269b4a984acfce",
+                "ImageLocation": "686862074153/nixos/23.11.3920.25e3d4c0d359-x86_64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-002279cd3a3566618",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "nixos/23.11.3920.25e3d4c0d359-x86_64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "legacy-bios",
-            "DeprecationTime": "2026-02-04T21:42:54.000Z",
-            "ImdsSupport": "v2.0"
-        },
-        {
-            "Architecture": "arm64",
-            "CreationDate": "2024-01-21T00:19:48.000Z",
-            "ImageId": "ami-0ddc5e83fa990a24d",
-            "ImageLocation": "686862074153/legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
-            "ImageType": "machine",
-            "Public": true,
-            "OwnerId": "686862074153",
-            "PlatformDetails": "Linux/UNIX",
-            "UsageOperation": "RunInstances",
-            "State": "available",
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "SnapshotId": "snap-03892236d14ba2f7b",
-                        "VolumeSize": 4,
-                        "VolumeType": "gp3",
-                        "Encrypted": false
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "nixos/23.11.3920.25e3d4c0d359-x86_64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "legacy-bios",
+                "DeprecationTime": "2026-02-04T21:42:54.000Z",
+                "ImdsSupport": "v2.0"
+            },
+            {
+                "Architecture": "arm64",
+                "CreationDate": "2024-01-21T00:19:48.000Z",
+                "ImageId": "ami-0ddc5e83fa990a24d",
+                "ImageLocation": "686862074153/legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
+                "ImageType": "machine",
+                "Public": true,
+                "OwnerId": "686862074153",
+                "PlatformDetails": "Linux/UNIX",
+                "UsageOperation": "RunInstances",
+                "State": "available",
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvda",
+                        "Ebs": {
+                            "DeleteOnTermination": true,
+                            "SnapshotId": "snap-03892236d14ba2f7b",
+                            "VolumeSize": 4,
+                            "VolumeType": "gp3",
+                            "Encrypted": false
+                        }
                     }
-                }
-            ],
-            "EnaSupport": true,
-            "Hypervisor": "xen",
-            "Name": "legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
-            "RootDeviceName": "/dev/xvda",
-            "RootDeviceType": "ebs",
-            "SriovNetSupport": "simple",
-            "VirtualizationType": "hvm",
-            "BootMode": "uefi",
-            "DeprecationTime": "2026-01-21T00:19:48.000Z",
-            "ImdsSupport": "v2.0"
-        }
-    ]
+                ],
+                "EnaSupport": true,
+                "Hypervisor": "xen",
+                "Name": "legacy/lsfhbfywq3d60vq31ib5jjfchsh5b25y-nixos-amazon-image-23.11.3326.d2003f2223cb-aarch64-linux",
+                "RootDeviceName": "/dev/xvda",
+                "RootDeviceType": "ebs",
+                "SriovNetSupport": "simple",
+                "VirtualizationType": "hvm",
+                "BootMode": "uefi",
+                "DeprecationTime": "2026-01-21T00:19:48.000Z",
+                "ImdsSupport": "v2.0"
+            }
+        ]
+    }
 }
