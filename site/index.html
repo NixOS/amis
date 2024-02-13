@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+        }
+
+        input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 0.5rem;
+        }
+
+        pre {
+            max-width: 80rem;
+            padding: 0.5rem;
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script type="module">
+        (async function () {
+            try {
+                /**
+                 * @typedef {Object} AWSImages
+                 * @property {AWSImage[]} Images
+                 */
+
+                /** 
+                 * @typedef {Object} AWSImage
+                 * @property {string} Architecture
+                 * @property {string} CreationDate
+                 * @property {string} ImageId
+                 * @property {string} Region
+                 * @property {string} Name
+                 */
+
+                const response = await fetch("images.json")
+                if (!response.ok) {
+                    throw new Error("Failed to fetch images")
+                }
+                /**
+                 * @type {Record<string, AWSImages>}
+                 */
+                const images = await response.json()
+
+                /** 
+                 * @type {HTMLTemplateElement}
+                 */
+                const rowTemplate = document.getElementById("row-template")
+
+                /** 
+                 * @type {HTMLTableElement}
+                 */
+                const imagesTable = document.getElementById("images-table")
+
+                const tbody = imagesTable.tBodies[0]
+
+                for (const [region, images_] of Object.entries(images)) {
+                    console.log(region, images_)
+                    for (const image of images_) {
+                        const row = rowTemplate.content.cloneNode(true)
+                        const cells = row.querySelectorAll("td")
+
+                        const regionCell = row.querySelector("td.region")
+                        regionCell.textContent = region
+
+                        const architectureCell = row.querySelector("td.architecture")
+                        architectureCell.textContent = image.Architecture
+
+                        const creationDateCell = row.querySelector("td.creation-date")
+                        creationDateCell.textContent = image.CreationDate
+
+                        const nameCell = row.querySelector("td.name")
+                        nameCell.textContent = image.Name
+
+                        const imageIdCell = row.querySelector("td.image-id")
+                        imageIdCell.textContent = image.ImageId
+
+                        tbody.appendChild(row)
+                    }
+
+                }
+
+
+
+                /** 
+                 * @type {NodeListOf<HTMLInputElement>}
+                 */
+                const searchInputs = document.querySelectorAll("input[type=search]")
+                for (const searchInput of searchInputs) {
+                    searchInput.addEventListener("input", function () {
+                        for (const row of tbody.rows) {
+                            let shouldHide = false
+                            for (const cell of row.cells) {
+                                const category = cell.className
+                                const searchInput = document.querySelector(`input[type=search].${category}`)
+                                if (!searchInput) {
+                                    continue
+                                }
+                                if (!cell.textContent.toLowerCase().includes(searchInput.value.toLowerCase())) {
+                                    shouldHide = true
+                                    break
+                                }
+                            }
+                            row.hidden = shouldHide
+                        }
+                    })
+                }
+
+                /** 
+                 * @type {HTMLButtonElement}
+                 */
+                const creationDateSortButton = document.querySelector("th.creation-date button.sort")
+
+                function sortTable(sortDirection) {
+                    const rows = tbody.querySelectorAll("tr")
+
+                    const sortedRows = Array.from(rows).sort((a, b) => {
+                        const aDate = new Date(a.querySelector("td.creation-date").textContent)
+                        const bDate = new Date(b.querySelector("td.creation-date").textContent)
+
+                        if (sortDirection === "ascending") {
+                            return aDate - bDate
+                        } else {
+                            return bDate - aDate
+                        }
+                    })
+
+                    for (const row of sortedRows) {
+                        tbody.appendChild(row)
+                    }
+                }
+
+                /** 
+                 * @type {HTMLTableHeaderCellElement}
+                 */
+                const thCreationDate = document.querySelector("th.creation-date");
+                const sortDirection = document.querySelector("th.creation-date").getAttribute("aria-sort");
+                sortTable(sortDirection)
+
+
+                creationDateSortButton.addEventListener("click", function () {
+                    let sortDirection = thCreationDate.getAttribute("aria-sort")
+
+                    const rows = tbody.querySelectorAll("tr")
+                    if (sortDirection === "ascending") {
+                        thCreationDate.setAttribute("aria-sort", "descending")
+                        this.innerHTML = `<span>▼</span>`
+                    } else {
+                        thCreationDate.setAttribute("aria-sort", "ascending")
+                        this.innerHTML = `<span>▲</span>`
+                    }
+                    sortTable(sortDirection === "ascending" ? "descending" : "ascending")
+
+                })
+
+                const datalists = document.querySelectorAll("datalist")
+
+                for (const datalist of datalists) {
+                    const category = datalist.className
+                    const values = new Set()
+                    for (const td of tbody.querySelectorAll(`td.${category}`)) {
+                        values.add(td.textContent)
+                    }
+
+                    for (const value of values) {
+                        const option = document.createElement("option")
+                        option.value = value
+                        datalist.appendChild(option)
+                    }
+                }
+            } catch (error) {
+                throw error
+            }
+        })()
+    </script>
+</head>
+
+<body>
+    <h1>Amazon Images</h1>
+
+    <p>Here are the latest NixOS images available in the Amazon cloud.</p>
+    <p>NixOS images are published under AWS Account ID 3283237582</p>
+    <table id="images-table">
+        <thead>
+            <tr>
+                <th class="region">
+                    <label for="search-regions">Region</label>
+                    <input type="search" class="region" list="regions-datalist" placeholder="Region">
+                    <datalist class="region" id="regions-datalist">
+                    </datalist>
+                </th>
+                <th class="architecture">
+                    <label for="search-architectures">Architecture</label>
+                    <input type="search" class="architecture" list="architectures-datalist" placeholder="Architecture">
+                    <datalist class="architecture" id="architectures-datalist">
+                    </datalist>
+                </th>
+                <th class="name" aria-sort="descending">
+                    <label for="search-name">Name</label>
+                    <input type="search" class="name" placeholder="Name">
+                    <datalist class="name" id="names-datalist">
+                    </datalist>
+                    <button class="sort">
+                        <span>▼</span>
+                    </button>
+                </th>
+                <th class="creation-date" aria-sort="descending">
+                    Creation date
+                    <button class="sort">
+                        <span>▼</span>
+                    </button>
+                </th>
+                <th>Image ID</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <template id="row-template">
+                <tr>
+                    <td class="region"></td>
+                    <td class="architecture"></td>
+                    <td class="name"></td>
+                    <td class="creation-date"></td>
+                    <td class="image-id"></td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+</body>
+
+</html>
