@@ -214,7 +214,11 @@ data "aws_iam_policy_document" "assume_upload_ami" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.repo}:environment:images"]
+      values   = [
+        "repo:${var.repo}:environment:images",
+        # TODO: separate role?
+        "repo:${var.repo}:environment:github-pages",
+      ]
     }
   }
 }
