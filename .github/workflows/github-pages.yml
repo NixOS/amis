@@ -17,7 +17,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    if: github.ref == 'refs/heads/main' 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
@@ -29,10 +28,11 @@ jobs:
       - name: Describe images
         run: nix run .#describe-images > ./site/images.json
       - name: Upload pages
-        uses: actions/upload-pages-artifact@v3.0.0
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: ./site
       - name: Deploy pages
-        uses: actions/deploy-pages@v4.0.3
+        uses: actions/deploy-pages@decdde0ac072f6dcbe43649d82d9c635fff5b4e4 # v4.0.4
         id: deployment
+        if: github.ref == 'refs/heads/main' 
 
