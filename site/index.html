@@ -67,6 +67,9 @@
                 const ownerId = images["us-east-1"].Images[0].OwnerId
                 document.querySelector("#owner-id").textContent = ownerId
 
+                const terraform = document.querySelector("#terraform")
+                terraform.textContent = terraform.textContent.replace("_OWNER_ID_", ownerId)
+
                 /** 
                  * @type {HTMLTemplateElement}
                  */
@@ -202,9 +205,43 @@
 
 <body>
     <h1>Amazon Images / AMIs</h1>
+    <p>NixOS images are published under AWS Account ID <span id="owner-id"></span></p>
+
+    <h2>Terraform / OpenTofu</h2>
+    <p>You can use terraform to query for the latest image</p>
+    <pre id="terraform">
+provider "aws" {
+  region = "eu-central-1"
+}
+
+data "aws_ami" "nixos_arm64" {
+  owners      = ["_OWNER_ID_"]
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["nixos/23.11*"]
+  }
+  filter {
+    name   = "architecture"
+    values = ["arm64"]
+  }
+}
+
+resource "aws_instance" "nixos_arm64" {
+  ami           = data.aws_ami.nixos_arm64.id
+  instance_type = "t4g.nano"
+}
+</pre>
+    <h2>AWS CLI</h2>
+    <pre id="awscli2">
+aws ec2 describe-images --owners 686862074153 \
+  --filter 'Name=name,Values=nixos/23.11*' \
+  --filter 'Name=architecture,Values=arm64'
+</pre>
+
 
     <p>Here are the latest NixOS images available in the Amazon cloud.</p>
-    <p>NixOS images are published under AWS Account ID <span id="owner-id"></span> </p>
     <table id="images-table">
         <thead>
             <tr>
