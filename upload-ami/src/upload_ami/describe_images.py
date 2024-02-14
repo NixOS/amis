@@ -16,7 +16,7 @@ def main():
             Owners=["self"],
             ExecutableUsers=["all"],
         )
-        images[region["RegionName"]] = result["Images"]
+        images[region["RegionName"]] = result
     
     print(json.dumps(images, indent=2))
 
