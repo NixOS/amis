@@ -67,9 +67,9 @@ jobs:
           summary<<${delimiter}
           ## Plan Output
           <details><summary>Click to expand</summary>
-          \`\`\`terraform
+          ```terraform
           ${plan}
-          \`\`\`
+          ```
           </details>
           ${delimiter}
           EOF
