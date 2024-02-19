@@ -95,8 +95,9 @@ jobs:
 
   deploy-pages:
     name: Deploy images page
-    if: github.ref == 'refs/heads/main' 
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    needs: upload-ami
     permissions:
       contents: read
       id-token: write
