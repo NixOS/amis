@@ -1,4 +1,10 @@
 terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.37.0"
+    }
+  }
   backend "s3" {
     key = "terraform.tfstate"
   }
@@ -6,13 +12,6 @@ terraform {
 
 provider "aws" {
   region = "eu-central-1"
-}
-
-data "terraform_remote_state" "state_backend" {
-  backend = "local"
-  config = {
-    path = "./state-backend/terraform.tfstate"
-  }
 }
 
 resource "aws_s3_bucket" "images" {
@@ -43,19 +42,15 @@ resource "aws_iam_role" "vmimport" {
 
 data "aws_iam_policy_document" "vmimport" {
   statement {
-    actions = ["s3:ListBucket"]
-    effect  = "Allow"
-    resources = [
-      "${aws_s3_bucket.images.arn}"
-    ]
+    actions   = ["s3:ListBucket"]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.images.arn}"]
   }
 
   statement {
-    actions = ["s3:GetObject"]
-    effect  = "Allow"
-    resources = [
-      "${aws_s3_bucket.images.arn}/*"
-    ]
+    actions   = ["s3:GetObject"]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.images.arn}/*"]
   }
 
   statement {

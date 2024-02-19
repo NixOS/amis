@@ -1,18 +1,12 @@
-name: Deploy
+name: Plan and Apply
 permissions:
   id-token: write
   contents: read
 on:
   push:
-    paths:
-      - 'tf/**'
-      - '.github/workflows/deploy.yml'
     branches: 
       - main
   pull_request:
-    paths:
-      - 'tf/**'
-      - '.github/workflows/deploy.yml'
     branches: 
       - main
 jobs:
@@ -67,7 +61,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@eeabdb06718ac63a7021c6132129679a8e22d0c7 # v3
       - uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/deploy
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/apply
           aws-region: ${{ vars.AWS_REGION }}
       - name: Download plan
         uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4
