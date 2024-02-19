@@ -20,11 +20,6 @@ resource "aws_iam_openid_connect_provider" "github_actions" {
   thumbprint_list = ["ffffffffffffffffffffffffffffffffffffffff"]
 }
 
-import {
-  id = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
-  to = aws_iam_openid_connect_provider.github_actions
-}
-
 resource "aws_s3_bucket" "state" {
   bucket_prefix = "tf-state"
   force_destroy = true
@@ -109,19 +104,9 @@ resource "aws_iam_policy" "write_state" {
   policy = data.aws_iam_policy_document.write_state.json
 }
 
-import {
-  id = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/write-state"
-  to = aws_iam_policy.write_state
-}
-
 resource "aws_iam_policy" "state" {
   name   = "state"
   policy = data.aws_iam_policy_document.state.json
-}
-
-import {
-  id = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/state"
-  to = aws_iam_policy.state
 }
 
 module "assume_gha_state" {
@@ -150,11 +135,6 @@ resource "aws_iam_role" "state" {
   managed_policy_arns = [aws_iam_policy.state.arn]
 }
 
-import {
-  id = "state"
-  to = aws_iam_role.state
-}
-
 resource "aws_iam_role" "plan" {
   name               = "plan"
   assume_role_policy = data.aws_iam_policy_document.assume_plan.json
@@ -163,11 +143,6 @@ resource "aws_iam_role" "plan" {
     aws_iam_policy.state.arn,
     aws_iam_policy.write_state.arn,
   ]
-}
-
-import {
-  id = "plan"
-  to = aws_iam_role.plan
 }
 
 output "plan_role_arn" {
@@ -192,11 +167,6 @@ resource "aws_iam_role" "deploy" {
   name                = "deploy"
   assume_role_policy  = data.aws_iam_policy_document.assume_deploy.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-}
-
-import {
-  id = "deploy"
-  to = aws_iam_role.deploy
 }
 
 output "deploy_role_arn" {
