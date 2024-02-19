@@ -149,26 +149,26 @@ output "plan_role_arn" {
   value = aws_iam_role.plan.arn
 }
 
-module "assume_gha_deploy" {
+module "assume_gha_apply" {
   providers      = { aws = aws }
   source         = "../assume_github_actions_policy_document"
   depends_on     = [aws_iam_openid_connect_provider.github_actions]
   subject_filter = ["repo:${var.repo}:environment:infra"]
 }
 
-data "aws_iam_policy_document" "assume_deploy" {
+data "aws_iam_policy_document" "assume_apply" {
   source_policy_documents = [
     module.assume_administrator_access.json,
-    module.assume_gha_deploy.json,
+    module.assume_gha_apply.json,
   ]
 }
 
-resource "aws_iam_role" "deploy" {
-  name                = "deploy"
-  assume_role_policy  = data.aws_iam_policy_document.assume_deploy.json
+resource "aws_iam_role" "apply" {
+  name                = "apply"
+  assume_role_policy  = data.aws_iam_policy_document.assume_apply.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
 }
 
-output "deploy_role_arn" {
-  value = aws_iam_role.deploy.arn
+output "apply_role_arn" {
+  value = aws_iam_role.apply.arn
 }
