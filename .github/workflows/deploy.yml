@@ -18,7 +18,6 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    environment: infra
     permissions:
       contents: read
       id-token: write
@@ -57,31 +56,6 @@ jobs:
         with:
           name: tfplan
           path: tf/tfplan
-
-      - name: Create string output
-        id: tf-plan-string
-        run: |
-          cd tf
-          plan=$(nix shell --inputs-from . nixpkgs#opentofu --command tofu show -no-color tfplan)
-          delimiter="$(openssl rand -hex 8)"
-          cat <<EOF >> "$GITHUB_OUTPUT"
-          summary<<${delimiter}
-          ## Plan Output
-          <details><summary>Click to expand</summary>
-          ```terraform
-          ${plan}
-          ```
-          </details>
-          ${delimiter}
-          EOF
-
-      - name: Publish Terraform Plan to Task Summary
-        env:
-          SUMMARY: ${{ steps.tf-plan-string.outputs.summary }}
-        run: |
-          echo "$SUMMARY" >> "$GITHUB_STEP_SUMMARY"
-
-
   apply:
     runs-on: ubuntu-latest
     needs: [plan]
