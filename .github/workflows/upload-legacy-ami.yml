@@ -33,7 +33,7 @@ jobs:
           id_token=$(mktemp)
           curl --silent --fail-with-body \
             --header "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://sts.amazonaws.com" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" \
             | jq --raw-output '.value' > "$id_token"
           echo "AWS_WEB_IDENTITY_TOKEN_FILE=$id_token" >> "$GITHUB_ENV"
           echo "AWS_ROLE_ARN=arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami" >> "$GITHUB_ENV"
