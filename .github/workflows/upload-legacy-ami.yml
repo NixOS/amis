@@ -30,12 +30,15 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@eeabdb06718ac63a7021c6132129679a8e22d0c7 # v3
       - name: Get ID Token
         run: |
+          id_token=$(mktemp)
           curl --silent --fail-with-body \
             --header "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
             "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https://sts.amazonaws.com" \
-            --output id_token.json
-          
-            cat id_token.json | jq .
+            | jq --raw-output '.value' > "$id_token"
+          echo "AWS_WEB_IDENTITY_TOKEN_FILE=$id_token" >> "$GITHUB_ENV"
+          echo "AWS_ROLE_ARN=arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami" >> "$GITHUB_ENV"
+          echo "AWS_ROLE_SESSION_NAME=GithubActions" >> "$GITHUB_ENV"
+      - run: aws sts get-caller-identity
       # NOTE: We download the AMI from Hydra instead of building it ourselves
       # because aarch64 is currently not supported by AWS EC2 and the legacy
       # image builder requires nested virtualization.
