@@ -10,9 +10,11 @@ on:
   schedule:
     - cron: '0 0 * * 0' 
 env:
-  AWS_REGION: eu-central-1
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_DEFAULT_REGION: ${{ vars.AWS_REGION }}
   AWS_ROLE_ARN: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
   AWS_ROLE_SESSION_NAME: GithubActions
+  AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/id_token
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
@@ -32,13 +34,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@eeabdb06718ac63a7021c6132129679a8e22d0c7 # v3
       - name: Set up AWS SDK with id token
         run: |
-          id_token=$(mktemp)
-          curl --silent --fail-with-body \
-            --header "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" \
-            | jq --raw-output '.value' > "$id_token"
-          echo "AWS_WEB_IDENTITY_TOKEN_FILE=$id_token" >> "$GITHUB_ENV"
-      - run: aws sts get-caller-identity
+          curl -H "Authorization: Bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" | jq -r '.value' > "$AWS_WEB_IDENTITY_TOKEN_FILE"
       # NOTE: We download the AMI from Hydra instead of building it ourselves
       # because aarch64 is currently not supported by AWS EC2 and the legacy
       # image builder requires nested virtualization.
