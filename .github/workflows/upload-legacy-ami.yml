@@ -50,11 +50,6 @@ jobs:
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
-      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-        with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
-          aws-region: ${{ env.AWS_REGION }}
-
       - name: For all regions disable-image-block-public-access
         run: nix run .#disable-image-block-public-access
 
