@@ -64,7 +64,7 @@ jobs:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/apply
           aws-region: ${{ vars.AWS_REGION }}
       - name: Download plan
-        uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4
+        uses: actions/download-artifact@87c55149d96e628cc2ef7e6fc2aab372015aec85 # v4
         with:
           name: tfplan
           path: tf
