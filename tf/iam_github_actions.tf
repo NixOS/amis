@@ -105,7 +105,7 @@ module "assume_github_pages" {
 data "aws_iam_policy_document" "github_pages" {
   statement {
     effect    = "Allow"
-    actions   = ["ec2:DescribeImages"]
+    actions   = ["ec2:DescribeImages", "ec2:DescribeRegions"]
     resources = ["*"]
   }
 }
