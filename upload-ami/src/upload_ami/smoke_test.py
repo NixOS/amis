@@ -28,10 +28,11 @@ def smoke_test(image_id, run_id, cancel):
         InstanceMarketOptions={"MarketType": "spot"},
     )
 
-    instance_id = run_instances["Instances"][0]["InstanceId"]
+    instance = run_instances["Instances"][0]
+    instance_id = instance["InstanceId"]
 
     try:
-        if not cancel and run_instances[0]["State"]["Name"] != "terminated":
+        if not cancel and instance["State"]["Name"] != "terminated":
             # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
             logging.info(f"Waiting for instance {instance_id} to be running")
             ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
