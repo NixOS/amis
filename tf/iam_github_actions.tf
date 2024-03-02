@@ -52,7 +52,7 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Deny"
     actions = ["ec2:RunInstances"]
-    resources = ["arn:ec2:*:*:instance/*"]
+    resources = ["arn:aws:ec2:*:*:instance/*"]
     condition {
       test     = "StringNotEquals"
       variable = "ec2:InstanceType"
