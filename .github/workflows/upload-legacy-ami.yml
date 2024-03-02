@@ -9,8 +9,6 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0' 
-env:
-  AWS_REGION: eu-central-1
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
@@ -42,10 +40,7 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: For all regions disable-image-block-public-access
-        run: nix run .#disable-image-block-public-access
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
@@ -63,17 +58,17 @@ jobs:
         # NOTE: make sure smoke test isn't cancelled. Such that instance gets cleaned up.
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
-          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+          image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id"
+          nix run .#smoke-test -- --image-id "$image_id" --run-id "$run_id"
 
       - name: Clean up smoke test
         if: ${{ cancelled() }}
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
-          image_id=$(echo "$image_ids" | jq -r '.["${{ env.AWS_REGION }}"]')
+          image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --region "${{ env.AWS_REGION }}" --run-id "$run_id" --cancel
+          nix run .#smoke-test -- --image-id "$image_id" --run-id "$run_id" --cancel
       
 
       # NOTE: We do not pass run-id as we're not  building the image ourselves
@@ -113,7 +108,7 @@ jobs:
         with:
           # TODO: Separate role?
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
       - name: Describe images
         run: nix run .#describe-images > ./site/images.json
       - name: Upload pages
