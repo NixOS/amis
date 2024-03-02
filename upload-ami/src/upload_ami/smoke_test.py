@@ -4,8 +4,8 @@ import argparse
 import logging
 
 
-def smoke_test(image_id, region, run_id, cancel):
-    ec2 = boto3.client("ec2", region_name=region)
+def smoke_test(image_id, run_id, cancel):
+    ec2 = boto3.client("ec2")
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
     assert len(images["Images"]) == 1
@@ -63,12 +63,11 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--image-id", required=True)
-    parser.add_argument("--region", required=True)
     parser.add_argument("--run-id", required=False)
     parser.add_argument("--cancel", action="store_true", required=False)
     args = parser.parse_args()
 
-    smoke_test(args.image_id, args.region, args.run_id, args.cancel)
+    smoke_test(args.image_id, args.run_id, args.cancel)
 
 
 if __name__ == "__main__":
