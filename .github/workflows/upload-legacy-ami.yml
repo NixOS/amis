@@ -85,7 +85,7 @@ jobs:
             --prefix "nixos/" \
             --s3-bucket "$images_bucket" \
             --copy-to-regions \
-            --public)
+            --public
 
   deploy-pages:
     name: Deploy images page
