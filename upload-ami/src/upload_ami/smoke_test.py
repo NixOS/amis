@@ -57,7 +57,7 @@ def smoke_test(image_id, run_id, cancel):
         logging.info(f"Terminating instance {instance_id}")
         if instance["State"]["Name"] != "terminated":
             ec2.terminate_instances(InstanceIds=[instance_id])
-        ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
+            ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
 
 
 def main():
