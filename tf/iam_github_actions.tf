@@ -48,8 +48,13 @@ data "aws_iam_policy_document" "upload_ami" {
     effect    = "Allow"
     actions   = ["ec2:RunInstances"]
     resources = ["*"]
+  }
+  statement {
+    effect = "Deny"
+    actions = ["ec2:RunInstances"]
+    resources = ["*"]
     condition {
-      test     = "StringEquals"
+      test     = "StringNotEquals"
       variable = "ec2:InstanceType"
       values   = ["t3a.nano", "t4g.nano"]
     }
