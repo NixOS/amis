@@ -11,7 +11,6 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-central-1"
 }
 
 resource "aws_s3_bucket" "images" {
@@ -73,4 +72,9 @@ resource "aws_iam_role_policy" "vmimport" {
 
 output "images_bucket" {
   value = aws_s3_bucket.images.bucket
+}
+
+resource "aws_iam_service_linked_role" "spot" {
+  aws_service_name = "spot.amazonaws.com"
+  description      = "Default EC2 Spot Service Linked Role"
 }

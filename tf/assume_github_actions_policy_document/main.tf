@@ -17,7 +17,7 @@ data "aws_iam_openid_connect_provider" "github_actions" {
   url = "https://token.actions.githubusercontent.com"
 }
 
-data "aws_iam_policy_document" "assume_upload_ami" {
+data "aws_iam_policy_document" "assume_github_actions" {
 
   statement {
     effect  = "Allow"
@@ -37,5 +37,5 @@ data "aws_iam_policy_document" "assume_upload_ami" {
 }
 
 output "json" {
-  value = data.aws_iam_policy_document.assume_upload_ami.json
+  value = data.aws_iam_policy_document.assume_github_actions.json
 }

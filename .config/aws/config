@@ -1,0 +1,31 @@
+[sso-session nixos]
+sso_start_url = https://nixos.awsapps.com/start
+sso_region = eu-north-1
+sso_registration_scopes = sso:account:access
+
+[profile default]
+sso_session = nixos
+sso_account_id = 427812963091
+sso_role_name = AWSAdministratorAccess
+output = yaml
+region = eu-north-1
+
+[profile upload-ami]
+source_profile = default
+role_arn = arn:aws:iam::427812963091:role/upload-ami
+
+[profile github-pages]
+source_profile = default
+role_arn = arn:aws:iam::427812963091:role/github-pages
+
+[profile plan]
+source_profile = default
+role_arn = arn:aws:iam::427812963091:role/plan
+
+[profile state]
+source_profile = default
+role_arn = arn:aws:iam::427812963091:role/state
+
+[profile apply]
+source_profile = default
+role_arn = arn:aws:iam::427812963091:role/apply

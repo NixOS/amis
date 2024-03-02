@@ -37,13 +37,31 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
-      "ec2:RunInstances",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:GetConsoleOutput",
       "ec2:TerminateInstances",
     ]
     resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:RunInstances"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Deny"
+    actions   = ["ec2:RunInstances"]
+    resources = ["arn:aws:ec2:*:*:instance/*"]
+    condition {
+      test     = "StringNotEquals"
+      variable = "ec2:InstanceType"
+      values = [
+        "t3.nano",
+        "t3a.nano",
+        "t4g.nano"
+      ]
+    }
   }
 }
 
@@ -57,11 +75,8 @@ module "assume_administrator_access" {
 }
 
 module "assume_upload_ami" {
-  source = "./assume_github_actions_policy_document"
-  subject_filter = [
-    "repo:${var.repo}:environment:images",
-    "repo:${var.repo}:environment:github-pages",
-  ]
+  source         = "./assume_github_actions_policy_document"
+  subject_filter = ["repo:${var.repo}:environment:images"]
 }
 
 data "aws_iam_policy_document" "assume_upload_ami" {
@@ -79,4 +94,36 @@ resource "aws_iam_role" "upload_ami" {
 
 output "upload_ami_role_arn" {
   value = aws_iam_role.upload_ami.arn
+}
+
+
+module "assume_github_pages" {
+  source         = "./assume_github_actions_policy_document"
+  subject_filter = ["repo:${var.repo}:environment:github-pages"]
+}
+
+data "aws_iam_policy_document" "github_pages" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:DescribeImages", "ec2:DescribeRegions"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "github_pages" {
+  name   = "github-pages"
+  policy = data.aws_iam_policy_document.github_pages.json
+}
+
+data "aws_iam_policy_document" "assume_github_pages" {
+  source_policy_documents = [
+    module.assume_administrator_access.json,
+    module.assume_upload_ami.json,
+  ]
+}
+
+resource "aws_iam_role" "github_pages" {
+  name                = "github-pages"
+  assume_role_policy  = data.aws_iam_policy_document.assume_github_pages.json
+  managed_policy_arns = [aws_iam_policy.github_pages.arn]
 }
