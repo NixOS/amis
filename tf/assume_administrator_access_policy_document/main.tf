@@ -7,6 +7,11 @@ terraform {
   }
 }
 
+variable "sso_region" {
+  type    = string
+  default = "eu-north-1"
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "this" {
@@ -20,7 +25,11 @@ data "aws_iam_policy_document" "this" {
     condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_*"]
+      values = [
+        var.sso_region == "us-east-1" ?
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AWSAdministratorAccess_*" :
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${var.sso_region}/AWSReservedSSO_AWSAdministratorAccess_*"
+      ]
     }
   }
 }
