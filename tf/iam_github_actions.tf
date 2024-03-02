@@ -56,7 +56,11 @@ data "aws_iam_policy_document" "upload_ami" {
     condition {
       test     = "StringNotEquals"
       variable = "ec2:InstanceType"
-      values   = ["t3a.nano", "t4g.nano"]
+      values = [
+        "t3.nano",
+        "t3a.nano",
+        "t4g.nano"
+      ]
     }
   }
 }

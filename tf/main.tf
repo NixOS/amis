@@ -76,4 +76,5 @@ output "images_bucket" {
 
 resource "aws_iam_service_linked_role" "spot" {
   aws_service_name = "spot.amazonaws.com"
+  description      = "Default EC2 Spot Service Linked Role"
 }
