@@ -60,7 +60,7 @@ jobs:
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --run-id "$run_id"
+          nix run .#smoke-test -- --image-id "$image_id"
 
       - name: Clean up smoke test
         if: ${{ cancelled() }}
@@ -68,7 +68,7 @@ jobs:
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
-          nix run .#smoke-test -- --image-id "$image_id" --run-id "$run_id" --cancel
+          nix run .#smoke-test -- --image-id "$image_id" --cancel
       
 
       # NOTE: We do not pass run-id as we're not  building the image ourselves
