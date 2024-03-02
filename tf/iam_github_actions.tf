@@ -118,7 +118,7 @@ resource "aws_iam_policy" "github_pages" {
 data "aws_iam_policy_document" "assume_github_pages" {
   source_policy_documents = [
     module.assume_administrator_access.json,
-    module.assume_upload_ami.json,
+    module.assume_github_pages.json,
   ]
 }
 

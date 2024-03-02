@@ -15,12 +15,13 @@ data "aws_iam_policy_document" "this" {
     actions = ["sts:AssumeRole"]
     principals {
       type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.account_id]
+      identifiers = ["427812963091"]
     }
     condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
-      values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_AWSAdministratorAccess_*/*"]
+      values = ["arn:aws:iam::427812963091:role/aws-reserved/sso.amazonaws.com/eu-north-1/AWSReservedSSO_AWSAdministratorAccess_*"]
+      # values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_AWSAdministratorAccess_*/*"]
     }
   }
 }
