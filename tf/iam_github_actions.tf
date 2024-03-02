@@ -37,13 +37,22 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
-      "ec2:RunInstances",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:GetConsoleOutput",
       "ec2:TerminateInstances",
     ]
     resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:RunInstances"]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:InstanceType"
+      values   = ["t3a.nano", "t4g.nano"]
+    }
   }
 }
 
