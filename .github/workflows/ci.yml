@@ -17,5 +17,5 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
       - uses: DeterminateSystems/magic-nix-cache-action@122e91d3464f7a0985c87c9639b08aa5d9160b31 # main
-      - run: nix build .#amazonImage -L --system ${{ matrix.runs-on.system }}
-      - run: nix flake check -L --system ${{ matrix.runs-on.system }}
+      - run: nix build .#amazonImage -L
+      - run: nix flake check -L 
