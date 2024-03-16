@@ -112,6 +112,7 @@ def register_image_if_not_exists(ec2, image_name, image_info, snapshot_id, publi
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
     if public:
+        logging.info(f"Making {image_id} public")
         ec2.modify_image_attribute(
             ImageId=image_id,
             Attribute="launchPermission",
@@ -157,6 +158,7 @@ def copy_image_to_regions(image_id, image_name, source_region, target_regions, p
             f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
         )
         if public:
+            logging.info(f"Making {copy_image['ImageId']} public")
             ec2r.modify_image_attribute(
                 ImageId=copy_image["ImageId"],
                 Attribute="launchPermission",
