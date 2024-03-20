@@ -7,9 +7,8 @@ on:
       - main
   pull_request:
   workflow_dispatch:
-  # PAUSED until is fixed https://github.com/NixOS/amis/issues/107
-  # schedule:
-  #  - cron: '0 0 * * 0' 
+  schedule:
+    - cron: '0 0 * * 0' 
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
