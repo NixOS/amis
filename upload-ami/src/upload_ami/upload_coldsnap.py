@@ -1,7 +1,12 @@
 import argparse
+from email.mime import image
 import json
 import logging
+from pathlib import Path
+from posixpath import basename
 from re import I
+from tempfile import mktemp
+import tempfile
 import boto3
 import subprocess
 from typing import Literal, TypedDict
@@ -93,12 +98,19 @@ def upload_coldsnap(
 ) -> str:
     logging.info(f"Uploading image to coldsnap")
 
+    image_file_vhd = Path(image_info["file"])
+    image_file_raw = image_file_vhd.with_suffix(".raw")
+
+    subprocess.check_call(
+        [ "qemu-img" , "convert", "-O", "raw", image_file_vhd, image_file_raw ]
+    )
+
     snapshot_id = subprocess.check_output(
             [
                 "coldsnap",
                 "upload",
                 "--wait",
-                image_info["file"],
+                image_file_raw,
             ]
         ).decode().strip()
 

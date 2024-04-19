@@ -2,6 +2,7 @@
 , python3Packages
 , lib
 , coldsnap
+, qemu
 }:
 
 let
@@ -39,7 +40,7 @@ buildPythonApplication {
     ];
 
 
-  makeWrapperArgs = [ "--prefix PATH : ${coldsnap}/bin" ];
+  makeWrapperArgs = [ "--prefix PATH : ${coldsnap}/bin" "--prefix PATH : ${qemu}/bin" ];
 
   propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
 
