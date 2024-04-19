@@ -24,23 +24,25 @@ class ImageInfo(TypedDict):
     format: str
 
 
-def upload_to_s3_if_not_exists(s3: S3Client, bucket: str, key: str, file: str) -> None:
+def upload_to_s3_if_not_exists(
+    s3: S3Client, bucket: str, image_name: str, file_name: str
+) -> None:
     """
     Upload file to S3 if it doesn't exist yet
 
     This function is idempotent.
     """
     try:
-        logging.info(f"Checking if s3://{bucket}/{key} exists")
-        s3.head_object(Bucket=bucket, Key=key)
+        logging.info(f"Checking if s3://{bucket}/{image_name} exists")
+        s3.head_object(Bucket=bucket, Key=image_name)
     except botocore.exceptions.ClientError:
-        logging.info(f"Uploading {file} to s3://{bucket}/{key}")
-        s3.upload_file(file, bucket, key)
-        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
+        logging.info(f"Uploading {file_name} to s3://{bucket}/{image_name}")
+        s3.upload_file(file_name, bucket, image_name)
+        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=image_name)
 
 
 def import_snapshot(
-    ec2: EC2Client, s3_bucket: str, s3_key: str, image_format: str
+    ec2: EC2Client, s3_bucket: str, image_name: str, image_format: str
 ) -> str:
     """
     Import snapshot from S3 and wait for it to finish
@@ -49,8 +51,8 @@ def import_snapshot(
 
     Returns the snapshot id
     """
-    logging.info(f"Importing s3://{s3_bucket}/{s3_key} to EC2")
-    client_token_hash = hashlib.sha256(s3_key.encode())
+    logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
+    client_token_hash = hashlib.sha256(image_name.encode())
     client_token_hash.update("x".encode())
     client_token = client_token_hash.hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
@@ -58,11 +60,11 @@ def import_snapshot(
     # run a task with the same client token a few months later?
     snapshot_import_task = ec2.import_snapshot(
         DiskContainer={
-            "Description": s3_key,
+            "Description": image_name,
             "Format": image_format,
-            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": s3_key},
+            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
         },
-        Description=s3_key,
+        Description=image_name,
         ClientToken=client_token,
     )
     ec2.get_waiter("snapshot_imported").wait(
@@ -235,11 +237,10 @@ def upload_ami(
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
-    s3_key = image_name
-    upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
+    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
 
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
+    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_format)
 
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public
