@@ -23,6 +23,15 @@ data "aws_iam_policy_document" "upload_ami" {
   }
   statement {
     effect = "Allow"
+    actions = ["ec2:CreateTags"]
+    resources = [
+      "arn:aws:ec2:*:*:snapshot/*",
+      "arn:aws:ec2:*:*:image/*",
+      "arn:aws:ec2:*:*:import-snapshot-task/*",
+    ]
+  }
+  statement {
+    effect = "Allow"
     actions = [
       "ec2:DescribeImages",
       "ec2:RegisterImage",
