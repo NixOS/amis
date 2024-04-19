@@ -1,6 +1,7 @@
 import json
 import hashlib
 import logging
+from pathlib import Path
 from typing import Iterable, Literal, TypedDict
 import boto3
 import boto3.ec2
@@ -25,7 +26,7 @@ class ImageInfo(TypedDict):
 
 
 def upload_to_s3_if_not_exists(
-    s3: S3Client, bucket: str, image_name: str, file_name: str
+    s3: S3Client, bucket: str, image_name: str, file_path: Path
 ) -> None:
     """
     Upload file to S3 if it doesn't exist yet
@@ -36,13 +37,18 @@ def upload_to_s3_if_not_exists(
         logging.info(f"Checking if s3://{bucket}/{image_name} exists")
         s3.head_object(Bucket=bucket, Key=image_name)
     except botocore.exceptions.ClientError:
-        logging.info(f"Uploading {file_name} to s3://{bucket}/{image_name}")
-        s3.upload_file(file_name, bucket, image_name)
+        logging.info(f"Uploading {file_path} to s3://{bucket}/{image_name}")
+        s3.upload_file(str(file_path), bucket, image_name)
         s3.get_waiter("object_exists").wait(Bucket=bucket, Key=image_name)
 
 
 def import_snapshot_if_not_exist(
-    s3: S3Client, ec2: EC2Client, s3_bucket: str, image_name: str, image_format: str
+    s3: S3Client,
+    ec2: EC2Client,
+    s3_bucket: str,
+    image_name: str,
+    image_file: Path,
+    image_format: str,
 ) -> str:
     """
     Import snapshot from S3 and wait for it to finish
@@ -286,14 +292,14 @@ def upload_ami(
     ec2: EC2Client = boto3.client("ec2")
     s3: S3Client = boto3.client("s3")
 
-    image_file = image_info["file"]
+    image_file = Path(image_info["file"])
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
 
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot_if_not_exist(
-        s3, ec2, s3_bucket, image_name, image_format
+        s3, ec2, s3_bucket, image_name, image_file, image_format
     )
 
     image_id = register_image_if_not_exists(
