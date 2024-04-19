@@ -99,6 +99,7 @@ def upload_coldsnap(
                 "coldsnap",
                 "upload",
                 "--wait",
+                image_info["file"],
             ]
         )
     )
