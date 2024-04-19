@@ -39,6 +39,11 @@ buildPythonApplication {
 
   propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
 
+  checkPhase = ''
+    mypy src
+    black --check src
+  '';
+
   passthru.pyproject = pyproject;
   passthru.parseDependency = parseDependency;
   passthru.resolvePackages = resolvePackages;
