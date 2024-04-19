@@ -66,49 +66,48 @@ def import_snapshot_if_not_exist(
         assert len(snapshots["Snapshots"]) == 1
         assert "SnapshotId" in snapshots["Snapshots"][0]
         snapshot_id = snapshots["Snapshots"][0]["SnapshotId"]
-        return snapshot_id
+    else:
+        upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
 
-    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
+        logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
+        client_token_hash = hashlib.sha256(image_name.encode())
+        client_token = client_token_hash.hexdigest()
+        # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
+        # thus if we can rely on the client token forever. E.g. what happens if I
+        # run a task with the same client token a few months later?
+        snapshot_import_task = ec2.import_snapshot(
+            DiskContainer={
+                "Description": image_name,
+                "Format": image_format,
+                "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
+            },
+            TagSpecifications=[
+                {
+                    "ResourceType": "import-snapshot-task",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                    ],
+                }
+            ],
+            Description=image_name,
+            ClientToken=client_token,
+        )
+        ec2.get_waiter("snapshot_imported").wait(
+            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+        )
 
-    logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
-    client_token_hash = hashlib.sha256(image_name.encode())
-    client_token = client_token_hash.hexdigest()
-    # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
-    # thus if we can rely on the client token forever. E.g. what happens if I
-    # run a task with the same client token a few months later?
-    snapshot_import_task = ec2.import_snapshot(
-        DiskContainer={
-            "Description": image_name,
-            "Format": image_format,
-            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
-        },
-        TagSpecifications=[
-            {
-                "ResourceType": "import-snapshot-task",
-                "Tags": [
-                    {"Key": "Name", "Value": image_name},
-                    {"Key": "ManagedBy", "Value": "nixos/amis"},
-                ],
-            }
-        ],
-        Description=image_name,
-        ClientToken=client_token,
-    )
-    ec2.get_waiter("snapshot_imported").wait(
-        ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
-    )
-
-    snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
-        ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
-    )
-    assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
-    snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
-    assert "SnapshotTaskDetail" in snapshot_import_task_2
-    assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
-    snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
-    ec2.create_tags(
-        Resources=[snapshot_id], Tags=[{"Key": "Name", "Value": image_name}]
-    )
+        snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
+            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+        )
+        assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
+        snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
+        assert "SnapshotTaskDetail" in snapshot_import_task_2
+        assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
+        snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
+        ec2.create_tags(
+            Resources=[snapshot_id], Tags=[{"Key": "Name", "Value": image_name}]
+        )
     s3.delete_object(Bucket=s3_bucket, Key=image_name)
     return snapshot_id
 
