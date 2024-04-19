@@ -6,7 +6,7 @@ name = "upload-ami"
 version = "0.1.0"
 dependencies = [
     "boto3",
-    "boto3-stubs",
+    "boto3-stubs[ec2,s3,sts]",
     "botocore-stubs",
 ]
 [project.scripts]
@@ -17,3 +17,5 @@ disable-image-block-public-access = "upload_ami.disable_image_block_public_acces
 enable-regions = "upload_ami.enable_regions:main"
 request-public-ami-quota-increase  = "upload_ami.request_public_ami_quota_increase:main"
 describe-images = "upload_ami.describe_images:main"
+[tool.mypy]
+strict=true
