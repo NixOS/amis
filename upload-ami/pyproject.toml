@@ -6,7 +6,7 @@ name = "upload-ami"
 version = "0.1.0"
 dependencies = [
     "boto3",
-    "boto3-stubs[ec2,s3,sts]",
+    "boto3-stubs[ec2,s3,sts,account,service-quotas]",
     "botocore-stubs",
 ]
 [project.scripts]
