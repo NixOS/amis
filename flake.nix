@@ -73,7 +73,6 @@
 
       apps = lib.genAttrs self.lib.supportedSystems (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
           upload-ami = self.packages.${system}.upload-ami;
           mkApp = name: _: { type = "app"; program = "${upload-ami}/bin/${name}"; };
         in
@@ -116,7 +115,6 @@
           nativeBuildInputs = [
             pkgs.awscli2
             pkgs.opentofu
-            (pkgs.python3.withPackages (p: [ p.boto3 p.botocore ]))
           ];
         };
       });

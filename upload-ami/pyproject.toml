@@ -7,9 +7,11 @@ version = "0.1.0"
 dependencies = [
     "boto3",
     "botocore",
+    "mypy-boto3-ec2",
+    "mypy-boto3-s3",
 ]
 [project.scripts]
-upload-ami = "upload_ami.cli:main"
+upload-ami = "upload_ami.upload_ami:main"
 nuke = "upload_ami.nuke:main"
 smoke-test = "upload_ami.smoke_test:main"
 disable-image-block-public-access = "upload_ami.disable_image_block_public_access:main"
