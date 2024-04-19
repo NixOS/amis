@@ -137,7 +137,7 @@ def main() -> None:
 
     print(
         upload_coldsnap(
-            image_info=args.image_info,
+            image_info=image_info,
             prefix=args.prefix,
         )
     )
