@@ -93,16 +93,14 @@ def upload_coldsnap(
 ) -> str:
     logging.info(f"Uploading image to coldsnap")
 
-    snapshot_id = str(
-        subprocess.check_output(
+    snapshot_id = subprocess.check_output(
             [
                 "coldsnap",
                 "upload",
                 "--wait",
                 image_info["file"],
             ]
-        )
-    )
+        ).decode().strip()
 
     ec2 = boto3.client("ec2")
     image_name = prefix + image_info["label"] + "-" + image_info["system"]
