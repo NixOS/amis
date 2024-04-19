@@ -49,7 +49,7 @@ jobs:
           images_bucket='${{ vars.IMAGES_BUCKET }}'
           image_ids=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
-            --prefix "smoketest/" \
+            --prefix "smoketest-test/" \
             --s3-bucket "$images_bucket")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
 
