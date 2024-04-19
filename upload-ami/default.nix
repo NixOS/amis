@@ -2,7 +2,7 @@
 , python3Packages
 , lib
 , coldsnap
-, qemu
+, qemu-utils
 }:
 
 let
@@ -40,9 +40,10 @@ buildPythonApplication {
     ];
 
 
-  makeWrapperArgs = [ "--prefix PATH : ${coldsnap}/bin" "--prefix PATH : ${qemu}/bin" ];
 
-  propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
+  propagatedBuildInputs =
+    lib.flatten (map resolvePackages pyproject.project.dependencies)
+    ++ [ coldsnap qemu-utils ];
 
   checkPhase = ''
     mypy src

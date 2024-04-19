@@ -4,7 +4,7 @@ import json
 import logging
 from pathlib import Path
 from posixpath import basename
-from re import I
+from re import I, sub
 from tempfile import mktemp
 import tempfile
 import boto3
@@ -102,17 +102,21 @@ def upload_coldsnap(
     image_file_raw = image_file_vhd.with_suffix(".raw")
 
     subprocess.check_call(
-        [ "qemu-img" , "convert", "-O", "raw", image_file_vhd, image_file_raw ]
+        ["qemu-img", "convert", "-O", "raw", image_file_vhd, image_file_raw]
     )
 
-    snapshot_id = subprocess.check_output(
+    snapshot_id = (
+        subprocess.check_output(
             [
                 "coldsnap",
                 "upload",
                 "--wait",
                 image_file_raw,
             ]
-        ).decode().strip()
+        )
+        .decode()
+        .strip()
+    )
 
     ec2 = boto3.client("ec2")
     image_name = prefix + image_info["label"] + "-" + image_info["system"]
