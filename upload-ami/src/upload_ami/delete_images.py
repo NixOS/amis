@@ -1,5 +1,4 @@
 import logging
-from telnetlib import EC
 import boto3
 from mypy_boto3_ec2 import EC2Client
 import argparse
