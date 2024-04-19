@@ -68,7 +68,7 @@ def import_snapshot_if_not_exist(
         snapshot_id = snapshots["Snapshots"][0]["SnapshotId"]
         return snapshot_id
 
-    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_name)
+    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
 
     logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
     client_token_hash = hashlib.sha256(image_name.encode())
