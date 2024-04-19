@@ -6,9 +6,8 @@ name = "upload-ami"
 version = "0.1.0"
 dependencies = [
     "boto3",
-    "botocore",
-    "mypy-boto3-ec2",
-    "mypy-boto3-s3",
+    "boto3-stubs",
+    "botocore-stubs",
 ]
 [project.scripts]
 upload-ami = "upload_ami.upload_ami:main"
