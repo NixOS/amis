@@ -99,7 +99,8 @@ def upload_coldsnap(
     logging.info(f"Uploading image to coldsnap")
 
     image_file_vhd = Path(image_info["file"])
-    image_file_raw = image_file_vhd.with_suffix(".raw")
+    image_file_raw = Path(image_file_vhd.with_suffix(".raw").name)
+
 
     subprocess.check_call(
         ["qemu-img", "convert", "-O", "raw", image_file_vhd, image_file_raw]
