@@ -47,26 +47,23 @@ jobs:
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
-          image_ids=$(nix run .#upload-ami -- \
+          image_id=$(nix run .#upload-coldsnap -- \
             --image-info "$image_info" \
-            --prefix "smoketest/" \
-            --s3-bucket "$images_bucket")
-          echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
+            --prefix "smoketest-coldsnap/")
+          echo "image_id=$image_id" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test
         id: smoke_test
         # NOTE: make sure smoke test isn't cancelled. Such that instance gets cleaned up.
         run: |
-          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
-          image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
+          image_id='${{ steps.upload_smoke_test_ami.outputs.image_id }}'
           run_id='${{ github.run_id }}'
           nix run .#smoke-test -- --image-id "$image_id"
 
       - name: Clean up smoke test
         if: ${{ cancelled() }}
         run: |
-          image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
-          image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
+          image_id='${{ steps.upload_smoke_test_ami.outputs.image_id }}'
           run_id='${{ github.run_id }}'
           nix run .#smoke-test -- --image-id "$image_id" --cancel
       

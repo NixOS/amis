@@ -1,6 +1,7 @@
 { buildPythonApplication
 , python3Packages
 , lib
+, coldsnap
 }:
 
 let
@@ -36,6 +37,9 @@ buildPythonApplication {
       python3Packages.mypy
       python3Packages.black
     ];
+
+
+  makeWrapperArgs = [ "--prefix PATH : ${coldsnap}/bin" ];
 
   propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
 

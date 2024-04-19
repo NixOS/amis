@@ -37,6 +37,17 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
+      "ebs:StartSnapshot",
+      "ebs:PutSnapshotBlock",
+      "ebs:ListChangedBlocks",
+      "ebs:ListSnapshotBlocks",
+      "ebs:CompleteSnapshot",
+    ]
+    resources = ["arn:aws:ec2:*:*:snapshot/*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:GetConsoleOutput",

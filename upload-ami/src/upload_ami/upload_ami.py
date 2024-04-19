@@ -9,11 +9,14 @@ import botocore
 import botocore.exceptions
 
 from mypy_boto3_ec2.client import EC2Client
-from mypy_boto3_ec2.literals import BootModeValuesType
 from mypy_boto3_ec2.type_defs import RegionTypeDef
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
+
+from typing import TypedDict
+
+from mypy_boto3_ec2.literals import BootModeValuesType
 
 
 class ImageInfo(TypedDict):
