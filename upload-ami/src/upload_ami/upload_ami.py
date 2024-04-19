@@ -1,7 +1,7 @@
 import json
 import hashlib
 import logging
-from typing import Literal, TypedDict
+from typing import Iterable, Literal, TypedDict
 import boto3
 import boto3.ec2
 import boto3.ec2.createtags
@@ -152,7 +152,7 @@ def copy_image_to_regions(
     image_id: str,
     image_name: str,
     source_region: str,
-    target_regions: filter[RegionTypeDef],
+    target_regions: Iterable[RegionTypeDef],
     public: bool,
 ) -> dict[str, str]:
     """
