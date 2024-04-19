@@ -41,8 +41,8 @@ def upload_to_s3_if_not_exists(
         s3.get_waiter("object_exists").wait(Bucket=bucket, Key=image_name)
 
 
-def import_snapshot(
-    ec2: EC2Client, s3_bucket: str, image_name: str, image_format: str
+def import_snapshot_if_not_exist(
+    s3: S3Client, ec2: EC2Client, s3_bucket: str, image_name: str, image_format: str
 ) -> str:
     """
     Import snapshot from S3 and wait for it to finish
@@ -51,6 +51,19 @@ def import_snapshot(
 
     Returns the snapshot id
     """
+
+    snapshots = ec2.describe_snapshots(
+        Filters=[{"Name": "tag:Name", "Values": [image_name]}]
+    )
+
+    if len(snapshots["Snapshots"]) != 0:
+        assert len(snapshots["Snapshots"]) == 1
+        assert "SnapshotId" in snapshots["Snapshots"][0]
+        snapshot_id = snapshots["Snapshots"][0]["SnapshotId"]
+        return snapshot_id
+
+    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_name)
+
     logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
     client_token_hash = hashlib.sha256(image_name.encode())
     client_token = client_token_hash.hexdigest()
@@ -66,7 +79,10 @@ def import_snapshot(
         TagSpecifications=[
             {
                 "ResourceType": "import-snapshot-task",
-                "Tags": [{"Key": "Name", "Value": image_name}],
+                "Tags": [
+                    {"Key": "Name", "Value": image_name},
+                    {"Key": "ManagedBy", "Value": "nixos/amis"},
+                ],
             }
         ],
         Description=image_name,
@@ -87,6 +103,7 @@ def import_snapshot(
     ec2.create_tags(
         Resources=[snapshot_id], Tags=[{"Key": "Name", "Value": image_name}]
     )
+    s3.delete_object(Bucket=s3_bucket, Key=image_name)
     return snapshot_id
 
 
@@ -148,7 +165,10 @@ def register_image_if_not_exists(
             TagSpecifications=[
                 {
                     "ResourceType": "image",
-                    "Tags": [{"Key": "Name", "Value": image_name}],
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                    ],
                 }
             ],
         )
@@ -209,6 +229,7 @@ def copy_image_to_regions(
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
                         {"Key": "SourceRegion", "Value": source_region},
+                        {"Key": "ManagedBy", "Value": "nixos/amis"},
                     ],
                 },
                 {
@@ -216,6 +237,7 @@ def copy_image_to_regions(
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
                         {"Key": "SourceRegion", "Value": source_region},
+                        {"Key": "ManagedBy", "Value": "nixos/amis"},
                     ],
                 },
             ],
@@ -268,10 +290,11 @@ def upload_ami(
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
-    upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
 
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot(ec2, s3_bucket, image_name, image_format)
+    snapshot_id = import_snapshot_if_not_exist(
+        s3, ec2, s3_bucket, image_name, image_format
+    )
 
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public
