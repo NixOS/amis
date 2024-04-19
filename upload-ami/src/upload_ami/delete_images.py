@@ -19,6 +19,9 @@ def delete_images_by_name(ec2: EC2Client, image_name: str) -> None:
     snapshots = ec2.describe_snapshots(
         OwnerIds=["self"], Filters=[{"Name": "tag:Name", "Values": [image_name]}]
     )
+    logger.info(f"Deleting {len(snapshots['Snapshots'])} snapshots")
+    input("Press Enter to continue")
+
     for snapshot in snapshots["Snapshots"]:
         assert "SnapshotId" in snapshot
         images = ec2.describe_images(
@@ -30,6 +33,8 @@ def delete_images_by_name(ec2: EC2Client, image_name: str) -> None:
                 }
             ],
         )
+        logger.info(f"Deleting {len(images['Images'])} images")
+        input("Press Enter to continue")
         for image in images["Images"]:
             assert "ImageId" in image
             logger.info(f"Deregistering {image['ImageId']}")
@@ -51,7 +56,7 @@ def main() -> None:
         action="store_true",
     )
     logging.basicConfig(level=logging.INFO)
-    ec2: EC2Client = boto3.client("ec2", region_name="us-east-1")
+    ec2: EC2Client = boto3.client("ec2")
 
     args = parser.parse_args()
     delete_images_by_name(ec2, args.image_name)
@@ -60,7 +65,9 @@ def main() -> None:
         for region in regions:
             assert "RegionName" in region
             ec2r = boto3.client("ec2", region_name=region["RegionName"])
-            logger.info(f"Deleting image by name {args.image_name} in {region['RegionName']}")
+            logger.info(
+                f"Deleting image by name {args.image_name} in {region['RegionName']}"
+            )
             delete_images_by_name(ec2r, args.image_name)
 
 
