@@ -3,14 +3,19 @@ import time
 import argparse
 import logging
 
+from mypy_boto3_ec2 import EC2Client
+from mypy_boto3_ec2.literals import InstanceTypeType
 
-def smoke_test(image_id, run_id, cancel):
-    ec2 = boto3.client("ec2")
+
+def smoke_test(image_id: str, run_id: str, cancel: bool) -> None:
+    ec2: EC2Client = boto3.client("ec2")
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
     assert len(images["Images"]) == 1
     image = images["Images"][0]
+    assert "Architecture" in image
     architecture = image["Architecture"]
+    instance_type: InstanceTypeType
     if architecture == "x86_64":
         instance_type = "t3.nano"
     elif architecture == "arm64":
@@ -29,6 +34,7 @@ def smoke_test(image_id, run_id, cancel):
     )
 
     instance = run_instances["Instances"][0]
+    assert "InstanceId" in instance
     instance_id = instance["InstanceId"]
 
     try:
@@ -46,7 +52,9 @@ def smoke_test(image_id, run_id, cancel):
                 logging.info(
                     f"Waiting for console output to become available ({tries} tries left)"
                 )
-                console_output = ec2.get_console_output(InstanceId=instance_id, Latest=True)
+                console_output = ec2.get_console_output(
+                    InstanceId=instance_id, Latest=True
+                )
                 output = console_output.get("Output")
                 tries -= 1
             logging.info(f"Console output: {output}")
@@ -55,12 +63,14 @@ def smoke_test(image_id, run_id, cancel):
         raise
     finally:
         logging.info(f"Terminating instance {instance_id}")
+        assert "State" in instance
+        assert "Name" in instance["State"]
         if instance["State"]["Name"] != "terminated":
             ec2.terminate_instances(InstanceIds=[instance_id])
             ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser()
