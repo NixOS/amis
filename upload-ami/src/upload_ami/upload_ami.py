@@ -64,6 +64,12 @@ def import_snapshot(
             "Format": image_format,
             "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
         },
+        TagSpecifications=[
+            {
+                "ResourceType": "import-snapshot-task",
+                "Tags": [{"Key": "Name", "Value": image_name}],
+            }
+        ],
         Description=image_name,
         ClientToken=client_token,
     )
@@ -78,7 +84,11 @@ def import_snapshot(
     snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
     assert "SnapshotTaskDetail" in snapshot_import_task_2
     assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
-    return snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
+    snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
+    ec2.create_tags(
+        Resources=[snapshot_id], Tags=[{"Key": "Name", "Value": image_name}]
+    )
+    return snapshot_id
 
 
 def register_image_if_not_exists(
@@ -136,6 +146,12 @@ def register_image_if_not_exists(
             EnaSupport=True,
             ImdsSupport="v2.0",
             SriovNetSupport="simple",
+            TagSpecifications=[
+                {
+                    "ResourceType": "image",
+                    "Tags": [{"Key": "Name", "Value": image_name}],
+                }
+            ],
         )
         image_id = register_image["ImageId"]
 
@@ -188,6 +204,22 @@ def copy_image_to_regions(
             SourceRegion=source_region,
             Name=image_name,
             ClientToken=image_id,
+            TagSpecifications=[
+                {
+                    "ResourceType": "image",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "SourceRegion", "Value": source_region},
+                    ],
+                },
+                {
+                    "ResourceType": "snapshot",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "SourceRegion", "Value": source_region},
+                    ],
+                },
+            ],
         )
         ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
         logging.info(
