@@ -53,7 +53,6 @@ def import_snapshot(
     """
     logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
     client_token_hash = hashlib.sha256(image_name.encode())
-    client_token_hash.update("x".encode())
     client_token = client_token_hash.hexdigest()
     # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
     # thus if we can rely on the client token forever. E.g. what happens if I
