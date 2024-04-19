@@ -10,9 +10,11 @@ buildPythonApplication {
   version = pyproject.project.version;
   src = ./.;
   pyproject = true;
-
   nativeBuildInputs =
-    map (name: python3Packages.${name}) pyproject.build-system.requires;
+    map (name: python3Packages.${name}) pyproject.build-system.requires ++ [
+      python3Packages.mypy
+      python3Packages.black
+    ];
 
   propagatedBuildInputs =
     map (name: python3Packages.${name}) pyproject.project.dependencies;
