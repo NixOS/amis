@@ -101,17 +101,17 @@ def upload_coldsnap(
     image_file_vhd = Path(image_info["file"])
     image_file_raw = Path(image_file_vhd.with_suffix(".raw").name)
 
-
+    logging.info(f"Converting {image_file_vhd} to {image_file_raw}")
     subprocess.check_call(
         ["qemu-img", "convert", "-O", "raw", image_file_vhd, image_file_raw]
     )
 
+    logging.info(f"Uploading {image_file_raw} to ebs")
     snapshot_id = (
         subprocess.check_output(
             [
                 "coldsnap",
                 "upload",
-                "--wait",
                 image_file_raw,
             ]
         )
@@ -119,9 +119,12 @@ def upload_coldsnap(
         .strip()
     )
 
+    logging.info(f"Waiting for snapshot {snapshot_id} to be available")
     ec2 = boto3.client("ec2")
-    image_name = prefix + image_info["label"] + "-" + image_info["system"]
+    ec2.get_waiter("snapshot_completed").wait(SnapshotIds=[snapshot_id])
 
+    image_name = prefix + image_info["label"] + "-" + image_info["system"]
+    logging.info(f"Registering image {image_name}")
     image_id = register_image_if_not_exists(
         ec2=ec2,
         image_name=image_name,
