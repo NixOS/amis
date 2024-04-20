@@ -21,7 +21,8 @@ jobs:
       matrix:
         system:
           - x86_64-linux
-          - aarch64-linux
+          # Lets disable parallelism for now.  I think it's making EBS-direct slow
+          # - aarch64-linux
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
