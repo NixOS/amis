@@ -58,7 +58,6 @@
                 # amazonImage.sizeMB = "auto";
                 amazonImage.format = "raw"; # coldsnap requires raw
               }
-              self.nixosModules.version
             ];
           }).config.system.build.amazonImage;
 
@@ -82,7 +81,6 @@
             node.specialArgs.selfPackages = self.packages.${system};
             defaults = { name, ... }: {
               imports = [
-                self.nixosModules.version
                 self.nixosModules.amazonImage
                 self.nixosModules.mock-imds
               ];
