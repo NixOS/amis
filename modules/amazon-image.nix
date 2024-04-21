@@ -13,13 +13,13 @@ in
     pkgs.runCommand config.system.build.image.name { } ''
       mkdir -p $out
       mkdir -p $out/nix-support
-      ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/${config.image.repart.imageFile} $out/${config.image.repart.imageFileBasename}.vhd
       cat <<EOF > $out/nix-support/image-info.json
       {
         "boot_mode": "uefi",
+        "format": "raw",
         "label": "${config.system.nixos.label}",
         "system": "${pkgs.stdenv.hostPlatform.system}",
-        "file": "$out/${config.image.repart.imageFileBasename}.vhd"
+        "file": "${config.image.repart.imageFile}"
       }
       EOF
     '';
