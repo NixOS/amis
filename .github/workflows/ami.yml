@@ -18,7 +18,8 @@ jobs:
           aws-region: eu-north-1
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
       - run: nix build ${{ env.FLAKE_REF }}#legacyAmazonImage
-      - run: file="$(jq '.file' < ./result/nix-support/image-info.json)"
-      - run: nix run --inputs-from ${{ env.FLAKE_REF }} nixpkgs#coldsnap -- upload --no-progress  "$file"
+      - run: |
+          file="$(jq '.file' < ./result/nix-support/image-info.json)"
+          nix run --inputs-from ${{ env.FLAKE_REF }} nixpkgs#coldsnap -- upload --no-progress  "$file"
 
 

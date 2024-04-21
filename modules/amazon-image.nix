@@ -19,12 +19,13 @@ in
         "format": "raw",
         "label": "${config.system.nixos.label}",
         "system": "${pkgs.stdenv.hostPlatform.system}",
-        "file": "${config.image.repart.imageFile}"
+        "file": "${config.system.build.image}/${config.image.repart.imageFile}"
       }
       EOF
     '';
 
-  image.repart.name = "${config.system.nixos.distroId}-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
+  image.repart.name = config.system.nixos.distroId;
+  image.repart.version = config.system.nixos.version;
   image.repart.partitions = {
     "00-esp" = {
       contents = {
