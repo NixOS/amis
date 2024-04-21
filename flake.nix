@@ -19,12 +19,6 @@
         amazonImage = ./modules/amazon-image.nix;
 
         mock-imds = ./modules/mock-imds.nix;
-        version = { config, ... }: {
-          system.stateVersion = config.system.nixos.release;
-          # NOTE: This will cause an image to be built per commit.
-          # system.nixos.versionSuffix = lib.mkForce
-          #  ".${lib.substring 0 8 (nixpkgs.lastModifiedDate or nixpkgs.lastModified or "19700101")}.${nixpkgs.shortRev}.${lib.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}.${self.shortRev or "dirty"}";
-        };
       };
 
       lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" ];
@@ -52,7 +46,6 @@
             modules = [
               self.nixosModules.ec2-instance-connect
               self.nixosModules.amazonImage
-              self.nixosModules.version
             ];
           }).config.system.build.amazonImage;
           legacyAmazonImage = (lib.nixosSystem {
@@ -61,10 +54,10 @@
             modules = [
               self.nixosModules.legacyAmazonImage
               {
-                boot.loader.grub.enable = false;
-                boot.loader.systemd-boot.enable = true;
+                ec2.efi = true;
+                # amazonImage.sizeMB = "auto";
+                amazonImage.format = "raw"; # coldsnap requires raw
               }
-              { ec2.efi = true; amazonImage.sizeMB = "auto"; }
               self.nixosModules.version
             ];
           }).config.system.build.amazonImage;
