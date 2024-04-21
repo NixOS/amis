@@ -56,6 +56,7 @@
               {
                 ec2.efi = true;
                 # amazonImage.sizeMB = "auto";
+                amazonImage.sizeMB = "auto";
                 amazonImage.format = "raw"; # coldsnap requires raw
               }
             ];
