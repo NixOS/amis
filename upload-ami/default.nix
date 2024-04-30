@@ -1,6 +1,8 @@
 { buildPythonApplication
 , python3Packages
 , lib
+, coldsnap
+, qemu-utils
 }:
 
 let
@@ -37,7 +39,11 @@ buildPythonApplication {
       python3Packages.black
     ];
 
-  propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
+
+
+  propagatedBuildInputs =
+    lib.flatten (map resolvePackages pyproject.project.dependencies)
+    ++ [ coldsnap qemu-utils ];
 
   checkPhase = ''
     mypy src
