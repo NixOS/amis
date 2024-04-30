@@ -16,9 +16,13 @@ jobs:
           aws-region: eu-north-1
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - run: |
-          nix build .#legacyAmazonImage
+      - name: build image
+        run: nix build .#legacyAmazonImage
+      - name: upload image with coldnsap
+        run: |
           file="$(jq -r '.file' < ./result/nix-support/image-info.json)"
+          echo "starting coldsnap"
           nix run --inputs-from . nixpkgs#coldsnap -- upload --no-progress  "$file"
+          echo "finished coldsnap"
 
 
