@@ -1,9 +1,27 @@
 import logging
 import boto3
 from mypy_boto3_ec2 import EC2Client
+import argparse
+import botocore.exceptions
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--image-name",
+        type=str,
+        required=True,
+        help="Name of the image to delete. Can be a filter.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--older-than",
+        type=str,
+    )
+    args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     ec2: EC2Client = boto3.client("ec2", region_name="us-east-1")
 
@@ -13,26 +31,23 @@ def main() -> None:
         assert "RegionName" in region
         ec2r = boto3.client("ec2", region_name=region["RegionName"])
         logging.info(f"Nuking {region['RegionName']}")
-        snapshots = ec2r.describe_snapshots(OwnerIds=["self"])
-        for snapshot in snapshots["Snapshots"]:
-
-            assert "SnapshotId" in snapshot
-            images = ec2r.describe_images(
-                Owners=["self"],
-                Filters=[
-                    {
-                        "Name": "block-device-mapping.snapshot-id",
-                        "Values": [snapshot["SnapshotId"]],
-                    }
-                ],
-            )
-            for image in images["Images"]:
-                assert "ImageId" in image
-                logging.info(f"Deregistering {image['ImageId']}")
-                ec2r.deregister_image(ImageId=image["ImageId"])
-
-            logging.info(f"Deleting {snapshot['SnapshotId']}")
-            ec2r.delete_snapshot(SnapshotId=snapshot["SnapshotId"])
+        images = ec2r.describe_images(
+            Owners=["self"], Filters=[{"Name": "name", "Values": [args.image_name]}]
+        )
+        for image in images["Images"]:
+            snapshot_id = image["BlockDeviceMappings"][0]["Ebs"]["SnapshotId"]
+            logging.info(f"Deregistering {image['ImageId']}")
+            try:
+                ec2r.deregister_image(ImageId=image["ImageId"], DryRun=args.dry_run)
+            except botocore.exceptions.ClientError as e:
+                if "DryRunOperation" not in str(e):
+                    raise
+            logging.info(f"Deleting {snapshot_id}")
+            try:
+                ec2r.delete_snapshot(SnapshotId=snapshot_id, DryRun=args.dry_run)
+            except botocore.exceptions.ClientError as e:
+                if "DryRunOperation" not in str(e):
+                    raise
 
 
 if __name__ == "__main__":

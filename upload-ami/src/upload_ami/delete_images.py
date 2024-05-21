@@ -6,7 +6,7 @@ import argparse
 logger = logging.getLogger(__name__)
 
 
-def delete_images_by_name(ec2: EC2Client, image_name: str) -> None:
+def delete_images_by_name(ec2: EC2Client, image_name: str, dry_run: bool) -> None:
     """
     Delete an image by its name.
 
@@ -19,7 +19,6 @@ def delete_images_by_name(ec2: EC2Client, image_name: str) -> None:
         OwnerIds=["self"], Filters=[{"Name": "tag:Name", "Values": [image_name]}]
     )
     logger.info(f"Deleting {len(snapshots['Snapshots'])} snapshots")
-    input("Press Enter to continue")
 
     for snapshot in snapshots["Snapshots"]:
         assert "SnapshotId" in snapshot
@@ -37,9 +36,9 @@ def delete_images_by_name(ec2: EC2Client, image_name: str) -> None:
         for image in images["Images"]:
             assert "ImageId" in image
             logger.info(f"Deregistering {image['ImageId']}")
-            ec2.deregister_image(ImageId=image["ImageId"])
+            ec2.deregister_image(ImageId=image["ImageId"], DryRun=dry_run)
         logger.info(f"Deleting {snapshot['SnapshotId']}")
-        ec2.delete_snapshot(SnapshotId=snapshot["SnapshotId"])
+        ec2.delete_snapshot(SnapshotId=snapshot["SnapshotId"], DryRun=dry_run)
 
 
 def main() -> None:
@@ -54,11 +53,15 @@ def main() -> None:
         "--all-regions",
         action="store_true",
     )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+    )
     logging.basicConfig(level=logging.INFO)
     ec2: EC2Client = boto3.client("ec2")
 
     args = parser.parse_args()
-    delete_images_by_name(ec2, args.image_name)
+    delete_images_by_name(ec2, args.image_name, args.dry_run)
     if args.all_regions:
         regions = ec2.describe_regions()["Regions"]
         for region in regions:
@@ -67,7 +70,7 @@ def main() -> None:
             logger.info(
                 f"Deleting image by name {args.image_name} in {region['RegionName']}"
             )
-            delete_images_by_name(ec2r, args.image_name)
+            delete_images_by_name(ec2r, args.image_name, args.dry_run)
 
 
 if __name__ == "__main__":
