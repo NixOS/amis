@@ -223,7 +223,7 @@ data "aws_ami" "nixos_arm64" {
 
   filter {
     name   = "name"
-    values = ["nixos/23.11*"]
+    values = ["nixos-23.11*"]
   }
   filter {
     name   = "architecture"
@@ -239,7 +239,7 @@ resource "aws_instance" "nixos_arm64" {
     <h2>AWS CLI</h2>
     <pre id="awscli2">
 aws ec2 describe-images --owners _OWNER_ID_ \
-  --filter 'Name=name,Values=nixos/23.11*' \
+  --filter 'Name=name,Values=nixos-23.11*' \
   --filter 'Name=architecture,Values=arm64'
 </pre>
 
