@@ -208,6 +208,15 @@
 
 <body>
     <h1>Amazon Images / AMIs</h1>
+    <p>
+        NixOS can be deployed to Amazon EC2 using our official AMI. We publish
+        AMIs to all AWS regions for both `x86_64` and `arm64` on a weekly basis.
+    </p>
+    <p>We will start deprecating and garbage collecting images older than 90 days
+        in the future.
+        This is why we suggest using a terraform data source or the AWS API to query
+        for the latest AMI.
+    </p>
     <p>NixOS images are published under AWS Account ID <span id="owner-id"></span></p>
 
     <h2>Terraform / OpenTofu</h2>
@@ -245,7 +254,6 @@ aws ec2 describe-images --owners _OWNER_ID_ \
 
     <h2>AMI table</h2>
     <p>Here are the latest NixOS images available in the Amazon cloud.</p>
-    <p>The data this table is generated from can be found at <a href="https://nixos.github.io/amis/images.json">https://nixos.github.io/amis/images.json</a>.</p>
     <table id="images-table">
         <thead>
             <tr>
