@@ -36,7 +36,8 @@ jobs:
         id: download_ami
         run: |
           set -o pipefail
-          out=$(curl --location --silent --fail-with-body --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
+          build_id=$(curl -sSL -H 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/tested/latest-finished | jq -r '.id')
+          out=$(curl -sSL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents"  | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
@@ -62,7 +63,6 @@ jobs:
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
-          run_id='${{ github.run_id }}'
           nix run .#smoke-test -- --image-id "$image_id"
 
       - name: Clean up smoke test
@@ -70,7 +70,6 @@ jobs:
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
-          run_id='${{ github.run_id }}'
           nix run .#smoke-test -- --image-id "$image_id" --cancel
 
       # NOTE: We do not pass run-id as we're not  building the image ourselves
