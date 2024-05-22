@@ -23,7 +23,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
-    ec2: EC2Client = boto3.client("ec2", region_name="us-east-1")
+    ec2: EC2Client = boto3.client("ec2")
 
     regions = ec2.describe_regions()["Regions"]
 
