@@ -86,7 +86,7 @@ def import_snapshot_if_not_exist(
                     "ResourceType": "import-snapshot-task",
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
-                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
                     ],
                 }
             ],
@@ -109,7 +109,7 @@ def import_snapshot_if_not_exist(
             Resources=[snapshot_id],
             Tags=[
                 {"Key": "Name", "Value": image_name},
-                {"Key": "ManagedBy", "Value": "nixos/amis"},
+                {"Key": "ManagedBy", "Value": "NixOS/amis"},
             ],
         )
     s3.delete_object(Bucket=s3_bucket, Key=image_name)
@@ -176,7 +176,7 @@ def register_image_if_not_exists(
                     "ResourceType": "image",
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
-                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
                     ],
                 }
             ],
@@ -238,7 +238,7 @@ def copy_image_to_regions(
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
                         {"Key": "SourceRegion", "Value": source_region},
-                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
                     ],
                 },
                 {
@@ -246,7 +246,7 @@ def copy_image_to_regions(
                     "Tags": [
                         {"Key": "Name", "Value": image_name},
                         {"Key": "SourceRegion", "Value": source_region},
-                        {"Key": "ManagedBy", "Value": "nixos/amis"},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
                     ],
                 },
             ],
