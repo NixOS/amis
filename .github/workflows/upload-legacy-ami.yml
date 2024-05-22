@@ -36,8 +36,8 @@ jobs:
         id: download_ami
         run: |
           set -o pipefail
-          build_id=$(curl -sSL -H 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/tested/latest-finished | jq -r '.id')
-          out=$(curl -sSL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents"  | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
+          build_id=$(curl -sSfL -H 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/tested/latest-finished | jq -r '.id')
+          out=$(curl -sSfL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents"  | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
