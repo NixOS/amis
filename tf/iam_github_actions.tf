@@ -8,6 +8,7 @@ data "aws_iam_policy_document" "upload_ami" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
+      "s3:DeleteObject",
     ]
     resources = ["${aws_s3_bucket.images.arn}/*"]
   }
@@ -23,6 +24,15 @@ data "aws_iam_policy_document" "upload_ami" {
   }
   statement {
     effect = "Allow"
+    actions = ["ec2:CreateTags"]
+    resources = [
+      "arn:aws:ec2:*:*:snapshot/*",
+      "arn:aws:ec2:*:*:image/*",
+      "arn:aws:ec2:*:*:import-snapshot-task/*",
+    ]
+  }
+  statement {
+    effect = "Allow"
     actions = [
       "ec2:DescribeImages",
       "ec2:RegisterImage",
@@ -30,7 +40,8 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeRegions",
       "ec2:CopyImage",
       "ec2:ModifyImageAttribute",
-      "ec2:DisableImageBlockPublicAccess"
+      "ec2:DisableImageBlockPublicAccess",
+      "ec2:EnableImageDeprecation"
     ]
     resources = ["*"]
   }

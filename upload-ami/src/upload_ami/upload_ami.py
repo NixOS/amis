@@ -1,12 +1,14 @@
 import json
 import hashlib
 import logging
+from pathlib import Path
 from typing import Iterable, Literal, TypedDict
 import boto3
 import boto3.ec2
 import boto3.ec2.createtags
 import botocore
 import botocore.exceptions
+import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
@@ -24,23 +26,30 @@ class ImageInfo(TypedDict):
     format: str
 
 
-def upload_to_s3_if_not_exists(s3: S3Client, bucket: str, key: str, file: str) -> None:
+def upload_to_s3_if_not_exists(
+    s3: S3Client, bucket: str, image_name: str, file_path: Path
+) -> None:
     """
     Upload file to S3 if it doesn't exist yet
 
     This function is idempotent.
     """
     try:
-        logging.info(f"Checking if s3://{bucket}/{key} exists")
-        s3.head_object(Bucket=bucket, Key=key)
+        logging.info(f"Checking if s3://{bucket}/{image_name} exists")
+        s3.head_object(Bucket=bucket, Key=image_name)
     except botocore.exceptions.ClientError:
-        logging.info(f"Uploading {file} to s3://{bucket}/{key}")
-        s3.upload_file(file, bucket, key)
-        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=key)
+        logging.info(f"Uploading {file_path} to s3://{bucket}/{image_name}")
+        s3.upload_file(str(file_path), bucket, image_name)
+        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=image_name)
 
 
-def import_snapshot(
-    ec2: EC2Client, s3_bucket: str, s3_key: str, image_format: str
+def import_snapshot_if_not_exist(
+    s3: S3Client,
+    ec2: EC2Client,
+    s3_bucket: str,
+    image_name: str,
+    image_file: Path,
+    image_format: str,
 ) -> str:
     """
     Import snapshot from S3 and wait for it to finish
@@ -49,34 +58,63 @@ def import_snapshot(
 
     Returns the snapshot id
     """
-    logging.info(f"Importing s3://{s3_bucket}/{s3_key} to EC2")
-    client_token_hash = hashlib.sha256(s3_key.encode())
-    client_token_hash.update("x".encode())
-    client_token = client_token_hash.hexdigest()
-    # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
-    # thus if we can rely on the client token forever. E.g. what happens if I
-    # run a task with the same client token a few months later?
-    snapshot_import_task = ec2.import_snapshot(
-        DiskContainer={
-            "Description": s3_key,
-            "Format": image_format,
-            "UserBucket": {"S3Bucket": s3_bucket, "S3Key": s3_key},
-        },
-        Description=s3_key,
-        ClientToken=client_token,
-    )
-    ec2.get_waiter("snapshot_imported").wait(
-        ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+
+    snapshots = ec2.describe_snapshots(
+        Filters=[{"Name": "tag:Name", "Values": [image_name]}]
     )
 
-    snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
-        ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
-    )
-    assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
-    snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
-    assert "SnapshotTaskDetail" in snapshot_import_task_2
-    assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
-    return snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
+    if len(snapshots["Snapshots"]) != 0:
+        assert len(snapshots["Snapshots"]) == 1
+        assert "SnapshotId" in snapshots["Snapshots"][0]
+        snapshot_id = snapshots["Snapshots"][0]["SnapshotId"]
+    else:
+        upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
+
+        logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
+        client_token_hash = hashlib.sha256(image_name.encode())
+        client_token = client_token_hash.hexdigest()
+        # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
+        # thus if we can rely on the client token forever. E.g. what happens if I
+        # run a task with the same client token a few months later?
+        snapshot_import_task = ec2.import_snapshot(
+            DiskContainer={
+                "Description": image_name,
+                "Format": image_format,
+                "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
+            },
+            TagSpecifications=[
+                {
+                    "ResourceType": "import-snapshot-task",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
+                    ],
+                }
+            ],
+            Description=image_name,
+            ClientToken=client_token,
+        )
+        ec2.get_waiter("snapshot_imported").wait(
+            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+        )
+
+        snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
+            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+        )
+        assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
+        snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
+        assert "SnapshotTaskDetail" in snapshot_import_task_2
+        assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
+        snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
+        ec2.create_tags(
+            Resources=[snapshot_id],
+            Tags=[
+                {"Key": "Name", "Value": image_name},
+                {"Key": "ManagedBy", "Value": "NixOS/amis"},
+            ],
+        )
+    s3.delete_object(Bucket=s3_bucket, Key=image_name)
+    return snapshot_id
 
 
 def register_image_if_not_exists(
@@ -134,10 +172,24 @@ def register_image_if_not_exists(
             EnaSupport=True,
             ImdsSupport="v2.0",
             SriovNetSupport="simple",
+            TagSpecifications=[
+                {
+                    "ResourceType": "image",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
+                    ],
+                }
+            ],
         )
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
+    deprecate_at = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    logging.info(f"Deprecating {image_id} at {deprecate_at}")
+    ec2.enable_image_deprecation(ImageId=image_id, DeprecateAt=deprecate_at)
     if public:
         logging.info(f"Making {image_id} public")
         ec2.modify_image_attribute(
@@ -186,11 +238,34 @@ def copy_image_to_regions(
             SourceRegion=source_region,
             Name=image_name,
             ClientToken=image_id,
+            TagSpecifications=[
+                {
+                    "ResourceType": "image",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "SourceRegion", "Value": source_region},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
+                    ],
+                },
+                {
+                    "ResourceType": "snapshot",
+                    "Tags": [
+                        {"Key": "Name", "Value": image_name},
+                        {"Key": "SourceRegion", "Value": source_region},
+                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
+                    ],
+                },
+            ],
         )
         ec2r.get_waiter("image_available").wait(ImageIds=[copy_image["ImageId"]])
         logging.info(
             f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
         )
+        deprecate_at = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        logging.info(f"Deprecating {copy_image['ImageId']} at {deprecate_at}")
+        ec2r.enable_image_deprecation(ImageId=image_id, DeprecateAt=deprecate_at)
         if public:
             logging.info(f"Making {copy_image['ImageId']} public")
             ec2r.modify_image_attribute(
@@ -231,15 +306,15 @@ def upload_ami(
     ec2: EC2Client = boto3.client("ec2")
     s3: S3Client = boto3.client("s3")
 
-    image_file = image_info["file"]
+    image_file = Path(image_info["file"])
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
-    s3_key = image_name
-    upload_to_s3_if_not_exists(s3, s3_bucket, s3_key, image_file)
 
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot(ec2, s3_bucket, s3_key, image_format)
+    snapshot_id = import_snapshot_if_not_exist(
+        s3, ec2, s3_bucket, image_name, image_file, image_format
+    )
 
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public

@@ -8,7 +8,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' 
+    - cron: "0 0 * * 0"
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
@@ -19,6 +19,9 @@ jobs:
       id-token: write
     strategy:
       matrix:
+        release:
+          - release-23.11
+          # - unstable-small
         system:
           - x86_64-linux
           - aarch64-linux
@@ -33,7 +36,7 @@ jobs:
         id: download_ami
         run: |
           set -o pipefail
-          out=$(curl --location --silent --fail-with-body --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
+          out=$(curl --location --silent --fail-with-body --header 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/nixos.amazonImage.${{ matrix.system }}/latest-finished  | jq --raw-output '.buildoutputs.out.path')
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
 
@@ -69,14 +72,13 @@ jobs:
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           run_id='${{ github.run_id }}'
           nix run .#smoke-test -- --image-id "$image_id" --cancel
-      
 
       # NOTE: We do not pass run-id as we're not  building the image ourselves
       # and we thus need to poll hydra periodically.  Including the run-id would
       # cause us to register  the same snapshot as an image over and over again
       # for each run.
       - name: Upload AMIs to all available regions
-        if: github.ref == 'refs/heads/main' 
+        if: github.ref == 'refs/heads/main'
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
@@ -116,4 +118,4 @@ jobs:
       - name: Deploy pages
         uses: actions/deploy-pages@decdde0ac072f6dcbe43649d82d9c635fff5b4e4 # v4.0.4
         id: deployment
-        if: github.ref == 'refs/heads/main' 
+        if: github.ref == 'refs/heads/main'
