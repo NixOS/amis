@@ -12,7 +12,7 @@ def delete_images_by_name(ec2: EC2Client, image_name: str, dry_run: bool) -> Non
 
     Name can be a filter
 
-    Idempotent, unlike delete_image_by_id
+    Idempotent, unlike nuke
     """
     logger.info(f"Deleting image by name {image_name}")
     snapshots = ec2.describe_snapshots(
@@ -32,7 +32,6 @@ def delete_images_by_name(ec2: EC2Client, image_name: str, dry_run: bool) -> Non
             ],
         )
         logger.info(f"Deleting {len(images['Images'])} images")
-        input("Press Enter to continue")
         for image in images["Images"]:
             assert "ImageId" in image
             logger.info(f"Deregistering {image['ImageId']}")
@@ -49,10 +48,7 @@ def main() -> None:
         required=True,
         help="Name of the image to delete. Can be a filter.",
     )
-    parser.add_argument(
-        "--all-regions",
-        action="store_true",
-    )
+
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -61,16 +57,14 @@ def main() -> None:
     ec2: EC2Client = boto3.client("ec2")
 
     args = parser.parse_args()
-    delete_images_by_name(ec2, args.image_name, args.dry_run)
-    if args.all_regions:
-        regions = ec2.describe_regions()["Regions"]
-        for region in regions:
-            assert "RegionName" in region
-            ec2r = boto3.client("ec2", region_name=region["RegionName"])
-            logger.info(
-                f"Deleting image by name {args.image_name} in {region['RegionName']}"
-            )
-            delete_images_by_name(ec2r, args.image_name, args.dry_run)
+    regions = ec2.describe_regions()["Regions"]
+    for region in regions:
+        assert "RegionName" in region
+        ec2r = boto3.client("ec2", region_name=region["RegionName"])
+        logger.info(
+            f"Deleting image by name {args.image_name} in {region['RegionName']}"
+        )
+        delete_images_by_name(ec2r, args.image_name, args.dry_run)
 
 
 if __name__ == "__main__":
