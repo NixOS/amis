@@ -2,6 +2,7 @@ import logging
 import boto3
 from mypy_boto3_ec2 import EC2Client
 import argparse
+import botocore.exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +36,18 @@ def delete_images_by_name(ec2: EC2Client, image_name: str, dry_run: bool) -> Non
         for image in images["Images"]:
             assert "ImageId" in image
             logger.info(f"Deregistering {image['ImageId']}")
-            ec2.deregister_image(ImageId=image["ImageId"], DryRun=dry_run)
+            try:
+                ec2.deregister_image(ImageId=image["ImageId"], DryRun=dry_run)
+            except botocore.exceptions.ClientError as e:
+                if "DryRunOperation" not in str(e):
+                    raise e
+
         logger.info(f"Deleting {snapshot['SnapshotId']}")
-        ec2.delete_snapshot(SnapshotId=snapshot["SnapshotId"], DryRun=dry_run)
+        try:
+            ec2.delete_snapshot(SnapshotId=snapshot["SnapshotId"], DryRun=dry_run)
+        except botocore.exceptions.ClientError as e:
+            if "DryRunOperation" not in str(e):
+                raise e
 
 
 def main() -> None:
@@ -52,6 +62,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run",
         action="store_true",
+        help="Do not actually delete anything, just log what would be deleted",
     )
     logging.basicConfig(level=logging.INFO)
     ec2: EC2Client = boto3.client("ec2")
