@@ -21,7 +21,7 @@ jobs:
       matrix:
         release:
           - release-23.11
-          - unstable-small
+          # - unstable-small
         system:
           - x86_64-linux
           - aarch64-linux
