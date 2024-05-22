@@ -8,6 +8,7 @@ import boto3.ec2
 import boto3.ec2.createtags
 import botocore
 import botocore.exceptions
+import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
@@ -184,6 +185,11 @@ def register_image_if_not_exists(
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
+    deprecate_at = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    logging.info(f"Deprecating {image_id} at {deprecate_at}")
+    ec2.enable_image_deprecation(ImageId=image_id, DeprecateAt=deprecate_at)
     if public:
         logging.info(f"Making {image_id} public")
         ec2.modify_image_attribute(
@@ -255,6 +261,11 @@ def copy_image_to_regions(
         logging.info(
             f"Finished image {image_id} from {source_region} to {target_region_name} {copy_image['ImageId']}"
         )
+        deprecate_at = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        logging.info(f"Deprecating {copy_image['ImageId']} at {deprecate_at}")
+        ec2r.enable_image_deprecation(ImageId=image_id, DeprecateAt=deprecate_at)
         if public:
             logging.info(f"Making {copy_image['ImageId']} public")
             ec2r.modify_image_attribute(
