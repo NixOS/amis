@@ -106,7 +106,11 @@ def import_snapshot_if_not_exist(
         assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
         snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
         ec2.create_tags(
-            Resources=[snapshot_id], Tags=[{"Key": "Name", "Value": image_name}]
+            Resources=[snapshot_id],
+            Tags=[
+                {"Key": "Name", "Value": image_name},
+                {"Key": "ManagedBy", "Value": "nixos/amis"},
+            ],
         )
     s3.delete_object(Bucket=s3_bucket, Key=image_name)
     return snapshot_id
