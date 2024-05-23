@@ -2,9 +2,6 @@ name: Upload Legacy Amazon Image
 permissions:
   contents: read
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_dispatch:
   schedule:
