@@ -7,7 +7,9 @@ from mypy_boto3_ec2 import EC2Client
 from mypy_boto3_ec2.literals import InstanceTypeType
 
 
-def smoke_test(image_id: str, run_id: str, cancel: bool) -> None:
+def smoke_test(
+    *, image_id: str, instance_type: InstanceTypeType | None, run_id: str, cancel: bool
+) -> None:
     ec2: EC2Client = boto3.client("ec2")
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
@@ -15,10 +17,9 @@ def smoke_test(image_id: str, run_id: str, cancel: bool) -> None:
     image = images["Images"][0]
     assert "Architecture" in image
     architecture = image["Architecture"]
-    instance_type: InstanceTypeType
-    if architecture == "x86_64":
+    if architecture == "x86_64" and instance_type is None:
         instance_type = "t3.nano"
-    elif architecture == "arm64":
+    elif architecture == "arm64" and instance_type is None:
         instance_type = "t4g.nano"
     else:
         raise Exception("Unknown architecture: " + architecture)
@@ -76,10 +77,16 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--image-id", required=True)
     parser.add_argument("--run-id", required=False)
+    parser.add_argument("--instance-type", required=False, type=str)
     parser.add_argument("--cancel", action="store_true", required=False)
     args = parser.parse_args()
 
-    smoke_test(args.image_id, args.run_id, args.cancel)
+    smoke_test(
+        image_id=args.image_id,
+        instance_type=args.instance_type,
+        run_id=args.run_id,
+        cancel=args.cancel,
+    )
 
 
 if __name__ == "__main__":

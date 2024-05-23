@@ -1,0 +1,24 @@
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: DeterminateSystems/nix-installer-action@cd46bde16ab981b0a7b2dce0574509104543276e # v9
+      - uses: DeterminateSystems/magic-nix-cache-action@eeabdb06718ac63a7021c6132129679a8e22d0c7 # v3
+      - run: nix build .#legacyAmazonImage
+      - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          aws-region: us-east-1 # because t2.nano not available in eu-north-1
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
+      - run: |
+          image_info=./result/nix-support/image-info.json
+          images_bucket=${{ vars.IMAGES_BUCKET }}
+          image_id=$(nix run .#upload-ami -- \
+            --image-info "$image_info" \
+            --prefix "build-upload-ami/" \
+            --s3-bucket "$images_bucket" | jq -r '.["us-east-1"]')
+          echo "$image_id"
