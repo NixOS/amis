@@ -2,6 +2,8 @@
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/arianvp/amis/badge)](https://securityscorecards.dev/viewer/?uri=github.com/arianvp/amis)
 
+[Join our Matrix Channel!](https://matrix.to/#/#aws:nixos.org)
+
 Github Action that regularly uploads AMIs for release channels
 
 > [!NOTE]
