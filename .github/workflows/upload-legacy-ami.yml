@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         release:
-          - release-24.05-small
+          - release-24.05
           # - nixos-unstable
         system:
           - x86_64-linux
