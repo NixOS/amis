@@ -10,6 +10,30 @@ Github Action that regularly uploads AMIs for release channels
 > The files in [./modules](./modules) are **NOT** being used yet and we are not **building** images from this repository yet.
 > Instead we are uploading the AMIs from this Hydra job:  https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.x86_64-linux
 
+## Can I use this to upload custom AMIs?
+
+Yes! for example with a config like this:
+
+```nix
+{
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
+  outputs = { nixpkgs, ... }: {
+    nixosConfigurations.my-system = nixpkgs.nixosSystem {
+      system = "aarch64-linux";
+      modules = [
+        "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
+        { services.ngninx.enable = true; }
+      ];
+    };
+  }
+}
+```
+
+you can upload it to your account like this:
+
+```
+nix run github:NixOS/amis#upload-ami -- --s3-bucket my-bucket --image-info $(nix build .#nixosConfigurations.my-system.config.system.build.amazonImage)
+```
 
 ## Setting up account
 
