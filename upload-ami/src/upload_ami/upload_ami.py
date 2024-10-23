@@ -265,7 +265,9 @@ def copy_image_to_regions(
             "%Y-%m-%dT%H:%M:%SZ"
         )
         logging.info(f"Deprecating {copy_image['ImageId']} at {deprecate_at}")
-        ec2r.enable_image_deprecation(ImageId=copy_image['ImageId'], DeprecateAt=deprecate_at)
+        ec2r.enable_image_deprecation(
+            ImageId=copy_image["ImageId"], DeprecateAt=deprecate_at
+        )
         if public:
             logging.info(f"Making {copy_image['ImageId']} public")
             ec2r.modify_image_attribute(
