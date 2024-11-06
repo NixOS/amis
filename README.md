@@ -16,16 +16,19 @@ Yes! for example with a config like this:
 
 ```nix
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
   outputs = { nixpkgs, ... }: {
-    nixosConfigurations.my-system = nixpkgs.nixosSystem {
-      system = "aarch64-linux";
+    nixosConfigurations.my-system = nixpkgs.lib.nixosSystem {
       modules = [
         "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
-        { services.ngninx.enable = true; }
+        {
+          nixpkgs.hostPlatform = "x86_64-linux";
+          services.nginx.enable = true;
+        }
       ];
     };
-  }
+  };
 }
 ```
 
