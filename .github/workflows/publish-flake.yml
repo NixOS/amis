@@ -19,4 +19,3 @@ jobs:
           name: NixOS/amis
           rolling: true
           visibility: public
-          include-output-paths: true
