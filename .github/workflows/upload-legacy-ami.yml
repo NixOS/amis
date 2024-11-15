@@ -18,6 +18,7 @@ jobs:
       matrix:
         release:
           - release-24.05
+          - release-24.11
           # - nixos-unstable
         system:
           - x86_64-linux
