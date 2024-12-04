@@ -17,6 +17,6 @@
   };
   services.openssh = {
     authorizedKeysCommandUser = "ec2-instance-connect";
-    authorizedKeysCommand = "/etc/ssh/eic_run_authorized_keys %u %f";
+    authorizedKeysCommand = "/etc/ssh/aws-ec2-instance-connect %u %f";
   };
 }
