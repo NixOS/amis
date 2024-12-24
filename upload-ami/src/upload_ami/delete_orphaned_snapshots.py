@@ -3,7 +3,6 @@ import boto3
 from mypy_boto3_ec2 import EC2Client
 import argparse
 import botocore.exceptions
-import datetime
 
 
 def delete_orphaned_snapshots(ec2: EC2Client, dry_run: bool) -> None:
@@ -13,6 +12,7 @@ def delete_orphaned_snapshots(ec2: EC2Client, dry_run: bool) -> None:
     )
     for pages in snapshot_iterator:
         for snapshot in pages["Snapshots"]:
+            assert "SnapshotId" in snapshot
             snapshot_id = snapshot["SnapshotId"]
             images = ec2.describe_images(
                 Filters=[
@@ -44,9 +44,10 @@ def main() -> None:
         help="Do not actually delete anything, just log what would be deleted",
     )
     logging.basicConfig(level=logging.INFO)
-    ec2: EC2Client = boto3.client("ec2")
+    ec2: EC2Client = boto3.client("ec2") # type: ignore 0
     args = parser.parse_args()
     regions = ec2.describe_regions()["Regions"]
     for region in regions:
-        ec2 = boto3.client("ec2", region_name=region["RegionName"])
+        assert "RegionName" in region
+        ec2 = boto3.client("ec2", region_name=region["RegionName"]) # type: ignore 
         delete_orphaned_snapshots(ec2, args.dry_run)
