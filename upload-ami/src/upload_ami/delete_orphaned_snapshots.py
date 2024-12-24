@@ -14,6 +14,7 @@ def delete_orphaned_snapshots(ec2: EC2Client, dry_run: bool) -> None:
         for snapshot in pages["Snapshots"]:
             assert "SnapshotId" in snapshot
             snapshot_id = snapshot["SnapshotId"]
+            logging.info(f"Checking snapshot {snapshot_id}")
             images = ec2.describe_images(
                 Filters=[
                     {
@@ -21,7 +22,7 @@ def delete_orphaned_snapshots(ec2: EC2Client, dry_run: bool) -> None:
                         "Values": [snapshot_id],
                     }
                 ],
-                MaxResults=1,
+                MaxResults=6,
             )
             if len(images["Images"]) == 0:
                 logging.info(f"Deleting orphaned snapshot {snapshot_id}")
@@ -44,10 +45,11 @@ def main() -> None:
         help="Do not actually delete anything, just log what would be deleted",
     )
     logging.basicConfig(level=logging.INFO)
-    ec2: EC2Client = boto3.client("ec2") # type: ignore 0
+    ec2: EC2Client = boto3.client("ec2")
     args = parser.parse_args()
     regions = ec2.describe_regions()["Regions"]
     for region in regions:
         assert "RegionName" in region
-        ec2 = boto3.client("ec2", region_name=region["RegionName"]) # type: ignore 
+        ec2 = boto3.client("ec2", region_name=region["RegionName"])
+        logging.info(f"Checking region {region['RegionName']}")
         delete_orphaned_snapshots(ec2, args.dry_run)

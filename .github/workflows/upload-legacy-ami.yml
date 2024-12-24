@@ -86,6 +86,11 @@ jobs:
             --copy-to-regions \
             --public
 
+      - name: Delete deprecated AMIs
+        if: github.ref == 'refs/heads/main'
+        run: |
+          nix run .#delete-deprecated-images 
+
   deploy-pages:
     name: Deploy images page
     if: github.ref == 'refs/heads/main'

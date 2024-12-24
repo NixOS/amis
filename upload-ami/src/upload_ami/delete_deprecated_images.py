@@ -63,13 +63,13 @@ def main() -> None:
         help="Do not actually delete anything, just log what would be deleted",
     )
     logging.basicConfig(level=logging.INFO)
-    ec2: EC2Client = boto3.client("ec2") # type: ignore 
+    ec2: EC2Client = boto3.client("ec2")
 
     args = parser.parse_args()
     regions = ec2.describe_regions()["Regions"]
     for region in regions:
         assert "RegionName" in region
-        ec2r = boto3.client("ec2", region_name=region["RegionName"]) # type: ignore 
+        ec2r = boto3.client("ec2", region_name=region["RegionName"])
         logging.info(f"Checking region {region['RegionName']}")
         delete_deprecated_images(ec2r, args.dry_run)
 
