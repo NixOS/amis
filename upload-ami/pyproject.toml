@@ -18,5 +18,7 @@ enable-regions = "upload_ami.enable_regions:main"
 request-public-ami-quota-increase  = "upload_ami.request_public_ami_quota_increase:main"
 describe-images = "upload_ami.describe_images:main"
 delete-images-by-name = "upload_ami.delete_images_by_name:main"
+delete-deprecated-images = "upload_ami.delete_deprecated_images:main"
+delete-orphaned-snapshots = "upload_ami.delete_orphaned_snapshots:main"
 [tool.mypy]
 strict=true
