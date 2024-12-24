@@ -17,6 +17,6 @@ disable-image-block-public-access = "upload_ami.disable_image_block_public_acces
 enable-regions = "upload_ami.enable_regions:main"
 request-public-ami-quota-increase  = "upload_ami.request_public_ami_quota_increase:main"
 describe-images = "upload_ami.describe_images:main"
-delete-images = "upload_ami.delete_images:main"
+delete-images-by-name = "upload_ami.delete_images_by_name:main"
 [tool.mypy]
 strict=true
