@@ -1,5 +1,7 @@
 { buildPythonApplication
 , python3Packages
+, awscli2
+, opentofu
 , lib
 }:
 
@@ -33,6 +35,8 @@ buildPythonApplication {
   pyproject = true;
   nativeBuildInputs =
     map (name: python3Packages.${name}) pyproject.build-system.requires ++ [
+      opentofu
+      awscli2 
       python3Packages.mypy
       python3Packages.black
     ];

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NixOS Amazon Images / AMIs</title>
     <style>
-        table {
+      table {
             border-collapse: collapse;
         }
 
@@ -38,7 +37,7 @@
         }
     </style>
     <script type="module">
-        (async function () {
+      (async function () {
             try {
                 /**
                  * @typedef {Object} AWSImages
@@ -204,21 +203,18 @@
             }
         })()
     </script>
-</head>
-
-<body>
+  </head>
+  <body>
     <h1>Amazon Images / AMIs</h1>
     <p>
-        NixOS can be deployed to Amazon EC2 using our official AMI. We publish
+      NixOS can be deployed to Amazon EC2 using our official AMI. We publish
         AMIs to all AWS regions for both `x86_64` and `arm64` on a weekly basis.
     </p>
-    <p>We will start deprecating and garbage collecting images older than 90 days
-        in the future.
+    <p>We deprecate and garbage collecting images older than 90 days.
         This is why we suggest using a terraform data source or the AWS API to query
-        for the latest AMI.
-    </p>
-    <p>NixOS images are published under AWS Account ID <span id="owner-id"></span></p>
-
+        for the latest AMI.</p>
+    <p>NixOS images are published under AWS Account ID
+      <span id="owner-id"></span></p>
     <h2>Terraform / OpenTofu</h2>
     <p>You can use terraform to query for the latest image</p>
     <pre id="terraform">
@@ -249,52 +245,49 @@ resource "aws_instance" "nixos_arm64" {
     <pre id="awscli2">
 aws ec2 describe-images --owners _OWNER_ID_  --filter 'Name=name,Values=nixos/24.11*' 'Name=architecture,Values=arm64' --query 'sort_by(Images, &CreationDate)'
 </pre>
-
     <h2>AMI table</h2>
     <p>Here are the latest NixOS images available in the Amazon cloud.</p>
     <table id="images-table">
-        <thead>
-            <tr>
-                <th class="region">
-                    <label for="search-regions">Region</label>
-                    <input type="search" class="region" list="regions-datalist" placeholder="Region">
-                    <datalist class="region" id="regions-datalist">
-                    </datalist>
-                </th>
-                <th class="architecture">
-                    <label for="search-architectures">Architecture</label>
-                    <input type="search" class="architecture" list="architectures-datalist" placeholder="Architecture">
-                    <datalist class="architecture" id="architectures-datalist">
-                    </datalist>
-                </th>
-                <th class="name">
-                    <label for="search-name">Name</label>
-                    <input type="search" class="name" placeholder="Name">
-                    <datalist class="name" id="names-datalist">
-                    </datalist>
-                </th>
-                <th class="creation-date" aria-sort="descending">
-                    Creation date
-                    <button class="sort">
-                        <span>▼</span>
-                    </button>
-                </th>
-                <th>Image ID</th>
-
-            </tr>
-        </thead>
-        <tbody>
-            <template id="row-template">
-                <tr>
-                    <td class="region"></td>
-                    <td class="architecture"></td>
-                    <td class="name"></td>
-                    <td class="creation-date"></td>
-                    <td class="image-id"></td>
-                </tr>
-            </template>
-        </tbody>
+      <thead>
+        <tr>
+          <th class="region">
+            <label for="search-regions">Region</label>
+            <input type="search" class="region" list="regions-datalist" placeholder="Region">
+            <datalist class="region" id="regions-datalist">
+            </datalist>
+          </th>
+          <th class="architecture">
+            <label for="search-architectures">Architecture</label>
+            <input type="search" class="architecture" list="architectures-datalist" placeholder="Architecture">
+            <datalist class="architecture" id="architectures-datalist">
+            </datalist>
+          </th>
+          <th class="name">
+            <label for="search-name">Name</label>
+            <input type="search" class="name" placeholder="Name">
+            <datalist class="name" id="names-datalist">
+            </datalist>
+          </th>
+          <th class="creation-date" aria-sort="descending">
+            Creation date
+            <button class="sort">
+              <span>▼</span>
+            </button>
+          </th>
+          <th>Image ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template id="row-template">
+          <tr>
+            <td class="region"></td>
+            <td class="architecture"></td>
+            <td class="name"></td>
+            <td class="creation-date"></td>
+            <td class="image-id"></td>
+          </tr>
+        </template>
+      </tbody>
     </table>
-</body>
-
+  </body>
 </html>

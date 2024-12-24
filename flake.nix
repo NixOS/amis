@@ -1,19 +1,19 @@
 {
   description = "A very basic flake";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-  };
+  inputs = { nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.11"; };
 
   outputs = { self, nixpkgs, ... }:
-    let inherit (nixpkgs) lib; in
+    let inherit (nixpkgs) lib;
 
-    {
+    in {
       nixosModules = {
         ec2-instance-connect = ./modules/ec2-instance-connect.nix;
 
-        legacyAmazonProfile = nixpkgs + "nixos/modules/virtualisation/amazon-image.nix";
-        legacyAmazonImage = nixpkgs + "/nixos/maintainers/scripts/ec2/amazon-image.nix";
+        legacyAmazonProfile = nixpkgs
+          + "nixos/modules/virtualisation/amazon-image.nix";
+        legacyAmazonImage = nixpkgs
+          + "/nixos/maintainers/scripts/ec2/amazon-image.nix";
 
         amazonProfile = ./modules/amazon-profile.nix;
         amazonImage = ./modules/amazon-image.nix;
@@ -27,11 +27,14 @@
         };
       };
 
-      lib.supportedSystems = [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" ];
+      lib.supportedSystems =
+        [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" ];
 
       packages = lib.genAttrs self.lib.supportedSystems (system:
-        let pkgs = nixpkgs.legacyPackages.${system}; in {
-          ec2-instance-connect = pkgs.callPackage ./packages/ec2-instance-connect.nix { };
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in {
+          ec2-instance-connect =
+            pkgs.callPackage ./packages/ec2-instance-connect.nix { };
           amazon-ec2-metadata-mock = pkgs.buildGoModule rec {
             pname = "amazon-ec2-metadata-mock";
             version = "1.11.2";
@@ -64,7 +67,10 @@
                 boot.loader.grub.enable = false;
                 boot.loader.systemd-boot.enable = true;
               }
-              { ec2.efi = true; amazonImage.sizeMB = "auto"; }
+              {
+                ec2.efi = true;
+                amazonImage.sizeMB = "auto";
+              }
               self.nixosModules.version
             ];
           }).config.system.build.amazonImage;
@@ -74,11 +80,12 @@
       apps = lib.genAttrs self.lib.supportedSystems (system:
         let
           upload-ami = self.packages.${system}.upload-ami;
-          mkApp = name: _: { type = "app"; program = "${upload-ami}/bin/${name}"; };
-        in
-          lib.mapAttrs mkApp self.packages.${system}.upload-ami.passthru.pyproject.project.scripts
-        );
-
+          mkApp = name: _: {
+            type = "app";
+            program = "${upload-ami}/bin/${name}";
+          };
+        in lib.mapAttrs mkApp
+        self.packages.${system}.upload-ami.passthru.pyproject.project.scripts);
 
       # TODO: unfortunately I don't have access to a aarch64-linux hardware with virtualisation support
       checks = lib.genAttrs [ "x86_64-linux" ] (system:
@@ -98,8 +105,7 @@
 
             };
           };
-        in
-        {
+        in {
           resize-partition = lib.nixos.runTest {
             hostPkgs = pkgs;
             imports = [ config ./tests/resize-partition.nix ];
@@ -110,13 +116,7 @@
           };
         });
 
-      devShells = lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ] (system: {
-        default = let pkgs = nixpkgs.legacyPackages.${system}; in pkgs.mkShell {
-          nativeBuildInputs = [
-            pkgs.awscli2
-            pkgs.opentofu
-          ];
-        };
-      });
+      devShells = lib.genAttrs [ "x86_64-linux" "aarch64-darwin" ]
+        (system: { default = self.packages.${system}.upload-ami; });
     };
 }
