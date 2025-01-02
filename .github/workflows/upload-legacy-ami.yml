@@ -87,7 +87,7 @@ jobs:
             --public
 
   delete-deprecated-images:
-    name: Deploy images page
+    name: Delete deprecated images
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: upload-ami
