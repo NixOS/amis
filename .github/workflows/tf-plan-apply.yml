@@ -24,8 +24,8 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/plan 
-          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: arn:aws:iam::427812963091:role/plan  
+          aws-region: eu-north-1
       - name: Init
         run: |
           cd tf
