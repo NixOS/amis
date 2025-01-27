@@ -33,7 +33,9 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
                 if current_time >= image["DeprecationTime"]:
                     assert "ImageId" in image
                     assert "Name" in image
-                    logger.info(f"Deleting image {image['Name']} : {image['ImageId']}. DeprecationTime: {image['DeprecationTime']}")
+                    logger.info(
+                        f"Deleting image {image['Name']} : {image['ImageId']}. DeprecationTime: {image['DeprecationTime']}"
+                    )
                     try:
                         ec2.deregister_image(ImageId=image["ImageId"], DryRun=dry_run)
                     except botocore.exceptions.ClientError as e:
