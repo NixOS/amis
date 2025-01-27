@@ -42,10 +42,11 @@ def smoke_test(image_id: str, run_id: str, cancel: bool) -> None:
 
     instance = run_instances["Instances"][0]
     assert "InstanceId" in instance
+    assert "State" in instance
+    assert "Name" in instance["State"]
     instance_id = instance["InstanceId"]
-
     try:
-        if cancel:
+        if cancel or instance["State"]["Name"] == "terminated":
             return
         # This basically waits for DHCP to have finished; as it uses ARP to check if the instance is healthy
         logging.info(f"Waiting for instance {instance_id} to be running")
@@ -69,8 +70,9 @@ def smoke_test(image_id: str, run_id: str, cancel: bool) -> None:
         raise
     finally:
         logging.info(f"Terminating instance {instance_id}")
-        ec2.terminate_instances(InstanceIds=[instance_id])
-        ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
+        if instance["State"]["Name"] != "terminated":
+            ec2.terminate_instances(InstanceIds=[instance_id])
+            ec2.get_waiter("instance_terminated").wait(InstanceIds=[instance_id])
 
 
 def main() -> None:
