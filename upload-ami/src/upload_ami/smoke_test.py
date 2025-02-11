@@ -6,10 +6,10 @@ import argparse
 import logging
 
 from mypy_boto3_ec2 import EC2Client
+from mypy_boto3_ec2.type_defs import InstanceMarketOptionsRequestTypeDef
 from mypy_boto3_ec2.literals import InstanceTypeType
 
-
-def smoke_test(image_id: str, run_id: str, cancel: bool, instance_market_options: str) -> None:
+def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
     ec2: EC2Client = boto3.client("ec2")
 
     images = ec2.describe_images(Owners=["self"], ImageIds=[image_id])
@@ -24,6 +24,12 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, instance_market_options
         instance_type = "t4g.nano"
     else:
         raise Exception("Unknown architecture: " + architecture)
+    instance_market_options:  InstanceMarketOptionsRequestTypeDef
+    if no_spot:
+        instance_market_options = {}
+    else:
+        instance_market_options = { "MarketType": "spot" }
+    
     logging.info("Starting instance")
     try:
         run_instances = ec2.run_instances(
@@ -32,7 +38,7 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, instance_market_options
             MinCount=1,
             MaxCount=1,
             ClientToken=image_id + run_id if run_id else image_id,
-            InstanceMarketOptions=json.loads(instance_market_options),
+            InstanceMarketOptions=instance_market_options,
         )
     except botocore.exceptions.ClientError as error:
         if error.response["Error"]["Code"] == "IdempotentInstanceTerminated":
@@ -81,10 +87,10 @@ def main() -> None:
     parser.add_argument("--image-id", required=True)
     parser.add_argument("--run-id", required=False)
     parser.add_argument("--cancel", action="store_true", required=False)
-    parser.add_argument("--instance-market-options", default="{\"MarketType\": \"spot\"}", required=False)
+    parser.add_argument("--no-spot", action="store_true", required=False)
     args = parser.parse_args()
 
-    smoke_test(args.image_id, args.run_id, args.cancel, args.instance_market_options)
+    smoke_test(args.image_id, args.run_id, args.cancel, args.no_spot)
 
 
 if __name__ == "__main__":
