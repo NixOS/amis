@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.11";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
