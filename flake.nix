@@ -18,18 +18,27 @@
     }:
     let
       inherit (nixpkgs) lib;
+      inherit (lib) genAttrs mapAttrs recursiveUpdate;
       supportedSystems = [
         "aarch64-linux"
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      eachSystem = f: lib.genAttrs supportedSystems (system: f nixpkgs.legacyPackages.${system});
+      eachSystem = f: genAttrs supportedSystems (system: f nixpkgs.legacyPackages.${system});
       treefmtEval = eachSystem (
         pkgs:
         treefmt-nix.lib.evalModule pkgs {
           projectRootFile = "flake.nix";
           programs.black.enable = true;
           programs.nixfmt.enable = true;
+          programs.actionlint = {
+            enable = true;
+            # includes = [ ".github/workflows/*.yml" ];
+          };
+          programs.yamlfmt = {
+            # includes = [ ".github/**/*.yml" ];
+            enable = true;
+          };
         }
       );
     in
@@ -55,8 +64,8 @@
       };
 
       packages =
-        lib.recursiveUpdate
-          (lib.genAttrs supportedSystems (
+        recursiveUpdate
+          (genAttrs supportedSystems (
             system:
             let
               pkgs = nixpkgs.legacyPackages.${system};
@@ -78,7 +87,7 @@
             }
           ))
           (
-            lib.genAttrs [ "aarch64-linux" "x86_64-liux" ] (
+            genAttrs [ "aarch64-linux" "x86_64-liux" ] (
               system:
               let
                 pkgs = nixpkgs.legacyPackages.${system};
@@ -89,7 +98,7 @@
             )
           );
 
-      apps = lib.genAttrs supportedSystems (
+      apps = genAttrs supportedSystems (
         system:
         let
           upload-ami = self.packages.${system}.upload-ami;
@@ -98,56 +107,57 @@
             program = "${upload-ami}/bin/${name}";
           };
         in
-        lib.mapAttrs mkApp self.packages.${system}.upload-ami.passthru.pyproject.project.scripts
+        mapAttrs mkApp self.packages.${system}.upload-ami.passthru.pyproject.project.scripts
       );
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
       checks =
-        eachSystem (pkgs: {
-          formatting = treefmtEval.${pkgs.system}.config.build.check self;
-        })
-        // lib.genAttrs supportedSystems (system: {
-          inherit (self.packages.${system}) upload-ami;
-        })
-        // lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (
-          system:
-          let
-            pkgs = nixpkgs.legacyPackages.${system};
-            config = {
-              node.pkgs = pkgs;
-              node.specialArgs.selfPackages = self.packages.${system};
-              defaults =
-                { name, ... }:
-                {
-                  imports = [
-                    self.nixosModules.version
-                    self.nixosModules.amazonImage
-                    self.nixosModules.mock-imds
-                  ];
-                  # Needed  because test framework insists on having a hostName
-                  networking.hostName = "";
+        recursiveUpdate
+          (genAttrs supportedSystems (system: {
+            inherit (self.packages.${system}) upload-ami;
+            formatting = treefmtEval.${system}.config.build.check self;
+          }))
+          (
+            lib.genAttrs [ "aarch64-linux" "x86_64-linux" ] (
+              system:
+              let
+                pkgs = nixpkgs.legacyPackages.${system};
+                config = {
+                  node.pkgs = pkgs;
+                  node.specialArgs.selfPackages = self.packages.${system};
+                  defaults =
+                    { name, ... }:
+                    {
+                      imports = [
+                        self.nixosModules.version
+                        self.nixosModules.amazonImage
+                        self.nixosModules.mock-imds
+                      ];
+                      # Needed  because test framework insists on having a hostName
+                      networking.hostName = "";
+                    };
                 };
-            };
-          in
-          {
-            resize-partition = lib.nixos.runTest {
-              hostPkgs = pkgs;
-              imports = [
-                config
-                ./tests/resize-partition.nix
-              ];
-            };
-            ec2-metadata = lib.nixos.runTest {
-              hostPkgs = pkgs;
-              imports = [
-                config
-                ./tests/ec2-metadata.nix
-              ];
-            };
-          }
-        );
-      devShells = lib.genAttrs supportedSystems (system: {
+              in
+              {
+                resize-partition = lib.nixos.runTest {
+                  hostPkgs = pkgs;
+                  imports = [
+                    config
+                    ./tests/resize-partition.nix
+                  ];
+                };
+                ec2-metadata = lib.nixos.runTest {
+                  hostPkgs = pkgs;
+                  imports = [
+                    config
+                    ./tests/ec2-metadata.nix
+                  ];
+                };
+              }
+            )
+          );
+      devShells = genAttrs supportedSystems (system: {
         default = self.packages.${system}.upload-ami;
       });
     };

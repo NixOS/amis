@@ -37,12 +37,10 @@ jobs:
           out=$(curl -sSfL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents"  | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
           nix-store --realise "$out" --add-root ./result
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
-
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
           aws-region: ${{ vars.AWS_REGION }}
-
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
         run: |
@@ -53,7 +51,6 @@ jobs:
             --prefix "smoketest/" \
             --s3-bucket "$images_bucket")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
-
       - name: Smoke test
         id: smoke_test
         # NOTE: make sure smoke test isn't cancelled. Such that instance gets cleaned up.
@@ -61,14 +58,12 @@ jobs:
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           nix run .#smoke-test -- --image-id "$image_id"
-
       - name: Clean up smoke test
         if: ${{ cancelled() }}
         run: |
           image_ids='${{ steps.upload_smoke_test_ami.outputs.image_ids }}'
           image_id=$(echo "$image_ids" | jq -r '.["${{ vars.AWS_REGION }}"]')
           nix run .#smoke-test -- --image-id "$image_id" --cancel
-
       # NOTE: We do not pass run-id as we're not  building the image ourselves
       # and we thus need to poll hydra periodically.  Including the run-id would
       # cause us to register  the same snapshot as an image over and over again
@@ -84,7 +79,6 @@ jobs:
             --s3-bucket "$images_bucket" \
             --copy-to-regions \
             --public
-
   delete-deprecated-images:
     name: Delete deprecated images
     if: github.ref == 'refs/heads/main'
@@ -104,14 +98,12 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: Delete deprecated AMIs
         if: github.ref == 'refs/heads/main'
-        run: |
-          nix run .#delete-deprecated-images 
-
+        run: "nix run .#delete-deprecated-images \n"
   deploy-pages:
     name: Deploy images page
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [ upload-ami, delete-deprecated-images ]
+    needs: [upload-ami, delete-deprecated-images]
     permissions:
       contents: read
       id-token: write
