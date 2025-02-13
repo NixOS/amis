@@ -31,14 +31,9 @@
           projectRootFile = "flake.nix";
           programs.black.enable = true;
           programs.nixfmt.enable = true;
-          programs.actionlint = {
-            enable = true;
-            # includes = [ ".github/workflows/*.yml" ];
-          };
-          programs.yamlfmt = {
-            # includes = [ ".github/**/*.yml" ];
-            enable = true;
-          };
+          programs.actionlint.enable = true;
+          programs.yamlfmt.enable = true;
+          programs.shellcheck.enable = true;
         }
       );
     in
