@@ -1,15 +1,16 @@
-{ stdenv
-, fetchFromGitHub
-, buildFHSEnv 
-, coreutils
-, curl
-, openssh
-, cacert
-, gnugrep
-, util-linux
-, openssl
-, gawk
-, gnused
+{
+  stdenv,
+  fetchFromGitHub,
+  buildFHSEnv,
+  coreutils,
+  curl,
+  openssh,
+  cacert,
+  gnugrep,
+  util-linux,
+  openssl,
+  gawk,
+  gnused,
 }:
 # TODO: This currently fails with exit code 1 and no helpful error message.
 let
@@ -24,15 +25,17 @@ in
 buildFHSEnv {
   name = "eic_run_authorized_keys";
   runScript = "${src}/src/bin/eic_run_authorized_keys";
-  targetPkgs = (p: with p; [
-    coreutils
-    curl
-    openssh
-    cacert
-    gnugrep
-    util-linux
-    openssl
-    gawk
-    gnused
-  ]);
+  targetPkgs = (
+    p: with p; [
+      coreutils
+      curl
+      openssh
+      cacert
+      gnugrep
+      util-linux
+      openssl
+      gawk
+      gnused
+    ]
+  );
 }
