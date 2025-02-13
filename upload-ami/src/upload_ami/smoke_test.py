@@ -49,7 +49,11 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
             raise error
 
     instance = run_instances["Instances"][0]
-    assert "InstanceId" in instance
+
+    if instance["State"]["Name"] == "terminated":
+        logging.warning("Instance was terminated")
+        return
+
     instance_id = instance["InstanceId"]
 
     try:
