@@ -1,4 +1,10 @@
-{ config, modulesPath, lib, pkgs, ... }:
+{
+  config,
+  modulesPath,
+  lib,
+  pkgs,
+  ...
+}:
 let
   efiArch = pkgs.stdenv.hostPlatform.efiArch;
 in
@@ -9,20 +15,19 @@ in
     ./amazon-profile.nix
   ];
 
-  system.build.amazonImage =
-    pkgs.runCommand config.system.build.image.name { } ''
-      mkdir -p $out
-      mkdir -p $out/nix-support
-      ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/${config.image.repart.imageFile} $out/${config.image.repart.imageFileBasename}.vhd
-      cat <<EOF > $out/nix-support/image-info.json
-      {
-        "boot_mode": "uefi",
-        "label": "${config.system.nixos.label}",
-        "system": "${pkgs.stdenv.hostPlatform.system}",
-        "file": "$out/${config.image.repart.imageFileBasename}.vhd"
-      }
-      EOF
-    '';
+  system.build.amazonImage = pkgs.runCommand config.system.build.image.name { } ''
+    mkdir -p $out
+    mkdir -p $out/nix-support
+    ${pkgs.qemu-utils}/bin/qemu-img convert -f raw -O vpc ${config.system.build.image}/${config.image.repart.imageFile} $out/${config.image.repart.imageFileBasename}.vhd
+    cat <<EOF > $out/nix-support/image-info.json
+    {
+      "boot_mode": "uefi",
+      "label": "${config.system.nixos.label}",
+      "system": "${pkgs.stdenv.hostPlatform.system}",
+      "file": "$out/${config.image.repart.imageFileBasename}.vhd"
+    }
+    EOF
+  '';
 
   image.repart.name = "${config.system.nixos.distroId}-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
   image.repart.partitions = {
@@ -67,7 +72,9 @@ in
 
   systemd.repart.enable = true;
   systemd.repart.partitions = {
-    "01-root" = { Type = "root"; };
+    "01-root" = {
+      Type = "root";
+    };
   };
 
   fileSystems = {
@@ -77,6 +84,5 @@ in
       autoResize = true;
     };
   };
-
 
 }

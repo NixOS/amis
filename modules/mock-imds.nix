@@ -1,4 +1,10 @@
-{ config, pkgs, lib, selfPackages, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  selfPackages,
+  ...
+}:
 let
   json = pkgs.formats.json { };
   cfg = config.ec2.imds;
@@ -14,11 +20,16 @@ in
           default = "80";
         };
       };
-      default = {};
+      default = { };
     };
   };
   config = {
-    networking.interfaces.lo.ipv4.addresses = [{ address = "169.254.169.254"; prefixLength = 32; }];
+    networking.interfaces.lo.ipv4.addresses = [
+      {
+        address = "169.254.169.254";
+        prefixLength = 32;
+      }
+    ];
 
     systemd.services.imds = {
       description = "Mock Instance Metadata Service";

@@ -1,7 +1,21 @@
-{ selfPackages, pkgs, config, lib, ... }: {
+{
+  selfPackages,
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+{
   name = "ec2-metadata";
-  nodes.machine = { lib, config, pkgs, ... }: {
-  };
+  nodes.machine =
+    {
+      lib,
+      config,
+      pkgs,
+      ...
+    }:
+    {
+    };
 
   testScript = ''
     machine.start()

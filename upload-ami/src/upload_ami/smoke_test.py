@@ -9,6 +9,7 @@ from mypy_boto3_ec2 import EC2Client
 from mypy_boto3_ec2.type_defs import InstanceMarketOptionsRequestTypeDef
 from mypy_boto3_ec2.literals import InstanceTypeType
 
+
 def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
     ec2: EC2Client = boto3.client("ec2")
 
@@ -24,12 +25,12 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
         instance_type = "t4g.nano"
     else:
         raise Exception("Unknown architecture: " + architecture)
-    instance_market_options:  InstanceMarketOptionsRequestTypeDef
+    instance_market_options: InstanceMarketOptionsRequestTypeDef
     if no_spot:
         instance_market_options = {}
     else:
-        instance_market_options = { "MarketType": "spot" }
-    
+        instance_market_options = {"MarketType": "spot"}
+
     logging.info("Starting instance")
     try:
         run_instances = ec2.run_instances(
@@ -48,7 +49,11 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
             raise error
 
     instance = run_instances["Instances"][0]
-    assert "InstanceId" in instance
+
+    if instance["State"]["Name"] == "terminated":
+        logging.warning("Instance was terminated")
+        return
+
     instance_id = instance["InstanceId"]
 
     try:

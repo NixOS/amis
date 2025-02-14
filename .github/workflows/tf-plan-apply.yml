@@ -4,10 +4,10 @@ permissions:
   contents: read
 on:
   push:
-    branches: 
+    branches:
       - main
   pull_request:
-    branches: 
+    branches:
       - main
 jobs:
   plan:
@@ -24,7 +24,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
-          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/plan 
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/plan
           aws-region: ${{ vars.AWS_REGION }}
       - name: Init
         run: |
@@ -32,19 +32,7 @@ jobs:
           nix shell --inputs-from . nixpkgs#opentofu --command ./tofu-init.sh
       - name: Plan
         id: plan
-        run: |
-          cd tf
-          set +e
-          nix shell --inputs-from . nixpkgs#opentofu --command tofu plan -var "repo=$GITHUB_REPOSITORY" -detailed-exitcode -out tfplan
-          export exitcode=$?
-          set -e
-          echo "exitcode=$exitcode" >> "$GITHUB_OUTPUT"
-          if [ $exitcode -eq 1 ]; then
-            exit 1
-          else 
-            exit 0
-          fi
-
+        run: "cd tf\nset +e\nnix shell --inputs-from . nixpkgs#opentofu --command tofu plan -var \"repo=$GITHUB_REPOSITORY\" -detailed-exitcode -out tfplan\nexport exitcode=$?\nset -e\necho \"exitcode=$exitcode\" >> \"$GITHUB_OUTPUT\"\nif [ $exitcode -eq 1 ]; then\n  exit 1\nelse \n  exit 0\nfi\n"
       - name: Publish plan
         uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4
         with:
@@ -76,4 +64,3 @@ jobs:
         run: |
           cd tf
           nix shell --inputs-from . nixpkgs#opentofu --command tofu apply -auto-approve tfplan
-
