@@ -32,7 +32,7 @@
           programs.black.enable = true;
           programs.nixfmt.enable = true;
           programs.actionlint.enable = true;
-          programs.yamlfmt.enable = false; # check and format dont agree about comments 
+          programs.yamlfmt.enable = false; # check and format dont agree about comments
           programs.shellcheck.enable = true;
         }
       );
