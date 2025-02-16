@@ -82,7 +82,7 @@
             }
           ))
           (
-            genAttrs [ "aarch64-linux" "x86_64-liux" ] (
+            genAttrs [ "aarch64-linux" "x86_64-linux" ] (
               system:
               let
                 pkgs = nixpkgs.legacyPackages.${system};
