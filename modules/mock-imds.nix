@@ -15,9 +15,15 @@ in
     settings = lib.mkOption {
       type = lib.types.submodule {
         freeformType = json.type;
-        options.server.port = lib.mkOption {
-          type = lib.types.str;
-          default = "80";
+        options = {
+          server.port = lib.mkOption {
+            type = lib.types.str;
+            default = "80";
+          };
+          server.hostname = lib.mkOption {
+            type = lib.types.str;
+            default = "169.254.169.254";
+          };
         };
       };
       default = { };
@@ -34,7 +40,7 @@ in
     systemd.services.imds = {
       description = "Mock Instance Metadata Service";
       wantedBy = [ "multi-user.target" ];
-      serviceConfig.ExecStart = "${selfPackages.amazon-ec2-metadata-mock}/bin/cmd --config-file ${json.generate "config.json" cfg.settings}";
+      serviceConfig.ExecStart = "${lib.getExe pkgs.amazon-ec2-metadata-mock} --config-file ${json.generate "config.json" cfg.settings}";
     };
   };
 }
