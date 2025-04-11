@@ -76,7 +76,7 @@
                 { config, ... }:
                 {
                   system.stateVersion = config.system.nixos.release;
-		  nixpkgs.hostPlatform = system;
+                  nixpkgs.hostPlatform = system;
                 }
               )
             ];
