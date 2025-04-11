@@ -76,6 +76,7 @@
                 { config, ... }:
                 {
                   system.stateVersion = config.system.nixos.release;
+                  virtualisation.diskSize = "auto";
                   nixpkgs.hostPlatform = system;
                 }
               )
