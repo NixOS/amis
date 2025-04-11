@@ -1,6 +1,6 @@
 # NixOS AMIs
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nixos/amis/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nixos/amis)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/NixOS/amis/badge)](https://securityscorecards.dev/viewer/?uri=github.com/NixOS/amis)
 
 [Join our Matrix Channel!](https://matrix.to/#/#aws:nixos.org)
 
