@@ -1,14 +1,10 @@
 # NixOS AMIs
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/arianvp/amis/badge)](https://securityscorecards.dev/viewer/?uri=github.com/arianvp/amis)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/NixOS/amis/badge)](https://securityscorecards.dev/viewer/?uri=github.com/NixOS/amis)
 
 [Join our Matrix Channel!](https://matrix.to/#/#aws:nixos.org)
 
 Github Action that regularly uploads AMIs for release channels
-
-> [!NOTE]
-> The files in [./modules](./modules) are **NOT** being used yet and we are not **building** images from this repository yet.
-> Instead we are uploading the AMIs from this Hydra job:  https://hydra.nixos.org/job/nixos/release-23.11/nixos.amazonImage.x86_64-linux
 
 ## Can I use this to upload custom AMIs?
 
