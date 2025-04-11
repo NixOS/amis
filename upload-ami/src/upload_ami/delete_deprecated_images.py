@@ -22,7 +22,7 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
     for pages in images_iterator:
         for image in pages["Images"]:
             assert "Name" in image
-            if "DeprecationTime" in image or image["Name"].startswith("nixos/23.11"):
+            if image["Name"].startswith("nixos/23.11") or "DeprecationTime" in image:
                 # HACK: As python can not parse ISO8601 strings with
                 # milliseconds, but it **can** produce them, instead of parsing
                 # the datetime from the API, we format the current time as an
@@ -31,12 +31,13 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
                 current_time = datetime.datetime.isoformat(
                     datetime.datetime.now(), timespec="milliseconds"
                 )
-                if current_time >= image["DeprecationTime"] or image["Name"].startswith(
-                    "23.11"
+                if (
+                    image["Name"].startswith("nixos/23.11")
+                    or current_time >= image["DeprecationTime"]
                 ):
                     assert "ImageId" in image
                     logger.info(
-                        f"Deleting image {image['Name']} : {image['ImageId']}. DeprecationTime: {image['DeprecationTime']}"
+                        f"Deleting image {image['Name']} : {image['ImageId']}. DeprecationTime: {image.get('DeprecationTime')}"
                     )
                     try:
                         ec2.deregister_image(ImageId=image["ImageId"], DryRun=dry_run)
