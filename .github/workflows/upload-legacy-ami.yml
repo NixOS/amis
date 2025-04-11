@@ -15,6 +15,7 @@ jobs:
       id-token: write
     runs-on: ${{ matrix.runs-on.labels }}
     strategy:
+      fail-fast: false
       matrix:
         release:
           - release-24.11
