@@ -21,7 +21,8 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
     images_iterator = images_paginator.paginate(Owners=["self"])
     for pages in images_iterator:
         for image in pages["Images"]:
-            if "DeprecationTime" in image:
+            assert "Name" in image
+            if "DeprecationTime" in image or image["Name"].startswith("nixos/23.11"):
                 # HACK: As python can not parse ISO8601 strings with
                 # milliseconds, but it **can** produce them, instead of parsing
                 # the datetime from the API, we format the current time as an
@@ -30,9 +31,10 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
                 current_time = datetime.datetime.isoformat(
                     datetime.datetime.now(), timespec="milliseconds"
                 )
-                if current_time >= image["DeprecationTime"]:
+                if current_time >= image["DeprecationTime"] or image["Name"].startswith(
+                    "23.11"
+                ):
                     assert "ImageId" in image
-                    assert "Name" in image
                     logger.info(
                         f"Deleting image {image['Name']} : {image['ImageId']}. DeprecationTime: {image['DeprecationTime']}"
                     )
