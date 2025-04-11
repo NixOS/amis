@@ -2,7 +2,7 @@
   description = "A very basic flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.11";
+    nixpkgs.url = "https://channels.nixos.org/nixos-24.11/nixexprs.tar.xz";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -65,6 +65,24 @@
         inherit (self.packages.${system}) upload-ami;
         formatting = treefmtEval.${system}.config.build.check self;
       });
+
+      hydraJobs = {
+        amazonImage = genAttrs [ "aarch64-linux" "x86_64-linux" ] (
+          system:
+          (nixpkgs.lib.nixosSystem {
+            modules = [
+              "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
+              (
+                { config, ... }:
+                {
+                  system.stateVersion = config.system.nixos.release;
+		  nixpkgs.hostPlatform = system;
+                }
+              )
+            ];
+          }).config.system.build.amazonImage
+        );
+      };
 
       devShells = genAttrs supportedSystems (system: {
         default = self.packages.${system}.upload-ami;

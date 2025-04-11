@@ -9,33 +9,29 @@ on:
 jobs:
   upload-ami:
     name: Upload Legacy Amazon Image
-    runs-on: ubuntu-latest
     environment: images
     permissions:
       contents: read
       id-token: write
+    runs-on: ${{ matrix.runs-on.labels }}
     strategy:
       matrix:
         release:
           - release-24.11
           # - nixos-unstable
-        system:
-          - x86_64-linux
-          - aarch64-linux
+        runs-on:
+          - labels: [ubuntu-latest]
+            system: x86_64-linux
+          - labels: [ubuntu-24.04-arm]
+            system: aarch64-linux
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
       - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
-      # NOTE: We download the AMI from Hydra instead of building it ourselves
-      # because aarch64 is currently not supported by AWS EC2 and the legacy
-      # image builder requires nested virtualization.
-      - name: Download AMI from Hydra
-        id: download_ami
+      - name: Build AMI
+        id: build
         run: |
-          set -o pipefail
-          build_id=$(curl -sSfL -H 'Accept: application/json' https://hydra.nixos.org/job/nixos/${{ matrix.release }}/tested/latest-finished | jq -r '.id')
-          out=$(curl -sSfL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents"  | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
-          nix-store --realise "$out" --add-root ./result
+          out=$(nix build -L .#hydraJobs.amazonImage.${{ matrix.runs-on.system }} --print-out-paths)
           echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
@@ -44,7 +40,7 @@ jobs:
       - name: Upload Smoke test AMI
         id: upload_smoke_test_ami
         run: |
-          image_info='${{ steps.download_ami.outputs.image_info }}'
+          image_info='${{ steps.build.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
           image_ids=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
@@ -71,7 +67,7 @@ jobs:
       - name: Upload AMIs to all available regions
         if: github.ref == 'refs/heads/main'
         run: |
-          image_info='${{ steps.download_ami.outputs.image_info }}'
+          image_info='${{ steps.build.outputs.image_info }}'
           images_bucket='${{ vars.IMAGES_BUCKET }}'
           nix run .#upload-ami -- \
             --image-info "$image_info" \
