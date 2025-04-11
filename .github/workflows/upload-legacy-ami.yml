@@ -27,6 +27,11 @@ jobs:
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
+        with:
+         # HACK: Lets just lie that we have kvm on aarch64. The image builder only uses qemu for a small part
+         # and is stil fast
+         extra-conf: |
+           extra-system-features = kvm
       - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
       - name: Build AMI
         id: build
