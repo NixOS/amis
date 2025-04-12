@@ -6,6 +6,10 @@ on:
       - main
 jobs:
   build-and-upload:
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:

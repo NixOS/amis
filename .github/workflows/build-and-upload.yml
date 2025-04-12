@@ -31,6 +31,7 @@ jobs:
         with:
           name: ${{ steps.build.outputs.name }}
           path: ${{ steps.build.outputs.out }}
+      # TODO: use https://github.com/arianvp/nix-attest to store more provenance information
       - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           subject-name: ${{ steps.build.outputs.name }}
