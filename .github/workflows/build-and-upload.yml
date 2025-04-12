@@ -27,6 +27,7 @@ jobs:
           extra-conf: extra-system-features = kvm
       - run: |
           out=$(nix eval --raw "$flakeref")
+          echo "$out"
           name=$(basename "$out")
           echo "out=$out" >> "$GITHUB_OUTPUT"
           echo "name=$name" >> "$GITHUB_OUTPUT"
