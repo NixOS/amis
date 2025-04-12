@@ -7,7 +7,7 @@ on:
 jobs:
   build-and-upload:
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.release }}-${{ matrix.system.runs-on }}-${{ matrix.system.system }}
       cancel-in-progress: true
     permissions:
       id-token: write
