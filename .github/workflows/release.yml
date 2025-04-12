@@ -1,0 +1,24 @@
+name: Upload AMI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-upload:
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - nixos-24.11
+          - nixos-unstable
+        system:
+          - runs-on: ubuntu-latest
+            system: x86_64-linux
+          - runs-on: ubuntu-24.04-arm
+            system: aarch64-linux
+    uses: ./.github/workflows/build-and-upload.yml
+    with:
+      runs-on: ${{ matrix.system.runs-on }}
+      system: ${{ matrix.system.system }}
+      release: ${{ matrix.system.release }}
