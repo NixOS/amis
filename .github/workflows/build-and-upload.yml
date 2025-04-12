@@ -19,6 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
+        with:
+          # HACK: lets lie that we support kvm. make-disk-image.nix is fast enough in emulation mode
+          # and aarch64 has no kvm on github actions
+          extra-conf: extra-system-features = kvm
       - run: |
           out=$(nix build -L "$flakeref" --print-out-paths)
           echo "out=$out" >> "$GITHUB_OUTPUT"
