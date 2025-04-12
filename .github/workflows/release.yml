@@ -6,6 +6,9 @@ on:
       - main
 jobs:
   build-and-upload:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       id-token: write
       attestations: write
@@ -14,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - nixos-24.11
-          - nixos-unstable
+          - nixos_2411
+          - nixos_unstable
         system:
           - runs-on: ubuntu-latest
             system: x86_64-linux
