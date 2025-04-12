@@ -16,6 +16,7 @@ jobs:
       attestations: write
     outputs:
       name: ${{ steps.build.outputs.name }}
+      digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
     env:
       flakeref: .#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
     steps:
@@ -69,10 +70,24 @@ jobs:
           name: ${{ needs.build.outputs.name }}
           path: ./result
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
+      - uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
+          aws-region: ${{ vars.AWS_REGION }}
       - run: |
           image_ids=$(nix run .#upload-ami -- --image-info "$image_info" --prefix "smoketest/" --s3-bucket "$images_bucket")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
         id: upload-smoketest
         env:
           image_info: ./result/nix-support/image-info.json
-      # TODO: Add provenance info that binds hash to snapshot and image id
+      - uses: actions/attest@a63cfcc7d1aab266ee064c58250cfc2c7d07bc31 # v2.1.1
+        with:
+          subject-name: ${{ needs.build.outputs.name }}
+          subject-digest: ${{ needs.build.outputs.digest}}
+          predicate-type: "https://github.com/nixos/amis/predicates/upload-ami/v0"
+          predicate: |
+            {
+              accountId: "${{ vars.AWS_ACCOUNT_ID }}",
+              imageIds: ${{ steps.upload-smoketest.outputs.image_ids }},
+              roleArn: "${{ arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami"
+            }
