@@ -36,8 +36,8 @@ jobs:
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         id: upload-artifact
         with:
-          name: ${{ steps.eval.outputs.name }}
-          path: ${{ steps.eval.outputs.out }}
+          name: ${{ steps.build.outputs.name }}
+          path: ${{ steps.build.outputs.out }}
       # TODO: use https://github.com/arianvp/nix-attest to store more provenance information
       - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         if: github.ref == 'refs/heads/main'
