@@ -78,18 +78,21 @@ jobs:
         env:
           image_info: ./result/nix-support/image-info.json
       - run: |
-          json=$(aws sts get-caller-identity --output json)
-          echo "json=$json"
+          {
+            echo "json<<EOF"
+            aws sts get-caller-identity --output json
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
         id: caller-identity
       - uses: actions/attest@a63cfcc7d1aab266ee064c58250cfc2c7d07bc31 # v2.1.1
         with:
           subject-name: ${{ needs.build.outputs.name }}
-          subject-digest: ${{ needs.build.outputs.digest }}
+          subject-digest: sha256:${{ needs.build.outputs.digest }}
           predicate-type: "https://github.com/nixos/amis/predicates/upload-ami/v0"
           predicate: |
             {
               "imageInfo": ${{ steps.image-info.outputs.json }},
-              "imageIds": ${{ steps.upload-smoketest.outputs.image_ids }},
+              "imageIds": ${{ steps.upload.outputs.image_ids }},
               "roleArn": "arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami",
               "accountId": "${{ vars.AWS_ACCOUNT_ID }}",
               "callerIdentity": ${{ steps.caller-identity.outputs.json }}
