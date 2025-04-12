@@ -16,28 +16,43 @@ jobs:
       attestations: write
     outputs:
       name: ${{ steps.build.outputs.name }}
+    env:
+      flakeref: .#hydraJobs${{ inputs.release }}.amazonImage.${{ inputs.system }}
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
         with:
           # HACK: lets lie that we support kvm. make-disk-image.nix is fast enough in emulation mode
           # and aarch64 has no kvm on github actions
           extra-conf: extra-system-features = kvm
       - run: |
+          out=$(nix eval --raw "$flakeref")
+          name=$(basename "$out")
+          echo "out=$out" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+        id: eval
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        id: download-artifact
+        with:
+          name: ${{ needs.eval.outputs.name }}
+          path: ./result
+        continue-on-error: true
+      - run: |
           out=$(nix build -L "$flakeref" --print-out-paths)
           echo "out=$out" >> "$GITHUB_OUTPUT"
           echo "name=$(basename "$out")" >> "$GITHUB_OUTPUT"
         id: build
+        if: steps.download-artifact.outcome != "success"
         env:
           flakeref: .#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
         id: upload-artifact
+        if: steps.download-artifact.outcome != "success"
         with:
-          name: ${{ steps.build.outputs.name }}
-          path: ${{ steps.build.outputs.out }}
+          name: ${{ steps.eval.outputs.name }}
+          path: ${{ steps.eval.outputs.out }}
       # TODO: use https://github.com/arianvp/nix-attest to store more provenance information
       - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
-        if: github.ref == 'refs/heads/main'
+        if: steps.download-artifact.outcome != "success" && github.ref == 'refs/heads/main'
         with:
           subject-name: ${{ steps.build.outputs.name }}
           subject-digest: sha256:${{ steps.upload-artifact.outputs.artifact-digest }}
