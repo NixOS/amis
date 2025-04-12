@@ -92,7 +92,7 @@ jobs:
           predicate: |
             {
               "imageInfo": ${{ steps.image-info.outputs.json }},
-              "imageIds": ${{ steps.upload.outputs.image_ids }},
+              "imageIds": ${{ steps.upload-smoketest.outputs.image_ids }},
               "roleArn": "arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami",
               "accountId": "${{ vars.AWS_ACCOUNT_ID }}",
               "callerIdentity": ${{ steps.caller-identity.outputs.json }}
