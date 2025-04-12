@@ -53,7 +53,7 @@ jobs:
           path: ${{ steps.eval.outputs.out }}
       # TODO: use https://github.com/arianvp/nix-attest to store more provenance information
       - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
-        if: steps.download-artifact.outcome != 'success' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         with:
           subject-name: ${{ steps.build.outputs.name }}
           subject-digest: sha256:${{ steps.upload-artifact.outputs.artifact-digest }}
