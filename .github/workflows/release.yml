@@ -21,4 +21,4 @@ jobs:
     with:
       runs-on: ${{ matrix.system.runs-on }}
       system: ${{ matrix.system.system }}
-      release: ${{ matrix.system.release }}
+      release: ${{ matrix.release }}

@@ -34,7 +34,7 @@ jobs:
       - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           subject-name: ${{ steps.build.outputs.name }}
-          subject-digest: sha256:${{ steps.upload-artifact.artifact-digest }}
+          subject-digest: sha256:${{ steps.upload-artifact.outputs.artifact-digest }}
   upload:
     runs-on: ubuntu-latest
     needs: [build]
