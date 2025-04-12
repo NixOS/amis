@@ -316,7 +316,7 @@ def upload_ami(
     # out of the nix store
     original_path = Path(image_info["file"])
     image_info_path = Path(image_info_file)
-    image_file = image_info_path.parent / original_path.name
+    image_file = image_info_path.parent.parent / original_path.name
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
