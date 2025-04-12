@@ -69,9 +69,11 @@ jobs:
           images_bucket: ${{ vars.IMAGES_BUCKET }}
       - run: |
           json=$(jq . "$image_info")
-          echo "json<<EOF"
-          jq . "$image_info"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          {
+            echo "json<<EOF"
+            jq . "$image_info"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
         id: image-info
         env:
           image_info: ./result/nix-support/image-info.json
