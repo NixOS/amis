@@ -17,7 +17,7 @@ jobs:
     outputs:
       name: ${{ steps.build.outputs.name }}
     env:
-      flakeref: .#hydraJobs${{ inputs.release }}.amazonImage.${{ inputs.system }}
+      flakeref: .#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
