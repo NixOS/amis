@@ -27,7 +27,6 @@ jobs:
           extra-conf: extra-system-features = kvm
       - run: |
           out=$(nix eval --raw "$flakeref")
-          echo "$out"
           name=$(basename "$out")
           echo "out=$out" >> "$GITHUB_OUTPUT"
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -35,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         id: download-artifact
         with:
-          name: ${{ needs.eval.outputs.name }}
+          name: ${{ steps.eval.outputs.name }}
           path: ./result
         continue-on-error: true
       - run: |
