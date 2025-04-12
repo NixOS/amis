@@ -84,9 +84,9 @@ jobs:
           predicate-type: "https://github.com/nixos/amis/predicates/upload-ami/v0"
           predicate: |
             {
-              "imageInfo": ${{ steps.image-info.json }},
+              "imageInfo": ${{ steps.image-info.outputs.json }},
               "imageIds": ${{ steps.upload-smoketest.outputs.image_ids }},
               "roleArn": "arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami",
               "accountId": "${{ vars.AWS_ACCOUNT_ID }}",
-              "callerIdentity": ${{ steps.caller-identity.json }}
+              "callerIdentity": ${{ steps.caller-identity.outputs.json }}
             }
