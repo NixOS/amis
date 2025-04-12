@@ -82,6 +82,7 @@
             system:
             (nixpkgs.lib.nixosSystem {
               modules = [
+                # TODO: use @phaer's new images interface
                 "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
                 (
                   { config, ... }:
