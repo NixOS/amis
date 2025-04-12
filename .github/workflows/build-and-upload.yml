@@ -87,5 +87,6 @@ jobs:
               "imageInfo": ${{ steps.image-info.json }},
               "imageIds": ${{ steps.upload-smoketest.outputs.image_ids }},
               "roleArn": "arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami",
+              "accountId": "${{ vars.AWS_ACCOUNT_ID }}",
               "callerIdentity": ${{ steps.caller-identity.json }}
             }
