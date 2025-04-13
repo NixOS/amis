@@ -3,8 +3,18 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.11";
-    nixos_2411.url = "github:NixOS/nixpkgs?ref=nixos-24.11";
-    nixos_unstable.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
+
+    # NOTE: We use the channel tarballs as they contain a .version and
+    # .version-suffix file with the naming convetions we want. The
+    # lib.trivial.version for flakes and git repos returns the wrong thing
+    nixos_2411 = {
+      url = "https://channels.nixos.org/nixos-24.11/nixexprs.tar.xz";
+      flake = false;
+    };
+    nixos_unstable = {
+      url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
+      flake = false;
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -76,18 +86,21 @@
         release:
         let
           nixpkgs = inputs.${release};
+          # NOTE: we can not use nixpkgs.lib.nixosSystem as that uses
+          # an extended version of lib that overrides lib.trivial.version
+          # with something flake-specific which breaks the naming conventions
+          # for images. (e.g.  pre for unstable, beta for 25.05, etc)
+          nixosSystem = args: import "${nixpkgs}/nixos/lib/eval-config.nix" ({ system = null; } // args);
         in
         {
           amazonImage = genAttrs [ "aarch64-linux" "x86_64-linux" ] (
             system:
-            (nixpkgs.lib.nixosSystem {
+            (nixosSystem {
               modules = [
                 # TODO: use @phaer's new images interface
                 "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
                 (
                   { config, ... }:
-                  # TODO: add beta to version string for beta releases
-                  # TODO: add pre to version string for unstable
                   {
                     system.stateVersion = config.system.nixos.release;
                     virtualisation.diskSize = "auto";
