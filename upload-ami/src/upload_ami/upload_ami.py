@@ -350,7 +350,9 @@ def main() -> None:
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
     parser.add_argument("--public", action="store_true")
-    parser.add_argument("--prefix", required=True, help="Prefix to prepend to image name")
+    parser.add_argument(
+        "--prefix", required=True, help="Prefix to prepend to image name"
+    )
     parser.add_argument("--run-id", help="Run id to append to image name")
     args = parser.parse_args()
 
