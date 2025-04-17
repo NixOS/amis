@@ -1,0 +1,31 @@
+name: Upload AMI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-upload:
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.release }}-${{ matrix.system.runs-on }}-${{ matrix.system.system }}
+      cancel-in-progress: true
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        release:
+          - nixos_2411
+          # - nixos_unstable
+        system:
+          - runs-on: ubuntu-latest
+            system: x86_64-linux
+          # - runs-on: ubuntu-24.04-arm
+          # system: aarch64-linux
+    uses: ./.github/workflows/build-and-upload.yml
+    with:
+      runs-on: ${{ matrix.system.runs-on }}
+      system: ${{ matrix.system.system }}
+      release: ${{ matrix.release }}
