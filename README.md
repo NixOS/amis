@@ -30,8 +30,9 @@ Yes! for example with a config like this:
 
 you can upload it to your account like this:
 
-```
-nix run github:NixOS/amis#upload-ami -- --s3-bucket my-bucket --image-info $(nix build .#nixosConfigurations.my-system.config.system.build.amazonImage)
+```bash
+nix build .#nixosConfigurations.my-system.config.system.build.amazonImage
+nix run github:NixOS/amis#upload-ami -- --prefix my-system --s3-bucket my-bucket --image-info ./result/nix-support/image-info.json
 ```
 
 ## Setting up account
