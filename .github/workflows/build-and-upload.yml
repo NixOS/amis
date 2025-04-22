@@ -88,7 +88,7 @@ jobs:
         with:
           subject-name: ${{ needs.build.outputs.name }}
           subject-digest: sha256:${{ needs.build.outputs.digest }}
-          predicate-type: "https://github.com/nixos/amis/predicates/upload-ami/v0"
+          predicate-type: "https://github.com/NixOS/amis/predicates/upload-ami/v0"
           predicate: |
             {
               "imageInfo": ${{ steps.image-info.outputs.json }},
