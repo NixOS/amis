@@ -373,7 +373,18 @@ def main() -> None:
         args.run_id,
         args.public,
     )
-    print(json.dumps(image_ids))
+
+    caller_identity = boto3.client("sts").get_caller_identity()
+
+
+    with open(args.image_info, "r") as f:
+        image_info = json.load(f)
+
+    print(json.dumps({
+        "image_ids": image_ids,
+        "caller_identity": caller_identity,
+        "image_info": image_info,
+    }))
 
 
 if __name__ == "__main__":

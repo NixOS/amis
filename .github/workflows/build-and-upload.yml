@@ -20,7 +20,7 @@ jobs:
       name: ${{ steps.build.outputs.name }}
       digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
     env:
-      flakeref: .#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
+      flakeref: .?dir=amis#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
     steps:
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
@@ -67,19 +67,17 @@ jobs:
       - name: Upload smoke test 
         id: upload-smoke-test
         run: |
-          image_ids=$(nix run .#upload-ami -- --image-info "$image_info" --prefix "nixos/" --s3-bucket "$images_bucket")
-          echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
+          predicate=$(nix run .#upload-ami -- --image-info "$image_info" --prefix "nixos/" --s3-bucket "$images_bucket")
+          echo "predicate=$predicate" >> "$GITHUB_OUTPUT"
         env:
           image_info: ./result/nix-support/image-info.json
           images_bucket: ${{ vars.IMAGES_BUCKET }}
 
       - name: Run smoke test
         id: smoke-test
-        run: |
-          image_id=$(echo "$image_ids" | jq -r '.[$ENV.AWS_REGION]')
-          nix run .#smoke-test -- --image-id "$image_id"
+        run: nix run .#smoke-test -- --image-id "$image_id"
         env:
-          image_ids: ${{ steps.upload-smoke-test.outputs.image_ids }}
+          image_id: ${{ fromJson(steps.upload-smoke-test.outputs.predicate).image_ids[vars.AWS_REGION] }}
 
       - name: Clean up smoke test
         if: ${{ cancelled() }}
@@ -93,39 +91,18 @@ jobs:
         if: github.ref == 'refs/heads/main'
         id: upload-amis
         run: |
-          image_ids=$(nix run .#upload-ami -- \
+          predicate=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
             --prefix "nixos/" \
             --s3-bucket "$images_bucket" \
             --copy-to-regions \
             --public)
-          echo "image_ids=$image_ids" >> "GITHUB_OUTPUT"
+          echo "predicate=$predicate" >> "GITHUB_OUTPUT"
         env:
           image_info: ./result/nix-support/image-info.json
           images_bucket: ${{ vars.IMAGES_BUCKET }}
 
-      - name: Get image info
-        run: |
-          {
-            echo "json<<EOF"
-            jq . "$image_info"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-        id: image-info
-        if: github.ref == 'refs/heads/main'
-        env:
-          image_info: ./result/nix-support/image-info.json
-
-      - name: Get caller identity
-        run: |
-          {
-            echo "json<<EOF"
-            aws sts get-caller-identity --output json
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-        id: caller-identity
-        if: github.ref == 'refs/heads/main'
-
+      # TODO: Only create if something was *actually* uploaded
       - name: Create upload attestation
         uses: actions/attest@a63cfcc7d1aab266ee064c58250cfc2c7d07bc31 # v2.1.1
         if: github.ref == 'refs/heads/main'
@@ -133,11 +110,4 @@ jobs:
           subject-name: ${{ needs.build.outputs.name }}
           subject-digest: sha256:${{ needs.build.outputs.digest }}
           predicate-type: "https://github.com/NixOS/amis/predicates/upload-ami/v0"
-          predicate: |
-            {
-              "imageInfo": ${{ steps.image-info.outputs.json }},
-              "imageIds": ${{ steps.upload-amis.outputs.image_ids }},
-              "roleArn": "arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami",
-              "accountId": "${{ vars.AWS_ACCOUNT_ID }}",
-              "callerIdentity": ${{ steps.caller-identity.outputs.json }}
-            }
+          predicate: ${{ steps.upload-amis.outputs.predicate }}

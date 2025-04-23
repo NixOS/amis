@@ -1,9 +1,13 @@
 name: Build and upload AMIs
 on:
   pull_request:
+    paths:
+      - amis/**
   push:
     branches:
       - main
+    paths:
+      - amis/**
 jobs:
   build-and-upload:
     name: ${{ matrix.release }} ${{ matrix.system.system }}
