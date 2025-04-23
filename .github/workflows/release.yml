@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   build-and-upload:
-    name: Build and upload AMI for ${{ matrix.release }} ${{ matrix.system.system }}
+    name: ${{ matrix.release }} ${{ matrix.system.system }}
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.release }}-${{ matrix.system.runs-on }}-${{ matrix.system.system }}
       cancel-in-progress: true
