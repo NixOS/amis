@@ -73,7 +73,7 @@ jobs:
       - name: Run smoke test
         id: smoke-test
         run: |
-          image_id=$(echo "$image_ids" | jq -r ".['$AWS_REGION']")
+          image_id=$(echo "$image_ids" | jq -r '.[$ENV.AWS_REGION]')
           nix run .#smoke-test -- --image-id "$image_id"
         env:
           image_ids: ${{ steps.upload-smoke-test.outputs.image_ids }}
@@ -81,7 +81,7 @@ jobs:
       - name: Clean up smoke test
         if: ${{ cancelled() }}
         run: |
-          image_id=$(echo "$image_ids" | jq -r ".['$AWS_REGION']")
+          image_id=$(echo "$image_ids" | jq -r '.[$ENV.AWS_REGION]')
           nix run .#smoke-test -- --image-id "$image_id" --cancel
         env:
           image_ids: ${{ steps.upload-smoke-test.outputs.image_ids }}
