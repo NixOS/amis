@@ -104,7 +104,8 @@ jobs:
           image_info: ./result/nix-support/image-info.json
           images_bucket: ${{ vars.IMAGES_BUCKET }}
 
-      - run: |
+      - name: Get image info
+        run: |
           {
             echo "json<<EOF"
             jq . "$image_info"
@@ -115,7 +116,8 @@ jobs:
         env:
           image_info: ./result/nix-support/image-info.json
 
-      - run: |
+      - name: Get caller identity
+        run: |
           {
             echo "json<<EOF"
             aws sts get-caller-identity --output json
