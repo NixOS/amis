@@ -1,0 +1,113 @@
+name: Build and upload AMI
+on:
+  workflow_call:
+    inputs:
+      system:
+        type: string
+      runs-on:
+        type: string
+      release:
+        type: string
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ inputs.runs-on }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    outputs:
+      name: ${{ steps.build.outputs.name }}
+      digest: ${{ steps.upload-artifact.outputs.artifact-digest }}
+    env:
+      flakeref: .?dir=amis#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+        with:
+          # HACK: lets lie that we support kvm. make-disk-image.nix is fast enough in emulation mode
+          # and aarch64 has no kvm on github actions
+          extra-conf: extra-system-features = kvm
+      - run: |
+          out=$(nix build -L "$flakeref" --print-out-paths)
+          echo "out=$out" >> "$GITHUB_OUTPUT"
+          echo "name=$(basename "$out")" >> "$GITHUB_OUTPUT"
+        id: build
+        env:
+          flakeref: .#hydraJobs.${{ inputs.release }}.amazonImage.${{ inputs.system }}
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4
+        id: upload-artifact
+        with:
+          name: ${{ steps.build.outputs.name }}
+          path: ${{ steps.build.outputs.out }}
+      # TODO: use https://github.com/arianvp/nix-attest to store more provenance information
+      - uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        if: github.ref == 'refs/heads/main'
+        with:
+          subject-name: ${{ steps.build.outputs.name }}
+          subject-digest: sha256:${{ steps.upload-artifact.outputs.artifact-digest }}
+  upload:
+    name: Upload
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment: images
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        id: download-artifact
+        with:
+          name: ${{ needs.build.outputs.name }}
+          path: ./result
+      - uses: DeterminateSystems/nix-installer-action@e50d5f73bfe71c2dd0aa4218de8f4afa59f8f81d # v16
+      - uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722 # v4.1.0
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload smoke test 
+        id: upload-smoke-test
+        run: |
+          predicate=$(nix run .#upload-ami -- --image-info "$image_info" --prefix "nixos/" --s3-bucket "$images_bucket")
+          echo "predicate=$predicate" >> "$GITHUB_OUTPUT"
+        env:
+          image_info: ./result/nix-support/image-info.json
+          images_bucket: ${{ vars.IMAGES_BUCKET }}
+
+      - name: Run smoke test
+        id: smoke-test
+        run: nix run .#smoke-test -- --image-id "$image_id"
+        env:
+          image_id: ${{ fromJson(steps.upload-smoke-test.outputs.predicate).image_ids[vars.AWS_REGION] }}
+
+      - name: Clean up smoke test
+        if: ${{ cancelled() }}
+        run: |
+          image_id=$(echo "$image_ids" | jq -r '.[$ENV.AWS_REGION]')
+          nix run .#smoke-test -- --image-id "$image_id" --cancel
+        env:
+          image_ids: ${{ steps.upload-smoke-test.outputs.image_ids }}
+
+      - name: Upload AMIs to all available regions
+        if: github.ref == 'refs/heads/main'
+        id: upload-amis
+        run: |
+          predicate=$(nix run .#upload-ami -- \
+            --image-info "$image_info" \
+            --prefix "nixos/" \
+            --s3-bucket "$images_bucket" \
+            --copy-to-regions \
+            --public)
+          echo "predicate=$predicate" >> "GITHUB_OUTPUT"
+        env:
+          image_info: ./result/nix-support/image-info.json
+          images_bucket: ${{ vars.IMAGES_BUCKET }}
+
+      # TODO: Only create if something was *actually* uploaded
+      - name: Create upload attestation
+        uses: actions/attest@a63cfcc7d1aab266ee064c58250cfc2c7d07bc31 # v2.1.1
+        if: github.ref == 'refs/heads/main'
+        with:
+          subject-name: ${{ needs.build.outputs.name }}
+          subject-digest: sha256:${{ needs.build.outputs.digest }}
+          predicate-type: "https://github.com/NixOS/amis/predicates/upload-ami/v0"
+          predicate: ${{ steps.upload-amis.outputs.predicate }}

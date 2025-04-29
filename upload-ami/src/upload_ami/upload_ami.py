@@ -16,6 +16,7 @@ from mypy_boto3_ec2.type_defs import RegionTypeDef
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
+from importlib import reload
 
 
 class ImageInfo(TypedDict):
@@ -292,7 +293,7 @@ def copy_image_to_regions(
 
 
 def upload_ami(
-    image_info: ImageInfo,
+    image_info_file: str,
     s3_bucket: str,
     copy_to_regions: bool,
     prefix: str,
@@ -308,11 +309,17 @@ def upload_ami(
     ec2: EC2Client = boto3.client("ec2")
     s3: S3Client = boto3.client("s3")
 
-    image_file = Path(image_info["file"])
+    with open(image_info_file, "r") as f:
+        image_info = json.load(f)
+
+    # HACK: This is to get this to work if we're pointing to an image-info
+    # out of the nix store
+    original_path = Path(image_info["file"])
+    image_info_path = Path(image_info_file)
+    image_file = image_info_path.parent.parent / original_path.name
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
-
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot_if_not_exist(
         s3, ec2, s3_bucket, image_name, image_file, image_format
@@ -359,19 +366,30 @@ def main() -> None:
     level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(level=level)
 
-    with open(args.image_info, "r") as f:
-        image_info = json.load(f)
-
     image_ids = {}
     image_ids = upload_ami(
-        image_info,
+        args.image_info,
         args.s3_bucket,
         args.copy_to_regions,
         args.prefix,
         args.run_id,
         args.public,
     )
-    print(json.dumps(image_ids))
+
+    caller_identity = boto3.client("sts").get_caller_identity()
+
+    with open(args.image_info, "r") as f:
+        image_info = json.load(f)
+
+    print(
+        json.dumps(
+            {
+                "image_ids": image_ids,
+                "caller_identity": caller_identity,
+                "image_info": image_info,
+            }
+        )
+    )
 
 
 if __name__ == "__main__":
