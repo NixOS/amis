@@ -19,6 +19,7 @@ Yes! for example with a config like this:
       modules = [
         "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
         {
+          virtualisation.diskSize = "auto";  # or gigabytes. default is 3 * 1024
           nixpkgs.hostPlatform = "x86_64-linux";
           services.nginx.enable = true;
         }
