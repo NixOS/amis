@@ -22,8 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - nixos_2411
-          # - nixos_unstable
+          # - nixos_2411
+          - nixos_unstable
         system:
           - runs-on: ubuntu-latest
             system: x86_64-linux
