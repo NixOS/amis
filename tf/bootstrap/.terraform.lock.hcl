@@ -2,28 +2,28 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.opentofu.org/hashicorp/aws" {
-  version     = "5.98.0"
-  constraints = "5.98.0"
+  version     = "5.99.1"
+  constraints = "5.99.1"
   hashes = [
-    "h1:2YBMZNKejf1OafXzi9s5QzjcOSozwkhP8ofuc4J7W0I=",
-    "h1:AJjGWBoDkSriA0wXLhqSwRtDlkUupZzGXnUYkGPHfSQ=",
-    "h1:D0+gw9bE2E7yK8vlnrob7ijLFjSEz+Zfcu1N5RPkNv0=",
-    "h1:RPmVw1Z3B0Qj8qqQiM6Rz21wPB2KA3HCjxcZ1MlVQeU=",
-    "h1:UQeT0LjY0o1+1Q//VYvxAWQVCNLBgM0U6BjXzJLGbDA=",
-    "h1:VIT6mKNDyF+nAV59ZOmJhdJwhpa5U71wQe8GhJf64KQ=",
-    "h1:WQ3rRWzDt0FA9Oi7gVo6xkMgS07ZmyPpPd0O0uB5xsY=",
-    "h1:bhhlgR8xj/1ExBbTLI45pyl/li6JgKqdrZdoO/eYnK8=",
-    "h1:l0YRNODVmQ0KrZRiD9oOjAI+6cZCG2AQE5J9Qvf6u7I=",
-    "h1:nOUtAP+l4GWnzE901iTT6Fiv+TSNoyC1BJPUW4sqaJk=",
-    "zh:1c8e4073151bc3f4e201a89ea5934733b7fe8a88399cf476bb53417e52e5a2d6",
-    "zh:433b575d313742cfffc808907cfdabf6f16ad4b2b4b722b33624c2c45ab28003",
-    "zh:4f10af33ac39df606a4ff2c685940349745b00f88f72717c6a35bf3aad8400a2",
-    "zh:63d442570d5fc8bef9139ef6e242b903b728282a4949721cfe6071ed5c05532a",
-    "zh:722e840d59c1126d2ed85cba09ff3d2d3597d6c3fa3d9a6f7d01c6d78772882e",
-    "zh:8270018389d9d095c20fe270b89e9be2ec444a5b447e1153436ff018b9e84710",
-    "zh:8cebf189600873a041c829cabb92096a5f8c9cd8ebec6997abcfb1a4981209a4",
-    "zh:a878695fc563f758fb29399ed10a44a3e96563062917fa8534766cd76f1b490e",
-    "zh:b9ea7fb2418462586642d1831775ea1872c3eda4180391459918de2f734d98c2",
-    "zh:ecc4ea0f659dab585e8328698d0bb343b80721e093b95af13769a4616c082fab",
+    "h1:/wcdT1vrAktWvNolQbBBy3xThqtZtAMoLJAU2d/i8xM=",
+    "h1:0jNckFqimGrHhRB88880ovIpmoE20xhjRb94GBdgjwo=",
+    "h1:0tU3fKBYNtjcfcglw6Lz3Ic1fq6YYPf5dIWwFg7bU8A=",
+    "h1:BVH3ws9pzVUaDyRnmWy5EaIHPqozkCfU6AftQaIYJJM=",
+    "h1:NGZxAmW/pp0GTq1MKoeNtmZXjzsLnHUHD639fLLmdPs=",
+    "h1:Vl9vXjm/BJ0erNchBVK3XiJXxwRSBurarop4Vrm1m/E=",
+    "h1:c3xUOhM4Ar29AFkuJJ4zUYpndM05DipiLtTAwm/JsM4=",
+    "h1:kJ1DoujE2uNxpb9XomuYWSMMVohctvkWv+RBpK9K3fE=",
+    "h1:s/WaduPnAJ6EZvKS1XRCMylfpEPNhDGXKbt/MlbVaxo=",
+    "h1:uOE/DomIZ2Olu/mfRxesIxiQX4IMfABjclSFC8hNuIE=",
+    "zh:13a07422f776dd97214dfa89d6a88340b99613cbb869013c756c1a68fd8cdd9d",
+    "zh:1841d422278afa25d42a8d3ea9197ad08cf092769bd2aa89056d25d4c2629df8",
+    "zh:269016c7ba09d76e42fbcf15de28f2de0595ff9a7304a0500011a4493d7a1551",
+    "zh:2b842c3d0f30e048c05a37752b9c07d316656f3caf79841d08a4f1b057555eb2",
+    "zh:6559eedc095f70a51460dc702613a9033734ba536c1de1ed86a735a3c8131e40",
+    "zh:6d43b2676630344db3a7d6ba8330d20993492168f124e19e040a0aa914ec832e",
+    "zh:7f5d5cb0c1a492080b668f456de50f5b91fc67018c05f12483added3faf703f6",
+    "zh:c3bb8094bf26565150229f1ca6014d41d1283b8a2b06a15b45cd5a6b4ce82e28",
+    "zh:e45bc994d0c6e1c0a0b70e8378f2f933e924f05c91061ed2a97ceaf282e08a25",
+    "zh:ee725d6fbc1dbaa5017e9eab6fa0aa7e107a4ed73a4a8e2acab6b5d3d54cd0e4",
   ]
 }
