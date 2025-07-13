@@ -95,7 +95,11 @@ def import_snapshot_if_not_exist(
             ClientToken=client_token,
         )
         ec2.get_waiter("snapshot_imported").wait(
-            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
+            ImportTaskIds=[snapshot_import_task["ImportTaskId"]],
+            WaiterConfig={
+                "Delay": 15,  # Same as the default for this waiter
+                "MaxAttempts": 400,  # Default is 40 (10min) 400 is 100 minutes
+            },
         )
 
         snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
