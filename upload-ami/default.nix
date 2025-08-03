@@ -1,8 +1,10 @@
 {
   buildPythonApplication,
-  python3Packages,
+  python,
   awscli2,
   opentofu,
+  mypy,
+  black,
   lib,
 }:
 
@@ -28,7 +30,7 @@ let
     dep:
     let
       inherit (parseDependency dep) name extras;
-      package = python3Packages.${name};
+      package = python.pkgs.${name};
       optionalPackages = lib.flatten (map (name: package.optional-dependencies.${name}) extras);
     in
     [ package ] ++ optionalPackages;
@@ -39,11 +41,11 @@ buildPythonApplication {
   version = pyproject.project.version;
   src = ./.;
   pyproject = true;
-  nativeBuildInputs = map (name: python3Packages.${name}) pyproject.build-system.requires ++ [
+  nativeBuildInputs = map (name: python.pkgs.${name}) pyproject.build-system.requires ++ [
     opentofu
     awscli2
-    python3Packages.mypy
-    python3Packages.black
+    mypy
+    black
   ];
 
   propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
