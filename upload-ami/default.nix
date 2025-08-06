@@ -1,11 +1,7 @@
 {
-  buildPythonApplication,
-  python3Packages,
-  awscli2,
-  opentofu,
   lib,
+  python3Packages,
 }:
-
 let
   pyproject = builtins.fromTOML (builtins.readFile ./pyproject.toml);
   # str -> { name: str, extras: [str] }
@@ -23,38 +19,38 @@ let
       extras = extras;
     };
 
-  # { name: str, extras: [str] } -> [package]
-  resolvePackages =
-    dep:
+  pyprojectToPythonPackage =
+    pyproject:
     let
-      inherit (parseDependency dep) name extras;
-      package = python3Packages.${name};
-      optionalPackages = lib.flatten (map (name: package.optional-dependencies.${name}) extras);
+      requires = map parseDependency pyproject.build-system.requires;
+      dependencies = map parseDependency pyproject.project.dependencies;
+      args =
+        (lib.genAttrs (
+          [ "buildPythonApplication" ] ++ (map ({ name, ... }: name) (requires ++ dependencies))
+        ))
+          (x: false);
     in
-    [ package ] ++ optionalPackages;
+    lib.setFunctionArgs (
+      python3Packages:
+      let
+        resolvePkgs =
+          { name, extras }:
+          let
+            pkg = python3Packages.${name};
+          in
+          [ pkg ] ++ map (name: pkg.optional-dependencies.${name}) extras;
+      in
+
+      python3Packages.buildPythonApplication {
+        name = pyproject.project.name;
+        version = pyproject.project.version;
+        src = ./.;
+        pyproject = true;
+        nativeBuildInputs = lib.flatten (map resolvePkgs requires);
+        propagatedBuildInputs = lib.flatten (map resolvePkgs dependencies);
+        passthru.pyproject = pyproject;
+      }
+    ) args;
 
 in
-buildPythonApplication {
-  pname = pyproject.project.name;
-  version = pyproject.project.version;
-  src = ./.;
-  pyproject = true;
-  nativeBuildInputs = map (name: python3Packages.${name}) pyproject.build-system.requires ++ [
-    opentofu
-    awscli2
-    python3Packages.mypy
-    python3Packages.black
-  ];
-
-  propagatedBuildInputs = lib.flatten (map resolvePackages pyproject.project.dependencies);
-
-  checkPhase = ''
-    mypy src
-    black --check src
-  '';
-
-  passthru.pyproject = pyproject;
-  passthru.parseDependency = parseDependency;
-  passthru.resolvePackages = resolvePackages;
-
-}
+python3Packages.callPackage (pyprojectToPythonPackage pyproject) { }
