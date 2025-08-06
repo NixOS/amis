@@ -1,8 +1,8 @@
 {
-  description = "A very basic flake";
+  description = "Upload AMI";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-24.11";
+    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.xz";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,6 +30,10 @@
         treefmt-nix.lib.evalModule pkgs {
           projectRootFile = "flake.nix";
           programs.black.enable = true;
+          programs.mypy.enable = true;
+          programs.mypy.directories."upload-ami" = {
+            extraPythonPackages = self.packages.${pkgs.system}.upload-ami.propagatedBuildInputs;
+          };
           programs.nixfmt.enable = true;
           programs.actionlint.enable = true;
           programs.yamlfmt.enable = false; # check and format dont agree about comments
@@ -44,7 +48,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          upload-ami = pkgs.python3Packages.callPackage ./upload-ami { };
+          upload-ami = pkgs.callPackage ./upload-ami { };
         }
       );
       apps = genAttrs supportedSystems (
