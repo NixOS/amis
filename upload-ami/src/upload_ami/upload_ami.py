@@ -12,7 +12,7 @@ import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
-from mypy_boto3_ec2.type_defs import RegionTypeDef
+from mypy_boto3_ec2.type_defs import RegionTypeDef, RegisterImageRequestTypeDef
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
@@ -150,19 +150,17 @@ def register_image_if_not_exists(
         else:
             raise Exception("Unknown system: " + image_info["system"])
 
-        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
-
         # TODO(arianvp): Not all instance types support TPM 2.0 yet. We should
         # upload two images, one with and one without TPM 2.0 support.
 
         # if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
         #    tpmsupport['TpmSupport'] = "v2.0"
 
-        register_image = ec2.register_image(
-            Name=image_name,
-            Architecture=architecture,
-            BootMode=image_info["boot_mode"],
-            BlockDeviceMappings=[
+        register_image_kwargs: RegisterImageRequestTypeDef = {
+            "Name": image_name,
+            "Architecture": architecture,
+            "BootMode": image_info["boot_mode"],
+            "BlockDeviceMappings": [
                 {
                     "DeviceName": "/dev/xvda",
                     "Ebs": {
@@ -171,12 +169,12 @@ def register_image_if_not_exists(
                     },
                 }
             ],
-            RootDeviceName="/dev/xvda",
-            VirtualizationType="hvm",
-            EnaSupport=True,
-            ImdsSupport="v2.0",
-            SriovNetSupport="simple",
-            TagSpecifications=[
+            "RootDeviceName": "/dev/xvda",
+            "VirtualizationType": "hvm",
+            "EnaSupport": True,
+            "ImdsSupport": "v2.0",
+            "SriovNetSupport": "simple",
+            "TagSpecifications": [
                 {
                     "ResourceType": "image",
                     "Tags": [
@@ -185,7 +183,11 @@ def register_image_if_not_exists(
                     ],
                 }
             ],
-        )
+        }
+
+        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
+
+        register_image = ec2.register_image(**register_image_kwargs)
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
