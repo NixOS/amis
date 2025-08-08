@@ -127,6 +127,7 @@ def register_image_if_not_exists(
     image_info: ImageInfo,
     snapshot_id: str,
     public: bool,
+    enable_tpm: bool,
 ) -> str:
     """
     Register image if it doesn't exist yet
@@ -149,12 +150,6 @@ def register_image_if_not_exists(
             architecture = "arm64"
         else:
             raise Exception("Unknown system: " + image_info["system"])
-
-        # TODO(arianvp): Not all instance types support TPM 2.0 yet. We should
-        # upload two images, one with and one without TPM 2.0 support.
-
-        # if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-        #    tpmsupport['TpmSupport'] = "v2.0"
 
         register_image_kwargs: RegisterImageRequestTypeDef = {
             "Name": image_name,
@@ -184,6 +179,13 @@ def register_image_if_not_exists(
                 }
             ],
         }
+
+        if (
+            enable_tpm
+            and architecture == "x86_64"
+            and image_info["boot_mode"] == "uefi"
+        ):
+            register_image_kwargs["TpmSupport"] = "v2.0"
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
 
@@ -305,6 +307,7 @@ def upload_ami(
     run_id: str,
     public: bool,
     dest_regions: list[str],
+    enable_tpm: bool,
 ) -> dict[str, str]:
     """
     Upload NixOS AMI to AWS and return the image ids for each region
@@ -326,7 +329,7 @@ def upload_ami(
     )
 
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id, public
+        ec2, image_name, image_info, snapshot_id, public, enable_tpm
     )
 
     regions = filter(
@@ -368,6 +371,12 @@ def main() -> None:
         action="append",
         default=[],
     )
+    parser.add_argument(
+        "--enable-tpm",
+        action="store_true",
+        default=False,
+        help="Enable TPM 2.0 support for UEFI x86_64 images",
+    )
 
     args = parser.parse_args()
 
@@ -386,6 +395,7 @@ def main() -> None:
         args.run_id,
         args.public,
         args.dest_region,
+        args.enable_tpm,
     )
     print(json.dumps(image_ids))
 
