@@ -12,7 +12,7 @@ import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
-from mypy_boto3_ec2.type_defs import RegionTypeDef
+from mypy_boto3_ec2.type_defs import RegionTypeDef, RegisterImageRequestTypeDef
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
@@ -127,6 +127,7 @@ def register_image_if_not_exists(
     image_info: ImageInfo,
     snapshot_id: str,
     public: bool,
+    enable_tpm: bool,
 ) -> str:
     """
     Register image if it doesn't exist yet
@@ -150,19 +151,11 @@ def register_image_if_not_exists(
         else:
             raise Exception("Unknown system: " + image_info["system"])
 
-        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
-
-        # TODO(arianvp): Not all instance types support TPM 2.0 yet. We should
-        # upload two images, one with and one without TPM 2.0 support.
-
-        # if architecture == "x86_64" and image_info["boot_mode"] == "uefi":
-        #    tpmsupport['TpmSupport'] = "v2.0"
-
-        register_image = ec2.register_image(
-            Name=image_name,
-            Architecture=architecture,
-            BootMode=image_info["boot_mode"],
-            BlockDeviceMappings=[
+        register_image_kwargs: RegisterImageRequestTypeDef = {
+            "Name": image_name,
+            "Architecture": architecture,
+            "BootMode": image_info["boot_mode"],
+            "BlockDeviceMappings": [
                 {
                     "DeviceName": "/dev/xvda",
                     "Ebs": {
@@ -171,12 +164,12 @@ def register_image_if_not_exists(
                     },
                 }
             ],
-            RootDeviceName="/dev/xvda",
-            VirtualizationType="hvm",
-            EnaSupport=True,
-            ImdsSupport="v2.0",
-            SriovNetSupport="simple",
-            TagSpecifications=[
+            "RootDeviceName": "/dev/xvda",
+            "VirtualizationType": "hvm",
+            "EnaSupport": True,
+            "ImdsSupport": "v2.0",
+            "SriovNetSupport": "simple",
+            "TagSpecifications": [
                 {
                     "ResourceType": "image",
                     "Tags": [
@@ -185,7 +178,18 @@ def register_image_if_not_exists(
                     ],
                 }
             ],
-        )
+        }
+
+        if (
+            enable_tpm
+            and architecture == "x86_64"
+            and image_info["boot_mode"] == "uefi"
+        ):
+            register_image_kwargs["TpmSupport"] = "v2.0"
+
+        logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
+
+        register_image = ec2.register_image(**register_image_kwargs)
         image_id = register_image["ImageId"]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
@@ -303,6 +307,7 @@ def upload_ami(
     run_id: str,
     public: bool,
     dest_regions: list[str],
+    enable_tpm: bool,
 ) -> dict[str, str]:
     """
     Upload NixOS AMI to AWS and return the image ids for each region
@@ -324,7 +329,7 @@ def upload_ami(
     )
 
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id, public
+        ec2, image_name, image_info, snapshot_id, public, enable_tpm
     )
 
     regions = filter(
@@ -366,6 +371,12 @@ def main() -> None:
         action="append",
         default=[],
     )
+    parser.add_argument(
+        "--enable-tpm",
+        action="store_true",
+        default=False,
+        help="Enable TPM 2.0 support for UEFI x86_64 images",
+    )
 
     args = parser.parse_args()
 
@@ -384,6 +395,7 @@ def main() -> None:
         args.run_id,
         args.public,
         args.dest_region,
+        args.enable_tpm,
     )
     print(json.dumps(image_ids))
 
