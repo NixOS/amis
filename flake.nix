@@ -60,7 +60,7 @@
             program = "${upload-ami}/bin/${name}";
           };
         in
-        mapAttrs mkApp self.packages.${system}.upload-ami.passthru.pyproject.project.scripts
+        mapAttrs mkApp self.packages.${system}.upload-ami.passthru.upload-ami.pyproject.project.scripts
       );
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
