@@ -48,7 +48,7 @@ let
         pyproject = true;
         nativeBuildInputs = lib.flatten (map resolvePkgs requires);
         propagatedBuildInputs = lib.flatten (map resolvePkgs dependencies);
-        passthru.pyproject = pyproject;
+        passthru.upload-ami.pyproject = pyproject;
       }
     ) args;
 
