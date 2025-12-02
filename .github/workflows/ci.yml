@@ -19,7 +19,7 @@ jobs:
           - labels: [ubuntu-24.04-arm]
             system: aarch64-linux
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
       - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
       - run: nix flake check -L --system ${{ matrix.runs-on.system }}
@@ -30,7 +30,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0  
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1  
       - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12        
       - uses: DeterminateSystems/flakehub-push@8da9e38b7e77f2b0a8aa08a22e57cc5c6316ea72 #v5
         with:
