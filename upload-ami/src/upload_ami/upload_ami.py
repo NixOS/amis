@@ -50,6 +50,7 @@ def import_snapshot_if_not_exist(
     image_name: str,
     image_file: Path,
     image_format: str,
+    import_role_name: str,
 ) -> str:
     """
     Import snapshot from S3 and wait for it to finish
@@ -93,6 +94,7 @@ def import_snapshot_if_not_exist(
             ],
             Description=image_name,
             ClientToken=client_token,
+            RoleName=import_role_name,
         )
         ec2.get_waiter("snapshot_imported").wait(
             ImportTaskIds=[snapshot_import_task["ImportTaskId"]],
@@ -308,6 +310,7 @@ def upload_ami(
     public: bool,
     dest_regions: list[str],
     enable_tpm: bool,
+    import_role_name: str,
 ) -> dict[str, str]:
     """
     Upload NixOS AMI to AWS and return the image ids for each region
@@ -325,7 +328,7 @@ def upload_ami(
 
     image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot_if_not_exist(
-        s3, ec2, s3_bucket, image_name, image_file, image_format
+        s3, ec2, s3_bucket, image_name, image_file, image_format, import_role_name
     )
 
     image_id = register_image_if_not_exists(
@@ -378,6 +381,13 @@ def main() -> None:
         help="Enable TPM 2.0 support for UEFI x86_64 images",
     )
 
+    parser.add_argument(
+        "--import-role-name",
+        default="vmimport",
+        help="Role to use to import snapshots from S3",
+    )
+
+
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
@@ -396,6 +406,7 @@ def main() -> None:
         args.public,
         args.dest_region,
         args.enable_tpm,
+        args.import_role_name
     )
     print(json.dumps(image_ids))
 
