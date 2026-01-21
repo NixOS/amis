@@ -387,7 +387,6 @@ def main() -> None:
         help="Role to use to import snapshots from S3",
     )
 
-
     args = parser.parse_args()
 
     level = logging.DEBUG if args.debug else logging.INFO
@@ -406,7 +405,7 @@ def main() -> None:
         args.public,
         args.dest_region,
         args.enable_tpm,
-        args.import_role_name
+        args.import_role_name,
     )
     print(json.dumps(image_ids))
 
