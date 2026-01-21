@@ -332,16 +332,17 @@ def upload_ami(
         ec2, image_name, image_info, snapshot_id, public, enable_tpm
     )
 
-    regions = filter(
-        lambda x: x.get("RegionName") != ec2.meta.region_name
-        and (True if dest_regions == [] else x.get("RegionName") in dest_regions),
-        ec2.describe_regions()["Regions"],
-    )
+    
 
     image_ids: dict[str, str] = {}
     image_ids[ec2.meta.region_name] = image_id
 
     if copy_to_regions:
+        regions = filter(
+            lambda x: x.get("RegionName") != ec2.meta.region_name
+            and (True if dest_regions == [] else x.get("RegionName") in dest_regions),
+            ec2.describe_regions()["Regions"],
+        )
         image_ids.update(
             copy_image_to_regions(
                 image_id, image_name, ec2.meta.region_name, regions, public
