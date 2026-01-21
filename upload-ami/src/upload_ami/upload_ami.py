@@ -332,8 +332,6 @@ def upload_ami(
         ec2, image_name, image_info, snapshot_id, public, enable_tpm
     )
 
-    
-
     image_ids: dict[str, str] = {}
     image_ids[ec2.meta.region_name] = image_id
 
