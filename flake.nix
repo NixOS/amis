@@ -20,11 +20,13 @@
       inherit (nixpkgs) lib;
       inherit (lib) genAttrs mapAttrs;
       linuxSystems = [
-        "aarch64-linux" "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-linux"
       ];
       supportedSystems = [
         "aarch64-darwin"
-      ] ++ linuxSystems;
+      ]
+      ++ linuxSystems;
       eachSystem = f: genAttrs supportedSystems (system: f nixpkgs.legacyPackages.${system});
       treefmtEval = eachSystem (
         pkgs:
@@ -74,6 +76,7 @@
               {
                 imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
                 nixpkgs.hostPlatform = system;
+                system.stateVersion = "26.05";
               }
             )
           ];
