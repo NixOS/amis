@@ -89,7 +89,7 @@
           formatting = treefmtEval.${system}.config.build.check self;
         })
         // {
-          image.x86_64-linux = self.nixosConfigurations.x86_64-linux.config.system.build.images.amazon;
+          x86_64-linux.system = self.nixosConfigurations.x86_64-linux.config.system.build.images.amazon;
         };
 
       devShells = genAttrs supportedSystems (system: {
