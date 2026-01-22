@@ -32,7 +32,7 @@ Yes! for example with a config like this:
 you can upload it to your account like this:
 
 ```bash
-nix build .#nixosConfigurations.my-system.config.images.amazon
+nix build .#nixosConfigurations.my-system.config.system.build.images.amazon
 ```
 
 Or you can use the the shorthand:

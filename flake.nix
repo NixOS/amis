@@ -65,7 +65,7 @@
       );
 
       # NOTE: We don't build the production images with these (yet). We use a hydra job instead0
-      nixosConfigurations = genAttrs supportedSystems (
+      nixosConfigurations = genAttrs linuxSystems (
         system:
         nixpkgs.lib.nixosSystem {
           modules = [
@@ -85,7 +85,7 @@
       checks = genAttrs linuxSystems (system: {
         inherit (self.packages.${system}) upload-ami;
         formatting = treefmtEval.${system}.config.build.check self;
-        image = self.nixosConfigurations.${system}.images.amazon;
+        image = self.nixosConfigurations.${system}.config.system.build.images.amazon;
       });
 
       devShells = genAttrs supportedSystems (system: {
