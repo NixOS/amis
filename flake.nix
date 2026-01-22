@@ -63,11 +63,28 @@
         mapAttrs mkApp self.packages.${system}.upload-ami.passthru.upload-ami.pyproject.project.scripts
       );
 
+      # NOTE: We don't build the production images with these (yet). We use a hydra job instead0
+      nixosConfigurations = genAttrs supportedSystems (
+        system:
+        nixpkgs.lib.nixosSystem {
+          modules = [
+            (
+              { modulesPath, ... }:
+              {
+                imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
+                nixpkgs.hostPlatform = system;
+              }
+            )
+          ];
+        }
+      );
+
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
       checks = genAttrs supportedSystems (system: {
         inherit (self.packages.${system}) upload-ami;
         formatting = treefmtEval.${system}.config.build.check self;
+        image = self.nixosConfigurations.${system}.images.amazon;
       });
 
       devShells = genAttrs supportedSystems (system: {
