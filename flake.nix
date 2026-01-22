@@ -19,11 +19,12 @@
     let
       inherit (nixpkgs) lib;
       inherit (lib) genAttrs mapAttrs;
-      supportedSystems = [
-        "aarch64-linux"
-        "x86_64-linux"
-        "aarch64-darwin"
+      linuxSystems = [
+        "aarch64-linux" "x86_64-linux"
       ];
+      supportedSystems = [
+        "aarch64-darwin"
+      ] ++ linuxSystems;
       eachSystem = f: genAttrs supportedSystems (system: f nixpkgs.legacyPackages.${system});
       treefmtEval = eachSystem (
         pkgs:
@@ -81,7 +82,7 @@
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
-      checks = genAttrs supportedSystems (system: {
+      checks = genAttrs linuxSystems (system: {
         inherit (self.packages.${system}) upload-ami;
         formatting = treefmtEval.${system}.config.build.check self;
         image = self.nixosConfigurations.${system}.images.amazon;
