@@ -66,22 +66,20 @@
         mapAttrs mkApp self.packages.${system}.upload-ami.passthru.upload-ami.pyproject.project.scripts
       );
 
-      # NOTE: We don't build the production images with these (yet). We use a hydra job instead0
-      nixosConfigurations = genAttrs linuxSystems (
-        system:
-        nixpkgs.lib.nixosSystem {
-          modules = [
-            (
-              { modulesPath, ... }:
-              {
-                imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
-                nixpkgs.hostPlatform = system;
-                system.stateVersion = "26.05";
-              }
-            )
-          ];
-        }
-      );
+      # NOTE: We don't build the production images with these (yet). We use a hydra job instead
+      # NOTE: Github Actions doesn't support kvm on arm64 builds
+      nixosConfigurations.x86_64-linux = nixpkgs.lib.nixosSystem {
+        modules = [
+          (
+            { modulesPath, ... }:
+            {
+              imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
+              nixpkgs.hostPlatform = "x86_64-linux";
+              system.stateVersion = "26.05";
+            }
+          )
+        ];
+      };
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
