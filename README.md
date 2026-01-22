@@ -33,6 +33,16 @@ you can upload it to your account like this:
 
 ```bash
 nix build .#nixosConfigurations.my-system.config.images.amazon
+```
+
+Or you can use the the shorthand:
+
+```bash
+nixos-rebuild build-image --image-variant amazon --flake .#my-system
+```
+Then upload it with:
+
+```bash
 nix run github:NixOS/amis#upload-ami -- --prefix my-system --s3-bucket my-bucket --image-info ./result/nix-support/image-info.json
 ```
 
