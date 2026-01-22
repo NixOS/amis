@@ -83,11 +83,14 @@
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
-      checks = genAttrs linuxSystems (system: {
-        inherit (self.packages.${system}) upload-ami;
-        formatting = treefmtEval.${system}.config.build.check self;
-        image = self.nixosConfigurations.${system}.config.system.build.images.amazon;
-      });
+      checks =
+        genAttrs linuxSystems (system: {
+          inherit (self.packages.${system}) upload-ami;
+          formatting = treefmtEval.${system}.config.build.check self;
+        })
+        // {
+          image.x86_64-linux = self.nixosConfigurations.x86_64-linux.config.system.build.images.amazon;
+        };
 
       devShells = genAttrs supportedSystems (system: {
         default = self.packages.${system}.upload-ami;
