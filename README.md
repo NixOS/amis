@@ -12,13 +12,13 @@ Yes! for example with a config like this:
 
 ```nix
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
 
   outputs = { nixpkgs, ... }: {
     nixosConfigurations.my-system = nixpkgs.lib.nixosSystem {
       modules = [
-        "${nixpkgs}/nixos/maintainers/scripts/ec2/amazon-image.nix"
-        {
+        { modulesPath, ... }:
+          imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
           virtualisation.diskSize = "auto";  # or gigabytes. default is 3 * 1024
           nixpkgs.hostPlatform = "x86_64-linux";
           services.nginx.enable = true;
@@ -32,7 +32,17 @@ Yes! for example with a config like this:
 you can upload it to your account like this:
 
 ```bash
-nix build .#nixosConfigurations.my-system.config.system.build.amazonImage
+nix build .#nixosConfigurations.my-system.config.system.build.images.amazon
+```
+
+Or you can use the the shorthand:
+
+```bash
+nixos-rebuild build-image --image-variant amazon --flake .#my-system
+```
+Then upload it with:
+
+```bash
 nix run github:NixOS/amis#upload-ami -- --prefix my-system --s3-bucket my-bucket --image-info ./result/nix-support/image-info.json
 ```
 
