@@ -8,7 +8,9 @@ import datetime
 logger = logging.getLogger(__name__)
 
 
-def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
+def delete_deprecated_images(
+    ec2: EC2Client, dry_run: bool, grace_period_days: int = 0
+) -> None:
     """
     Delete an image by its name.
 
@@ -29,7 +31,9 @@ def delete_deprecated_images(ec2: EC2Client, dry_run: bool) -> None:
                 # ISO8601 string and compare the strings. This works because
                 # ISO8601 strings are lexicographically comparable.
                 current_time = datetime.datetime.isoformat(
-                    datetime.datetime.now(), timespec="milliseconds"
+                    datetime.datetime.now()
+                    - datetime.timedelta(days=grace_period_days),
+                    timespec="milliseconds",
                 )
                 if (
                     image["Name"].startswith("nixos/23.11")
@@ -67,6 +71,13 @@ def main() -> None:
         action="store_true",
         help="Do not actually delete anything, just log what would be deleted",
     )
+    parser.add_argument(
+        "--grace-period",
+        type=int,
+        default=0,
+        metavar="DAYS",
+        help="Number of days after deprecation before an image is deleted (default: 0)",
+    )
     logging.basicConfig(level=logging.INFO)
     ec2: EC2Client = boto3.client("ec2")
 
@@ -76,7 +87,7 @@ def main() -> None:
         assert "RegionName" in region
         ec2r = boto3.client("ec2", region_name=region["RegionName"])
         logging.info(f"Checking region {region['RegionName']}")
-        delete_deprecated_images(ec2r, args.dry_run)
+        delete_deprecated_images(ec2r, args.dry_run, args.grace_period)
 
 
 if __name__ == "__main__":
