@@ -216,6 +216,7 @@ def copy_image_to_regions(
     source_region: str,
     target_regions: Iterable[RegionTypeDef],
     public: bool,
+    best_effort_regions: list[str] = [],
 ) -> dict[str, str]:
     """
     Copy image to all target regions
@@ -289,13 +290,25 @@ def copy_image_to_regions(
 
     with ThreadPoolExecutor(max_workers=32) as executor:
 
-        def _copy_image(target_region: RegionTypeDef) -> tuple[str, str]:
+        def _copy_image(target_region: RegionTypeDef) -> tuple[str, str] | None:
             assert "RegionName" in target_region
-            return copy_image(
-                image_id, image_name, source_region, target_region["RegionName"]
-            )
+            region_name = target_region["RegionName"]
+            try:
+                return copy_image(image_id, image_name, source_region, region_name)
+            except Exception as e:
+                if region_name not in best_effort_regions:
+                    logging.error(f"Copying to {region_name} failed: {e}")
+                    raise
+                logging.warning(
+                    f"Copying to {region_name} failed (best-effort, ignoring): {e}"
+                )
+                return None
 
-        image_ids = dict(executor.map(_copy_image, target_regions))
+        image_ids = dict(
+            result
+            for result in executor.map(_copy_image, target_regions)
+            if result is not None
+        )
 
     image_ids[source_region] = image_id
     return image_ids
@@ -311,6 +324,7 @@ def upload_ami(
     dest_regions: list[str],
     enable_tpm: bool,
     import_role_name: str,
+    best_effort_regions: list[str] = [],
 ) -> dict[str, str]:
     """
     Upload NixOS AMI to AWS and return the image ids for each region
@@ -346,7 +360,12 @@ def upload_ami(
         )
         image_ids.update(
             copy_image_to_regions(
-                image_id, image_name, ec2.meta.region_name, regions, public
+                image_id,
+                image_name,
+                ec2.meta.region_name,
+                regions,
+                public,
+                best_effort_regions,
             )
         )
 
@@ -385,6 +404,12 @@ def main() -> None:
         default="vmimport",
         help="Role to use to import snapshots from S3",
     )
+    parser.add_argument(
+        "--best-effort-region",
+        help="Regions where copy failures are logged as warnings instead of errors",
+        action="append",
+        default=[],
+    )
 
     args = parser.parse_args()
 
@@ -405,6 +430,7 @@ def main() -> None:
         args.dest_region,
         args.enable_tpm,
         args.import_role_name,
+        args.best_effort_region,
     )
     print(json.dumps(image_ids))
 
