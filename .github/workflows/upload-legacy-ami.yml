@@ -79,6 +79,7 @@ jobs:
             --prefix "nixos/" \
             --s3-bucket "$images_bucket" \
             --copy-to-regions \
+            --best-effort-region me-central-1 \
             --public
   delete-deprecated-images:
     name: Delete deprecated images
