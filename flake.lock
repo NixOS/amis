@@ -2,11 +2,11 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1774701658,
-        "narHash": "sha256-5QVei2IIfVO3GqMkiiXlrZtaniOkXyMWnqbTVkItrco=",
-        "rev": "b63fe7f000adcfa269967eeff72c64cafecbbebe",
+        "lastModified": 1775403759,
+        "narHash": "sha256-avkT2TR2Wh/TQTysYGFOkGiF5+2R2nS7TZOfQ4omieQ=",
+        "rev": "5e11f7acce6c3469bef9df154d78534fa7ae8b6c",
         "type": "tarball",
-        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre971056.b63fe7f000ad/nixexprs.tar.xz"
+        "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.05pre975217.5e11f7acce6c/nixexprs.tar.xz"
       },
       "original": {
         "type": "tarball",
@@ -26,11 +26,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773297127,
-        "narHash": "sha256-6E/yhXP7Oy/NbXtf1ktzmU8SdVqJQ09HC/48ebEGBpk=",
+        "lastModified": 1775125835,
+        "narHash": "sha256-2qYcPgzFhnQWchHo0SlqLHrXpux5i6ay6UHA+v2iH4U=",
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "rev": "71b125cd05fbfd78cab3e070b73544abe24c5016",
+        "rev": "75925962939880974e3ab417879daffcba36c4a3",
         "type": "github"
       },
       "original": {
