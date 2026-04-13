@@ -1,0 +1,59 @@
+name: Test coldsnap upload speed
+on:
+  workflow_dispatch:
+jobs:
+  test-coldsnap:
+    name: Test coldsnap upload (${{ matrix.system }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        system:
+          - aarch64-linux
+          - x86_64-linux
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
+      - uses: DeterminateSystems/magic-nix-cache-action@87b14cf437d03d37989d87f0fa5ce4f5dc1a330b # v8
+      - name: Download AMI from Hydra
+        id: download_ami
+        run: |
+          set -o pipefail
+          build_id=$(curl -sSfL -H 'Accept: application/json' https://hydra.nixos.org/job/nixos/release-25.05/tested/latest-finished | jq -r '.id')
+          out=$(curl -sSfL -H 'Accept: application/json' "https://hydra.nixos.org/build/${build_id}/constituents" | jq -r '.[] | select(.job == "nixos.amazonImage.${{ matrix.system }}") | .buildoutputs.out.path')
+          nix-store --realise "$out" --add-root ./result
+          echo "image_info=$out/nix-support/image-info.json" >> "$GITHUB_OUTPUT"
+      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+      - name: Convert VHD to raw
+        run: |
+          image_file=$(jq -r '.file' < '${{ steps.download_ami.outputs.image_info }}')
+          echo "Converting $image_file to raw"
+          nix shell nixpkgs#qemu -c qemu-img convert -O raw "$image_file" /tmp/nixos-test.raw
+          ls -lh /tmp/nixos-test.raw
+      - name: Coldsnap upload - run 1
+        run: |
+          echo "Starting coldsnap upload run 1"
+          start=$SECONDS
+          snap_id=$(nix shell nixpkgs#coldsnap -c coldsnap upload /tmp/nixos-test.raw 2>&1 | tee /dev/stderr | tail -1)
+          echo "Run 1: $(( SECONDS - start ))s — snapshot: $snap_id"
+          aws ec2 delete-snapshot --snapshot-id "$snap_id"
+      - name: Coldsnap upload - run 2
+        run: |
+          echo "Starting coldsnap upload run 2"
+          start=$SECONDS
+          snap_id=$(nix shell nixpkgs#coldsnap -c coldsnap upload /tmp/nixos-test.raw 2>&1 | tee /dev/stderr | tail -1)
+          echo "Run 2: $(( SECONDS - start ))s — snapshot: $snap_id"
+          aws ec2 delete-snapshot --snapshot-id "$snap_id"
+      - name: Coldsnap upload - run 3
+        run: |
+          echo "Starting coldsnap upload run 3"
+          start=$SECONDS
+          snap_id=$(nix shell nixpkgs#coldsnap -c coldsnap upload /tmp/nixos-test.raw 2>&1 | tee /dev/stderr | tail -1)
+          echo "Run 3: $(( SECONDS - start ))s — snapshot: $snap_id"
+          aws ec2 delete-snapshot --snapshot-id "$snap_id"
