@@ -78,6 +78,12 @@ def main() -> None:
         metavar="DAYS",
         help="Number of days after deprecation before an image is deleted (default: 0)",
     )
+    parser.add_argument(
+        "--best-effort-region",
+        help="Regions where failures are logged as warnings instead of errors",
+        action="append",
+        default=[],
+    )
     logging.basicConfig(level=logging.INFO)
     ec2: EC2Client = boto3.client("ec2")
 
@@ -85,9 +91,17 @@ def main() -> None:
     regions = ec2.describe_regions()["Regions"]
     for region in regions:
         assert "RegionName" in region
-        ec2r = boto3.client("ec2", region_name=region["RegionName"])
-        logging.info(f"Checking region {region['RegionName']}")
-        delete_deprecated_images(ec2r, args.dry_run, args.grace_period)
+        region_name = region["RegionName"]
+        ec2r = boto3.client("ec2", region_name=region_name)
+        logging.info(f"Checking region {region_name}")
+        try:
+            delete_deprecated_images(ec2r, args.dry_run, args.grace_period)
+        except Exception as e:
+            if region_name not in args.best_effort_region:
+                raise
+            logging.warning(
+                f"Deleting deprecated images in {region_name} failed (best-effort, ignoring): {e}"
+            )
 
 
 if __name__ == "__main__":
