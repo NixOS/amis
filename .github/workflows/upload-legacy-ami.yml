@@ -101,7 +101,10 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: Delete deprecated AMIs
         if: github.ref == 'refs/heads/main'
-        run: "nix run .#delete-deprecated-images \n"
+        run: |
+          nix run .#delete-deprecated-images -- \
+            --best-effort-region me-central-1 \
+            --best-effort-region me-south-1
   deploy-pages:
     name: Deploy images page
     if: github.ref == 'refs/heads/main'
