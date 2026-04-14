@@ -74,6 +74,9 @@
             { modulesPath, ... }:
             {
               imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
+              image.modules.amazon = {
+                amazonImage.format = "raw";
+              };
               nixpkgs.hostPlatform = "x86_64-linux";
               system.stateVersion = "26.05";
             }

@@ -17,6 +17,8 @@ from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
 
+from .snapshot_uploader import upload_snapshot
+
 
 class ImageInfo(TypedDict):
     file: str
@@ -121,6 +123,40 @@ def import_snapshot_if_not_exist(
         )
     s3.delete_object(Bucket=s3_bucket, Key=image_name)
     return snapshot_id
+
+
+def import_snapshot_ebs_direct(
+    ec2: EC2Client,
+    image_name: str,
+    image_file: Path,
+    region: str,
+) -> str:
+    """
+    Upload a raw disk image directly to an EBS snapshot via the EBS Direct APIs.
+
+    Idempotent: returns the existing snapshot ID if one with the same
+    name tag already exists.
+    """
+    snapshots = ec2.describe_snapshots(
+        OwnerIds=["self"],
+        Filters=[
+            {"Name": "tag:Name", "Values": [image_name]},
+            {"Name": "status", "Values": ["completed"]},
+        ],
+    )
+    if len(snapshots["Snapshots"]) != 0:
+        assert len(snapshots["Snapshots"]) == 1
+        assert "SnapshotId" in snapshots["Snapshots"][0]
+        return snapshots["Snapshots"][0]["SnapshotId"]
+
+    client_token = hashlib.sha256(image_name.encode()).hexdigest()
+    return upload_snapshot(
+        image_file,
+        region=region,
+        description=image_name,
+        tags={"Name": image_name, "ManagedBy": "NixOS/amis"},
+        client_token=client_token,
+    )
 
 
 def register_image_if_not_exists(
@@ -316,7 +352,7 @@ def copy_image_to_regions(
 
 def upload_ami(
     image_info: ImageInfo,
-    s3_bucket: str,
+    s3_bucket: str | None,
     copy_to_regions: bool,
     prefix: str,
     run_id: str,
@@ -324,6 +360,7 @@ def upload_ami(
     dest_regions: list[str],
     enable_tpm: bool,
     import_role_name: str,
+    ebs_direct: bool,
     best_effort_regions: list[str] = [],
 ) -> dict[str, str]:
     """
@@ -341,9 +378,17 @@ def upload_ami(
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
 
     image_format = image_info.get("format") or "VHD"
-    snapshot_id = import_snapshot_if_not_exist(
-        s3, ec2, s3_bucket, image_name, image_file, image_format, import_role_name
-    )
+    if ebs_direct:
+        snapshot_id = import_snapshot_ebs_direct(
+            ec2, image_name, image_file, ec2.meta.region_name
+        )
+    else:
+        assert (
+            s3_bucket is not None
+        ), "--s3-bucket is required unless --ebs-direct is set"
+        snapshot_id = import_snapshot_if_not_exist(
+            s3, ec2, s3_bucket, image_name, image_file, image_format, import_role_name
+        )
 
     image_id = register_image_if_not_exists(
         ec2, image_name, image_info, snapshot_id, public, enable_tpm
@@ -377,7 +422,12 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
     parser.add_argument("--image-info", help="Path to image info", required=True)
-    parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
+    parser.add_argument("--s3-bucket", help="S3 bucket to upload to")
+    parser.add_argument(
+        "--ebs-direct",
+        action="store_true",
+        help="Upload via EBS Direct APIs instead of importing from S3",
+    )
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
@@ -430,6 +480,7 @@ def main() -> None:
         args.dest_region,
         args.enable_tpm,
         args.import_role_name,
+        args.ebs_direct,
         args.best_effort_region,
     )
     print(json.dumps(image_ids))

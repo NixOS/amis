@@ -1,0 +1,52 @@
+name: Test EBS Direct Upload
+permissions:
+  contents: read
+on:
+  pull_request:
+    paths:
+      - upload-ami/**
+      - flake.nix
+      - flake.lock
+  workflow_dispatch:
+jobs:
+  test-ebs-direct:
+    name: Test EBS Direct Upload
+    runs-on: ubuntu-latest
+    environment: images
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: DeterminateSystems/nix-installer-action@7993355175c2765e5733dae74f3e0786fe0e5c4f # v12
+      - name: Build NixOS Amazon image
+        run: nix build .#checks.x86_64-linux.system -L
+      - uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/upload-ami
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Upload image via EBS Direct
+        id: upload
+        run: |
+          image_id=$(nix run .#upload-ami -- \
+            --image-info ./result/nix-support/image-info.json \
+            --prefix "ebs-direct-test/" \
+            --run-id "${{ github.run_id }}" \
+            --ebs-direct | jq -r '.[]')
+          echo "image_id=$image_id" >> "$GITHUB_OUTPUT"
+      - name: Smoke test
+        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}"
+      - name: Clean up smoke test
+        if: ${{ cancelled() }}
+        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}" --cancel
+      - name: Deregister AMI and delete snapshot
+        if: always()
+        run: |
+          image_id="${{ steps.upload.outputs.image_id }}"
+          if [ -z "$image_id" ]; then exit 0; fi
+          snapshot_id=$(aws ec2 describe-images --image-ids "$image_id" \
+            --query 'Images[0].BlockDeviceMappings[0].Ebs.SnapshotId' --output text 2>/dev/null || true)
+          aws ec2 deregister-image --image-id "$image_id" || true
+          if [ -n "$snapshot_id" ] && [ "$snapshot_id" != "None" ]; then
+            aws ec2 delete-snapshot --snapshot-id "$snapshot_id" || true
+          fi
