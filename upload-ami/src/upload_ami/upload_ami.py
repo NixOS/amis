@@ -1,21 +1,18 @@
-import json
 import hashlib
+import json
 import logging
 from pathlib import Path
 from typing import Iterable, Literal, TypedDict
 import boto3
-import boto3.ec2
-import boto3.ec2.createtags
-import botocore
-import botocore.exceptions
 import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
 from mypy_boto3_ec2.type_defs import RegionTypeDef, RegisterImageRequestTypeDef
-from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
+
+from .snapshot_uploader import upload_snapshot
 
 
 class ImageInfo(TypedDict):
@@ -26,100 +23,43 @@ class ImageInfo(TypedDict):
     format: str
 
 
-def upload_to_s3_if_not_exists(
-    s3: S3Client, bucket: str, image_name: str, file_path: Path
-) -> None:
-    """
-    Upload file to S3 if it doesn't exist yet
-
-    This function is idempotent.
-    """
-    try:
-        logging.info(f"Checking if s3://{bucket}/{image_name} exists")
-        s3.head_object(Bucket=bucket, Key=image_name)
-    except botocore.exceptions.ClientError:
-        logging.info(f"Uploading {file_path} to s3://{bucket}/{image_name}")
-        s3.upload_file(str(file_path), bucket, image_name)
-        s3.get_waiter("object_exists").wait(Bucket=bucket, Key=image_name)
-
-
 def import_snapshot_if_not_exist(
-    s3: S3Client,
     ec2: EC2Client,
-    s3_bucket: str,
     image_name: str,
     image_file: Path,
-    image_format: str,
-    import_role_name: str,
+    region: str,
 ) -> str:
     """
-    Import snapshot from S3 and wait for it to finish
+    Upload a raw disk image directly to an EBS snapshot.
 
-    This function is idempotent by using the image_name as the client token
-
-    Returns the snapshot id
+    Idempotent: returns the existing snapshot ID if one with the same
+    name tag already exists.
     """
-
     snapshots = ec2.describe_snapshots(
-        Filters=[{"Name": "tag:Name", "Values": [image_name]}]
+        OwnerIds=["self"],
+        Filters=[
+            {"Name": "tag:Name", "Values": [image_name]},
+            {"Name": "status", "Values": ["completed"]},
+        ],
     )
 
     if len(snapshots["Snapshots"]) != 0:
-        assert len(snapshots["Snapshots"]) == 1
-        assert "SnapshotId" in snapshots["Snapshots"][0]
-        snapshot_id = snapshots["Snapshots"][0]["SnapshotId"]
-    else:
-        upload_to_s3_if_not_exists(s3, s3_bucket, image_name, image_file)
+        if len(snapshots["Snapshots"]) != 1:
+            raise RuntimeError(
+                f"Expected 1 snapshot named {image_name!r}, "
+                f"found {len(snapshots['Snapshots'])}"
+            )
+        snapshot_id: str = snapshots["Snapshots"][0]["SnapshotId"]
+        return snapshot_id
 
-        logging.info(f"Importing s3://{s3_bucket}/{image_name} to EC2")
-        client_token_hash = hashlib.sha256(image_name.encode())
-        client_token = client_token_hash.hexdigest()
-        # TODO: I'm not sure how long AWS keeps track of import_snapshot_tasks and
-        # thus if we can rely on the client token forever. E.g. what happens if I
-        # run a task with the same client token a few months later?
-        snapshot_import_task = ec2.import_snapshot(
-            DiskContainer={
-                "Description": image_name,
-                "Format": image_format,
-                "UserBucket": {"S3Bucket": s3_bucket, "S3Key": image_name},
-            },
-            TagSpecifications=[
-                {
-                    "ResourceType": "import-snapshot-task",
-                    "Tags": [
-                        {"Key": "Name", "Value": image_name},
-                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
-                    ],
-                }
-            ],
-            Description=image_name,
-            ClientToken=client_token,
-            RoleName=import_role_name,
-        )
-        ec2.get_waiter("snapshot_imported").wait(
-            ImportTaskIds=[snapshot_import_task["ImportTaskId"]],
-            WaiterConfig={
-                "Delay": 15,  # Same as the default for this waiter
-                "MaxAttempts": 400,  # Default is 40 (10min) 400 is 100 minutes
-            },
-        )
-
-        snapshot_import_tasks = ec2.describe_import_snapshot_tasks(
-            ImportTaskIds=[snapshot_import_task["ImportTaskId"]]
-        )
-        assert len(snapshot_import_tasks["ImportSnapshotTasks"]) != 0
-        snapshot_import_task_2 = snapshot_import_tasks["ImportSnapshotTasks"][0]
-        assert "SnapshotTaskDetail" in snapshot_import_task_2
-        assert "SnapshotId" in snapshot_import_task_2["SnapshotTaskDetail"]
-        snapshot_id = snapshot_import_task_2["SnapshotTaskDetail"]["SnapshotId"]
-        ec2.create_tags(
-            Resources=[snapshot_id],
-            Tags=[
-                {"Key": "Name", "Value": image_name},
-                {"Key": "ManagedBy", "Value": "NixOS/amis"},
-            ],
-        )
-    s3.delete_object(Bucket=s3_bucket, Key=image_name)
+    client_token = hashlib.sha256(image_name.encode()).hexdigest()
+    snapshot_id = upload_snapshot(
+        image_file,
+        region=region,
+        description=image_name,
+        tags={"Name": image_name, "ManagedBy": "NixOS/amis"},
+        client_token=client_token,
+    )
     return snapshot_id
 
 
@@ -316,14 +256,12 @@ def copy_image_to_regions(
 
 def upload_ami(
     image_info: ImageInfo,
-    s3_bucket: str,
     copy_to_regions: bool,
     prefix: str,
     run_id: str,
     public: bool,
     dest_regions: list[str],
     enable_tpm: bool,
-    import_role_name: str,
     best_effort_regions: list[str] = [],
 ) -> dict[str, str]:
     """
@@ -333,16 +271,14 @@ def upload_ami(
     """
 
     ec2: EC2Client = boto3.client("ec2")
-    s3: S3Client = boto3.client("s3")
 
     image_file = Path(image_info["file"])
     label = image_info["label"]
     system = image_info["system"]
     image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
 
-    image_format = image_info.get("format") or "VHD"
     snapshot_id = import_snapshot_if_not_exist(
-        s3, ec2, s3_bucket, image_name, image_file, image_format, import_role_name
+        ec2, image_name, image_file, ec2.meta.region_name
     )
 
     image_id = register_image_if_not_exists(
@@ -377,9 +313,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Upload NixOS AMI to AWS")
     parser.add_argument("--image-info", help="Path to image info", required=True)
-    parser.add_argument("--s3-bucket", help="S3 bucket to upload to", required=True)
     parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--cleanup", action="store_true")
     parser.add_argument("--copy-to-regions", action="store_true")
     parser.add_argument("--public", action="store_true")
     parser.add_argument(
@@ -398,12 +332,6 @@ def main() -> None:
         default=False,
         help="Enable TPM 2.0 support for UEFI x86_64 images",
     )
-
-    parser.add_argument(
-        "--import-role-name",
-        default="vmimport",
-        help="Role to use to import snapshots from S3",
-    )
     parser.add_argument(
         "--best-effort-region",
         help="Regions where copy failures are logged as warnings instead of errors",
@@ -419,17 +347,14 @@ def main() -> None:
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
-    image_ids = {}
     image_ids = upload_ami(
         image_info,
-        args.s3_bucket,
         args.copy_to_regions,
         args.prefix,
         args.run_id,
         args.public,
         args.dest_region,
         args.enable_tpm,
-        args.import_role_name,
         args.best_effort_region,
     )
     print(json.dumps(image_ids))

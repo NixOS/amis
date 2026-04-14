@@ -1,4 +1,4 @@
-name: Upload Legacy Amazon Image
+name: Upload Amazon Image
 permissions:
   contents: read
 on:
@@ -8,7 +8,7 @@ on:
     - cron: "0 0 * * 0"
 jobs:
   upload-ami:
-    name: Upload Legacy Amazon Image
+    name: Upload Amazon Image
     runs-on: ubuntu-latest
     environment: images
     permissions:
@@ -46,11 +46,9 @@ jobs:
         id: upload_smoke_test_ami
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
-          images_bucket='${{ vars.IMAGES_BUCKET }}'
           image_ids=$(nix run .#upload-ami -- \
             --image-info "$image_info" \
-            --prefix "smoketest/" \
-            --s3-bucket "$images_bucket")
+            --prefix "smoketest/")
           echo "image_ids=$image_ids" >> "$GITHUB_OUTPUT"
       - name: Smoke test
         id: smoke_test
@@ -73,11 +71,9 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           image_info='${{ steps.download_ami.outputs.image_info }}'
-          images_bucket='${{ vars.IMAGES_BUCKET }}'
           nix run .#upload-ami -- \
             --image-info "$image_info" \
             --prefix "nixos/" \
-            --s3-bucket "$images_bucket" \
             --copy-to-regions \
             --best-effort-region me-central-1 \
             --best-effort-region me-south-1 \

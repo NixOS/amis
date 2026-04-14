@@ -6,17 +6,9 @@ data "aws_iam_policy_document" "upload_ami" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-    ]
-    resources = ["${aws_s3_bucket.images.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:ImportSnapshot",
-      "ec2:DescribeImportSnapshotTasks",
+      "ebs:StartSnapshot",
+      "ebs:PutSnapshotBlock",
+      "ebs:CompleteSnapshot",
       "ec2:DescribeSnapshots",
       "ec2:DeleteSnapshot",
     ]
@@ -28,7 +20,6 @@ data "aws_iam_policy_document" "upload_ami" {
     resources = [
       "arn:aws:ec2:*:*:snapshot/*",
       "arn:aws:ec2:*:*:image/*",
-      "arn:aws:ec2:*:*:import-snapshot-task/*",
     ]
   }
   statement {
