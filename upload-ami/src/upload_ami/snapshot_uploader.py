@@ -1,7 +1,7 @@
 """Upload raw disk images to EBS snapshots via EBS Direct APIs.
 
-Uses PutSnapshotBlock to write 512 KiB blocks in parallel.  Transient
-errors are retried with full-jitter exponential backoff.
+Uses PutSnapshotBlock to write 512 KiB blocks in parallel.  Retries
+are handled by boto3's adaptive retry mode.
 """
 
 import base64
@@ -9,7 +9,6 @@ import hashlib
 import logging
 import math
 import os
-import random
 import threading
 import time
 import uuid
@@ -18,22 +17,12 @@ from pathlib import Path
 
 import boto3
 import botocore.config
-import botocore.exceptions
 from mypy_boto3_ebs.client import EBSClient
 
 log = logging.getLogger(__name__)
 
 BLOCK_SIZE = 512 * 1024  # Fixed by EBS Direct API.
 GIB = 1024**3
-
-# Error codes that indicate throttling (retryable).
-_THROTTLE_CODES = frozenset(
-    {
-        "RequestThrottledException",
-        "ThrottlingException",
-        "Throttling",
-    }
-)
 
 
 def upload_snapshot(
@@ -45,7 +34,6 @@ def upload_snapshot(
     tags: dict[str, str] | None = None,
     client_token: str | None = None,
     workers: int = 64,
-    block_attempts: int = 5,
     timeout_minutes: int = 60,
 ) -> str:
     """Upload a raw disk image to a new EBS snapshot.
@@ -95,7 +83,6 @@ def upload_snapshot(
             file_size,
             client,
             workers,
-            block_attempts,
         )
         status = _complete_snapshot(client, snapshot_id, block_count)
         if status == "error":
@@ -118,9 +105,9 @@ def upload_snapshot(
 
 
 def _create_client(region: str, max_connections: int) -> EBSClient:
-    """Create a boto3 EBS client with a connection pool sized for the worker count."""
+    """Create a boto3 EBS client with adaptive retry and a sized connection pool."""
     cfg = botocore.config.Config(
-        retries={"mode": "standard", "total_max_attempts": 1},
+        retries={"mode": "adaptive"},
         connect_timeout=5,
         read_timeout=12,
         max_pool_connections=max_connections,
@@ -160,34 +147,17 @@ def _start_snapshot(
 
 
 def _complete_snapshot(
-    client: EBSClient, snapshot_id: str, block_count: int, attempts: int = 5
+    client: EBSClient, snapshot_id: str, block_count: int
 ) -> str:
-    """Complete the snapshot, retrying on transient errors.
+    """Complete the snapshot.
 
     Returns the snapshot status from the CompleteSnapshot response.
+    Retries are handled by boto3's adaptive retry mode.
     """
-    last_exc: Exception | None = None
-    for attempt in range(attempts):
-        if attempt > 0:
-            time.sleep(_backoff_s(attempt))
-        try:
-            resp = client.complete_snapshot(
-                SnapshotId=snapshot_id, ChangedBlocksCount=block_count
-            )
-            return resp["Status"]
-        except Exception as exc:
-            if not _is_retryable(exc):
-                raise
-            last_exc = exc
-            log.warning(
-                "CompleteSnapshot attempt %d/%d failed: %s",
-                attempt + 1,
-                attempts,
-                exc,
-            )
-    raise RuntimeError(
-        f"CompleteSnapshot failed after {attempts} attempts: {last_exc}"
+    resp = client.complete_snapshot(
+        SnapshotId=snapshot_id, ChangedBlocksCount=block_count
     )
+    return resp["Status"]
 
 
 def _put_block(
@@ -258,39 +228,6 @@ def _read_block(fd: int, block_index: int, file_size: int) -> bytes:
     return data
 
 
-# -- Retry logic -------------------------------------------------------------
-
-
-def _is_retryable(exc: Exception) -> bool:
-    """Return True if the error is transient and worth retrying.
-
-    Retries transport errors, throttling codes, and any server-side 5xx.
-    """
-    if isinstance(
-        exc,
-        (
-            botocore.exceptions.ReadTimeoutError,
-            botocore.exceptions.ConnectTimeoutError,
-            botocore.exceptions.EndpointConnectionError,
-            botocore.exceptions.ConnectionClosedError,
-        ),
-    ):
-        return True
-    if isinstance(exc, botocore.exceptions.ClientError):
-        code = exc.response.get("Error", {}).get("Code", "")
-        if code in _THROTTLE_CODES:
-            return True
-        http_status = exc.response.get("ResponseMetadata", {}).get("HTTPStatusCode", 0)
-        return http_status >= 500
-    return False
-
-
-def _backoff_s(attempt: int) -> float:
-    """Full-jitter exponential backoff capped at 2 seconds."""
-    ceiling: float = min(2.0, 0.1 * (2**attempt))
-    return random.random() * ceiling
-
-
 # -- Upload orchestration ----------------------------------------------------
 
 
@@ -301,9 +238,8 @@ def _upload_blocks(
     file_size: int,
     client: EBSClient,
     workers: int,
-    block_attempts: int,
 ) -> None:
-    """Upload all blocks in parallel with per-block retries."""
+    """Upload all blocks in parallel. Retries are handled by boto3."""
     fd = os.open(str(path), os.O_RDONLY)
     try:
         failed: dict[int, BaseException] = {}
@@ -322,7 +258,6 @@ def _upload_blocks(
                     idx,
                     file_size,
                     client,
-                    block_attempts,
                 )
                 futures[f] = idx
 
@@ -348,40 +283,7 @@ def _upload_one_block(
     block_index: int,
     file_size: int,
     client: EBSClient,
-    block_attempts: int,
 ) -> None:
-    """Upload a single block with retries and exponential backoff."""
+    """Upload a single block. Retries are handled by boto3."""
     data = _read_block(fd, block_index, file_size)
-
-    last_exc: Exception | None = None
-    for attempt in range(block_attempts):
-        if attempt > 0:
-            delay = _backoff_s(attempt)
-            log.debug(
-                "block %d: retry %d/%d, backoff %.0fms",
-                block_index,
-                attempt,
-                block_attempts,
-                delay * 1000,
-            )
-            time.sleep(delay)
-        try:
-            _put_block(client, snapshot_id, block_index, data)
-            return
-        except Exception as exc:
-            if not _is_retryable(exc):
-                raise RuntimeError(
-                    f"block {block_index}: permanent failure: {exc}"
-                ) from exc
-            last_exc = exc
-            log.warning(
-                "block %d: attempt %d/%d failed: %s",
-                block_index,
-                attempt + 1,
-                block_attempts,
-                exc,
-            )
-
-    raise RuntimeError(
-        f"block {block_index}: failed after {block_attempts} attempts: {last_exc}"
-    )
+    _put_block(client, snapshot_id, block_index, data)
