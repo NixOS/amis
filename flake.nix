@@ -83,14 +83,30 @@
 
       formatter = eachSystem (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
 
-      checks =
-        genAttrs linuxSystems (system: {
+      checks = genAttrs supportedSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          isLinux = pkgs.stdenv.hostPlatform.isLinux;
+          testSrc = ./upload-ami;
+          testPython = pkgs.python3.withPackages (
+            _: self.packages.${system}.upload-ami.propagatedBuildInputs
+          );
+        in
+        {
+          upload-ami-tests = pkgs.runCommand "upload-ami-tests" { nativeBuildInputs = [ testPython ]; } ''
+            PYTHONPATH=${testSrc}/src python ${testSrc}/tests/test_register_image.py -v
+            touch $out
+          '';
+        }
+        // lib.optionalAttrs isLinux {
           inherit (self.packages.${system}) upload-ami;
           formatting = treefmtEval.${system}.config.build.check self;
-        })
-        // {
-          x86_64-linux.system = self.nixosConfigurations.x86_64-linux.config.system.build.images.amazon;
-        };
+        }
+        // lib.optionalAttrs (system == "x86_64-linux") {
+          system = self.nixosConfigurations.x86_64-linux.config.system.build.images.amazon;
+        }
+      );
 
       devShells = genAttrs supportedSystems (system: {
         default = self.packages.${system}.upload-ami;
