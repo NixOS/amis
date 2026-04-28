@@ -25,7 +25,13 @@ class ImageInfo(TypedDict):
     label: str
     system: str
     boot_mode: BootModeValuesType
-    format: str
+    format: str | None
+    name: str | None
+    description: str | None
+    tpm_support: bool | None
+    ena_support: bool | None
+    imds_support: Literal["v1.0", "v2.0"] | None
+    public: bool | None
 
 
 def upload_to_s3_if_not_exists(
@@ -202,10 +208,11 @@ def register_image_if_not_exists(
                     },
                 }
             ],
+            "Description": image_info.get("description") or f"NixOS {image_name}",
             "RootDeviceName": "/dev/xvda",
             "VirtualizationType": "hvm",
-            "EnaSupport": True,
-            "ImdsSupport": "v2.0",
+            "EnaSupport": image_info.get("ena_support", True),
+            "ImdsSupport": image_info.get("imds_support", "v2.0"),
             "SriovNetSupport": "simple",
             "TagSpecifications": [
                 {
@@ -219,7 +226,7 @@ def register_image_if_not_exists(
         }
 
         if (
-            enable_tpm
+            (enable_tpm or image_info.get("tpm_support"))
             and architecture == "x86_64"
             and image_info["boot_mode"] == "uefi"
         ):
@@ -375,7 +382,9 @@ def upload_ami(
     image_file = Path(image_info["file"])
     label = image_info["label"]
     system = image_info["system"]
-    image_name = prefix + label + "-" + system + ("." + run_id if run_id else "")
+    image_name = image_info.get("name") or (
+        prefix + label + "-" + system + ("." + run_id if run_id else "")
+    )
 
     image_format = image_info.get("format") or "VHD"
     if ebs_direct:
@@ -390,8 +399,14 @@ def upload_ami(
             s3, ec2, s3_bucket, image_name, image_file, image_format, import_role_name
         )
 
+    is_public = public or image_info.get("public", False)
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id, public, enable_tpm
+        ec2,
+        image_name,
+        image_info,
+        snapshot_id,
+        is_public,
+        enable_tpm,
     )
 
     image_ids: dict[str, str] = {}
@@ -409,7 +424,7 @@ def upload_ami(
                 image_name,
                 ec2.meta.region_name,
                 regions,
-                public,
+                is_public,
                 best_effort_regions,
             )
         )
