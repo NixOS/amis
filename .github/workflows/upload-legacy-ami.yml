@@ -126,7 +126,11 @@ jobs:
           role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/github-pages
           aws-region: ${{ vars.AWS_REGION }}
       - name: Describe images
-        run: nix run .#describe-images > ./site/images.json
+        run: |
+          nix run .#describe-images -- \
+            --best-effort-region me-central-1 \
+            --best-effort-region me-south-1 \
+            > ./site/images.json
       - name: Upload pages
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
