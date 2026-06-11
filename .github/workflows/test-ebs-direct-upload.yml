@@ -35,10 +35,10 @@ jobs:
             --ebs-direct | jq -r '.[]')
           echo "image_id=$image_id" >> "$GITHUB_OUTPUT"
       - name: Smoke test
-        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}"
+        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}" --no-spot
       - name: Clean up smoke test
         if: ${{ cancelled() }}
-        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}" --cancel
+        run: nix run .#smoke-test -- --image-id "${{ steps.upload.outputs.image_id }}" --run-id "${{ github.run_id }}" --cancel --no-spot
       - name: Deregister AMI and delete snapshot
         if: always()
         run: |
