@@ -38,7 +38,8 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
             InstanceType=instance_type,
             MinCount=1,
             MaxCount=1,
-            ClientToken=image_id + run_id if run_id else image_id,
+            ClientToken=(image_id + run_id if run_id else image_id)
+            + ("-nospot" if no_spot else ""),
             InstanceMarketOptions=instance_market_options,
         )
     except botocore.exceptions.ClientError as error:
