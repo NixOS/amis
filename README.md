@@ -14,18 +14,19 @@ Yes! for example with a config like this:
 {
   inputs.nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
 
-  outputs = { nixpkgs, ... }: {
-    nixosConfigurations.my-system = nixpkgs.lib.nixosSystem {
-      modules = [
-        { modulesPath, ... }:
-          imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
-          virtualisation.diskSize = "auto";  # or gigabytes. default is 3 * 1024
-          nixpkgs.hostPlatform = "x86_64-linux";
-          services.nginx.enable = true;
-        }
-      ];
+  outputs =
+    { nixpkgs, ... }:
+    {
+      nixosConfigurations.my-system = nixpkgs.lib.nixosSystem {
+        modules = [
+          {
+            virtualisation.diskSize = "auto"; # or gigabytes. default is 3 * 1024
+            nixpkgs.hostPlatform = "x86_64-linux";
+            services.nginx.enable = true;
+          }
+        ];
+      };
     };
-  };
 }
 ```
 

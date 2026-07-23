@@ -70,17 +70,13 @@
       # NOTE: Github Actions doesn't support kvm on arm64 builds
       nixosConfigurations.x86_64-linux = nixpkgs.lib.nixosSystem {
         modules = [
-          (
-            { modulesPath, ... }:
-            {
-              imports = [ "${modulesPath}/virtualisation/amazon-image.nix" ];
-              image.modules.amazon = {
-                amazonImage.format = "raw";
-              };
-              nixpkgs.hostPlatform = "x86_64-linux";
-              system.stateVersion = "26.05";
-            }
-          )
+          {
+            image.modules.amazon = {
+              amazonImage.format = "raw";
+            };
+            nixpkgs.hostPlatform = "x86_64-linux";
+            system.stateVersion = "26.05";
+          }
         ];
       };
 
