@@ -20,7 +20,7 @@ def smoke_test(image_id: str, run_id: str, cancel: bool, no_spot: bool) -> None:
     architecture = image["Architecture"]
     instance_type: InstanceTypeType
     if architecture == "x86_64":
-        instance_type = "t3.nano"
+        instance_type = "t2.nano"
     elif architecture == "arm64":
         instance_type = "t4g.nano"
     else:
