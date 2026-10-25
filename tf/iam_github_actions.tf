@@ -26,6 +26,16 @@ data "aws_iam_policy_document" "upload_ami" {
     resources = ["*"]
   }
   statement {
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.vmimport.arn]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["vmie.amazonaws.com"]
+    }
+  }
+  statement {
     effect = "Allow"
     actions = ["ec2:CreateTags"]
     resources = [
