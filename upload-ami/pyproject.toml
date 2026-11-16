@@ -21,4 +21,6 @@ delete-images-by-name = "upload_ami.delete_images_by_name:main"
 delete-deprecated-images = "upload_ami.delete_deprecated_images:main"
 delete-orphaned-snapshots = "upload_ami.delete_orphaned_snapshots:main"
 [tool.mypy]
-strict=true
+strict = true
+mypy_path = "src"
+explicit_package_bases = true
