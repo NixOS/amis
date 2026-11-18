@@ -29,8 +29,9 @@ class ImageInfo(TypedDict):
     label: str
     system: str
     boot_mode: BootModeValuesType
-    format: str
+    format: NotRequired[str]
     root_volume_size_gib: NotRequired[int]
+    tpm_support: NotRequired[bool]
 
 
 def upload_to_s3_if_not_exists(
@@ -228,11 +229,10 @@ def register_image_if_not_exists(
             ],
         }
 
-        if (
-            enable_tpm
-            and architecture == "x86_64"
-            and image_info["boot_mode"] == "uefi"
-        ):
+        tpm_support = image_info.get(
+            "tpm_support", enable_tpm and image_info["boot_mode"] == "uefi"
+        )
+        if tpm_support:
             register_image_kwargs["TpmSupport"] = "v2.0"
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
@@ -456,7 +456,7 @@ def main() -> None:
         "--enable-tpm",
         action="store_true",
         default=False,
-        help="Enable TPM 2.0 support for UEFI x86_64 images",
+        help="Enable TPM 2.0 support for UEFI images whose image info has no tpm_support",
     )
 
     parser.add_argument(
