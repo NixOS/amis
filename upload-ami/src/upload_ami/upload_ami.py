@@ -389,6 +389,10 @@ def upload_ami(
 
     image_format = image_info.get("format") or "VHD"
     if ebs_direct:
+        # EBS direct uploads the file's bytes as the disk.
+        assert (
+            image_info.get("format", "RAW") == "RAW"
+        ), "--ebs-direct needs a raw image"
         snapshot_id = import_snapshot_ebs_direct(
             ec2, image_name, image_file, ec2.meta.region_name
         )
