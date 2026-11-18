@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
+from botocore.exceptions import WaiterError
+
 from upload_ami import upload_ami
 from upload_ami.upload_ami import (
     ImageInfo,
@@ -241,10 +243,6 @@ class UploadAmi(unittest.TestCase):
     def test_ebs_direct_raw(self) -> None:
         self.upload(image_info(format="RAW"), ebs_direct=True)[0].assert_called_once()
 
-    def test_ebs_direct_refuses_vhd(self) -> None:
-        with self.assertRaises(AssertionError):
-            self.upload(image_info(format="VHD"), ebs_direct=True)
-
     def test_s3_format_absent(self) -> None:
         s3, _ = self.upload(image_info())
         self.assertEqual(s3.call_args.args[5], "VHD")
@@ -252,6 +250,80 @@ class UploadAmi(unittest.TestCase):
     def test_s3_raw(self) -> None:
         s3, _ = self.upload(image_info(format="RAW"))
         self.assertEqual(s3.call_args.args[5], "RAW")
+
+
+class EbsDirect(unittest.TestCase):
+    def setUp(self) -> None:
+        self.ec2 = fake_ec2()
+        self.ec2.describe_snapshots.return_value = {"Snapshots": []}
+        self.ec2.get_ebs_encryption_by_default.return_value = {
+            "EbsEncryptionByDefault": False
+        }
+        self.ec2.meta.region_name = "eu-central-1"
+        self.qemu_format = "raw"
+        self.output = self.enterContext(
+            patch("subprocess.check_output", side_effect=self.check_output)
+        )
+        self.convert = self.enterContext(patch("subprocess.run"))
+
+    def check_output(self, args: list[Any], **kwargs: Any) -> str:
+        if args[0] == "qemu-img":
+            return json.dumps({"format": self.qemu_format})
+        return "snap-1\n"
+
+    def upload(self) -> str:
+        return upload_ami.import_snapshot_ebs_direct(self.ec2, "name", Path("/image"))
+
+    def coldsnap(self) -> list[str]:
+        return cast(list[str], self.output.call_args.args[0])
+
+    def test_raw(self) -> None:
+        self.assertEqual(self.upload(), "snap-1")
+        self.convert.assert_not_called()
+        self.assertEqual(
+            self.coldsnap()[:4], ["coldsnap", "--region", "eu-central-1", "upload"]
+        )
+        self.assertNotIn("--wait", self.coldsnap())
+        self.assertEqual(self.coldsnap()[-1], "/image")
+        self.ec2.get_waiter.return_value.wait.assert_called_once_with(
+            SnapshotIds=["snap-1"]
+        )
+        self.ec2.delete_snapshot.assert_not_called()
+
+    def test_omits_zero_blocks_when_unencrypted(self) -> None:
+        self.upload()
+        self.assertIn("--omit-zero-blocks", self.coldsnap())
+
+    def test_uploads_zero_blocks_when_encrypted_by_default(self) -> None:
+        self.ec2.get_ebs_encryption_by_default.return_value = {
+            "EbsEncryptionByDefault": True
+        }
+        self.upload()
+        self.assertNotIn("--omit-zero-blocks", self.coldsnap())
+
+    def test_vhd_is_converted(self) -> None:
+        self.qemu_format = "vpc"
+        self.upload()
+        convert = self.convert.call_args.args[0]
+        self.assertEqual(convert[:6], ["qemu-img", "convert", "-f", "vpc", "-O", "raw"])
+        self.assertEqual(convert[6], Path("/image"))
+        self.assertEqual(self.coldsnap()[-1], str(convert[7]))
+
+    def test_existing_snapshot(self) -> None:
+        self.ec2.describe_snapshots.return_value = {
+            "Snapshots": [{"SnapshotId": "snap-old"}]
+        }
+        self.assertEqual(self.upload(), "snap-old")
+        self.output.assert_not_called()
+        self.convert.assert_not_called()
+
+    def test_failed_wait_deletes_snapshot(self) -> None:
+        self.ec2.get_waiter.return_value.wait.side_effect = WaiterError(
+            "SnapshotCompleted", "timed out", {}
+        )
+        with self.assertRaises(WaiterError):
+            self.upload()
+        self.ec2.delete_snapshot.assert_called_once_with(SnapshotId="snap-1")
 
 
 if __name__ == "__main__":

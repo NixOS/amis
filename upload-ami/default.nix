@@ -1,6 +1,8 @@
 {
   lib,
   python3Packages,
+  coldsnap,
+  qemu-utils,
 }:
 let
   pyproject = builtins.fromTOML (builtins.readFile ./pyproject.toml);
@@ -57,6 +59,15 @@ let
           "-s"
           "tests"
           "-v"
+        ];
+        makeWrapperArgs = [
+          "--prefix"
+          "PATH"
+          ":"
+          (lib.makeBinPath [
+            coldsnap
+            qemu-utils
+          ])
         ];
         passthru.upload-ami.pyproject = pyproject;
       }

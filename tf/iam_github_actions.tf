@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "upload_ami" {
       "ec2:DescribeImportSnapshotTasks",
       "ec2:DescribeSnapshots",
       "ec2:DeleteSnapshot",
+      "ec2:GetEbsEncryptionByDefault",
       "ebs:StartSnapshot",
       "ebs:PutSnapshotBlock",
       "ebs:CompleteSnapshot",

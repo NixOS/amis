@@ -2,6 +2,8 @@ import copy
 import json
 import hashlib
 import logging
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any, Iterable, Literal, NotRequired, TypedDict, cast
 import boto3
@@ -17,8 +19,6 @@ from mypy_boto3_ec2.type_defs import RegionTypeDef, RegisterImageRequestTypeDef
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
-
-from .snapshot_uploader import upload_snapshot
 
 
 class ImageInfo(TypedDict):
@@ -130,10 +130,9 @@ def import_snapshot_ebs_direct(
     ec2: EC2Client,
     image_name: str,
     image_file: Path,
-    region: str,
 ) -> str:
     """
-    Upload a raw disk image directly to an EBS snapshot via the EBS Direct APIs.
+    Upload a disk image directly to an EBS snapshot with coldsnap.
 
     Idempotent: returns the existing snapshot ID if one with the same
     name tag already exists.
@@ -150,14 +149,62 @@ def import_snapshot_ebs_direct(
         assert "SnapshotId" in snapshots["Snapshots"][0]
         return snapshots["Snapshots"][0]["SnapshotId"]
 
-    client_token = hashlib.sha256(image_name.encode()).hexdigest()
-    return upload_snapshot(
-        image_file,
-        region=region,
-        description=image_name,
-        tags={"Name": image_name, "ManagedBy": "NixOS/amis"},
-        client_token=client_token,
-    )
+    with tempfile.TemporaryDirectory() as tmp:
+        # coldsnap uploads the file's bytes as the disk.
+        image_format = json.loads(
+            subprocess.check_output(["qemu-img", "info", "--output=json", image_file])
+        )["format"]
+        if image_format != "raw":
+            raw_file = Path(tmp) / "image.raw"
+            logging.info(f"Converting {image_file} from {image_format} to raw")
+            subprocess.run(
+                [
+                    "qemu-img",
+                    "convert",
+                    "-f",
+                    image_format,
+                    "-O",
+                    "raw",
+                    image_file,
+                    raw_file,
+                ],
+                check=True,
+            )
+            image_file = raw_file
+
+        upload = [
+            "coldsnap",
+            "--region",
+            ec2.meta.region_name,
+            "upload",
+            "--no-progress",
+            "--description",
+            image_name,
+            "--tag",
+            f"Key=Name,Value={image_name}",
+            "--tag",
+            "Key=ManagedBy,Value=NixOS/amis",
+        ]
+        # Unwritten blocks read back as zeros only in unencrypted snapshots.
+        if not ec2.get_ebs_encryption_by_default()["EbsEncryptionByDefault"]:
+            upload.append("--omit-zero-blocks")
+
+        logging.info(f"Uploading {image_file} with coldsnap")
+        snapshot_id = subprocess.check_output(
+            [*upload, str(image_file)], text=True
+        ).strip()
+
+    logging.info(f"Waiting for snapshot {snapshot_id}")
+    try:
+        ec2.get_waiter("snapshot_completed").wait(SnapshotIds=[snapshot_id])
+    except Exception:
+        logging.error(f"Deleting snapshot {snapshot_id}")
+        try:
+            ec2.delete_snapshot(SnapshotId=snapshot_id)
+        except Exception as e:
+            logging.warning(f"Failed to delete snapshot {snapshot_id}: {e}")
+        raise
+    return snapshot_id
 
 
 def default_register_image(image_info: ImageInfo, enable_tpm: bool) -> dict[str, Any]:
@@ -395,13 +442,7 @@ def upload_ami(
 
     image_format = image_info.get("format") or "VHD"
     if ebs_direct:
-        # EBS direct uploads the file's bytes as the disk.
-        assert (
-            image_info.get("format", "RAW") == "RAW"
-        ), "--ebs-direct needs a raw image"
-        snapshot_id = import_snapshot_ebs_direct(
-            ec2, image_name, image_file, ec2.meta.region_name
-        )
+        snapshot_id = import_snapshot_ebs_direct(ec2, image_name, image_file)
     else:
         assert (
             s3_bucket is not None
@@ -450,7 +491,7 @@ def main() -> None:
     parser.add_argument(
         "--ebs-direct",
         action="store_true",
-        help="Upload via EBS Direct APIs instead of importing from S3",
+        help="Upload with coldsnap via EBS Direct APIs instead of importing from S3",
     )
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--cleanup", action="store_true")
