@@ -2,7 +2,7 @@ import json
 import hashlib
 import logging
 from pathlib import Path
-from typing import Iterable, Literal, TypedDict
+from typing import Iterable, Literal, NotRequired, TypedDict
 import boto3
 import boto3.ec2
 import boto3.ec2.createtags
@@ -12,7 +12,11 @@ import datetime
 
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.literals import BootModeValuesType
-from mypy_boto3_ec2.type_defs import RegionTypeDef, RegisterImageRequestTypeDef
+from mypy_boto3_ec2.type_defs import (
+    EbsBlockDeviceTypeDef,
+    RegionTypeDef,
+    RegisterImageRequestTypeDef,
+)
 from mypy_boto3_s3.client import S3Client
 
 from concurrent.futures import ThreadPoolExecutor
@@ -26,6 +30,7 @@ class ImageInfo(TypedDict):
     system: str
     boot_mode: BootModeValuesType
     format: str
+    root_volume_size_gib: NotRequired[int]
 
 
 def upload_to_s3_if_not_exists(
@@ -189,6 +194,14 @@ def register_image_if_not_exists(
         else:
             raise Exception("Unknown system: " + image_info["system"])
 
+        ebs: EbsBlockDeviceTypeDef = {"SnapshotId": snapshot_id, "VolumeType": "gp3"}
+        # Without VolumeSize, EC2 sizes the root volume to the snapshot.
+        if "root_volume_size_gib" in image_info:
+            snapshot = ec2.describe_snapshots(SnapshotIds=[snapshot_id])["Snapshots"][0]
+            ebs["VolumeSize"] = max(
+                image_info["root_volume_size_gib"], snapshot.get("VolumeSize", 0)
+            )
+
         register_image_kwargs: RegisterImageRequestTypeDef = {
             "Name": image_name,
             "Architecture": architecture,
@@ -196,10 +209,7 @@ def register_image_if_not_exists(
             "BlockDeviceMappings": [
                 {
                     "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "SnapshotId": snapshot_id,
-                        "VolumeType": "gp3",
-                    },
+                    "Ebs": ebs,
                 }
             ],
             "RootDeviceName": "/dev/xvda",
