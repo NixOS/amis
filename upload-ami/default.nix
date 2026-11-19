@@ -26,7 +26,11 @@ let
       dependencies = map parseDependency pyproject.project.dependencies;
       args =
         (lib.genAttrs (
-          [ "buildPythonApplication" ] ++ (map ({ name, ... }: name) (requires ++ dependencies))
+          [
+            "buildPythonApplication"
+            "unittestCheckHook"
+          ]
+          ++ (map ({ name, ... }: name) (requires ++ dependencies))
         ))
           (x: false);
     in
@@ -48,6 +52,12 @@ let
         pyproject = true;
         nativeBuildInputs = lib.flatten (map resolvePkgs requires);
         propagatedBuildInputs = lib.flatten (map resolvePkgs dependencies);
+        nativeCheckInputs = [ python3Packages.unittestCheckHook ];
+        unittestFlags = [
+          "-s"
+          "tests"
+          "-v"
+        ];
         passthru.upload-ami.pyproject = pyproject;
       }
     ) args;
