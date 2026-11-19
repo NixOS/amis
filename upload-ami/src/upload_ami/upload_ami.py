@@ -1,8 +1,9 @@
+import copy
 import json
 import hashlib
 import logging
 from pathlib import Path
-from typing import Iterable, Literal, TypedDict
+from typing import Any, Iterable, Literal, TypedDict, cast
 import boto3
 import boto3.ec2
 import boto3.ec2.createtags
@@ -159,13 +160,47 @@ def import_snapshot_ebs_direct(
     )
 
 
+def default_register_image(image_info: ImageInfo, enable_tpm: bool) -> dict[str, Any]:
+    """
+    RegisterImage arguments for images without register-image.json
+    """
+    architecture: Literal["x86_64", "arm64"]
+    assert "system" in image_info
+    if image_info["system"] == "x86_64-linux":
+        architecture = "x86_64"
+    elif image_info["system"] == "aarch64-linux":
+        architecture = "arm64"
+    else:
+        raise Exception("Unknown system: " + image_info["system"])
+
+    register_image: dict[str, Any] = {
+        "Architecture": architecture,
+        "BootMode": image_info["boot_mode"],
+        "BlockDeviceMappings": [
+            {
+                "DeviceName": "/dev/xvda",
+                "Ebs": {"VolumeType": "gp3"},
+            }
+        ],
+        "RootDeviceName": "/dev/xvda",
+        "VirtualizationType": "hvm",
+        "EnaSupport": True,
+        "ImdsSupport": "v2.0",
+        "SriovNetSupport": "simple",
+    }
+
+    if enable_tpm and architecture == "x86_64" and image_info["boot_mode"] == "uefi":
+        register_image["TpmSupport"] = "v2.0"
+
+    return register_image
+
+
 def register_image_if_not_exists(
     ec2: EC2Client,
     image_name: str,
-    image_info: ImageInfo,
+    register_image: dict[str, Any],
     snapshot_id: str,
     public: bool,
-    enable_tpm: bool,
 ) -> str:
     """
     Register image if it doesn't exist yet
@@ -180,55 +215,35 @@ def register_image_if_not_exists(
         assert "ImageId" in describe_images["Images"][0]
         image_id = describe_images["Images"][0]["ImageId"]
     else:
-        architecture: Literal["x86_64", "arm64"]
-        assert "system" in image_info
-        if image_info["system"] == "x86_64-linux":
-            architecture = "x86_64"
-        elif image_info["system"] == "aarch64-linux":
-            architecture = "arm64"
-        else:
-            raise Exception("Unknown system: " + image_info["system"])
-
-        register_image_kwargs: RegisterImageRequestTypeDef = {
-            "Name": image_name,
-            "Architecture": architecture,
-            "BootMode": image_info["boot_mode"],
-            "BlockDeviceMappings": [
-                {
-                    "DeviceName": "/dev/xvda",
-                    "Ebs": {
-                        "SnapshotId": snapshot_id,
-                        "VolumeType": "gp3",
-                    },
-                }
-            ],
-            "RootDeviceName": "/dev/xvda",
-            "VirtualizationType": "hvm",
-            "EnaSupport": True,
-            "ImdsSupport": "v2.0",
-            "SriovNetSupport": "simple",
-            "TagSpecifications": [
-                {
-                    "ResourceType": "image",
-                    "Tags": [
-                        {"Key": "Name", "Value": image_name},
-                        {"Key": "ManagedBy", "Value": "NixOS/amis"},
-                    ],
-                }
-            ],
-        }
-
-        if (
-            enable_tpm
-            and architecture == "x86_64"
-            and image_info["boot_mode"] == "uefi"
-        ):
-            register_image_kwargs["TpmSupport"] = "v2.0"
+        request = copy.deepcopy(register_image)
+        request["Name"] = image_name
+        request["TagSpecifications"] = [
+            {
+                "ResourceType": "image",
+                "Tags": [
+                    {"Key": "Name", "Value": image_name},
+                    {"Key": "ManagedBy", "Value": "NixOS/amis"},
+                ],
+            }
+        ]
+        [root] = [
+            mapping
+            for mapping in request["BlockDeviceMappings"]
+            if mapping["DeviceName"] == request["RootDeviceName"]
+        ]
+        root["Ebs"]["SnapshotId"] = snapshot_id
+        if "VolumeSize" in root["Ebs"]:
+            # RegisterImage rejects a root volume smaller than the snapshot.
+            snapshot = ec2.describe_snapshots(SnapshotIds=[snapshot_id])["Snapshots"][0]
+            root["Ebs"]["VolumeSize"] = max(
+                root["Ebs"]["VolumeSize"], snapshot.get("VolumeSize", 0)
+            )
 
         logging.info(f"Registering image {image_name} with snapshot {snapshot_id}")
 
-        register_image = ec2.register_image(**register_image_kwargs)
-        image_id = register_image["ImageId"]
+        image_id = ec2.register_image(**cast(RegisterImageRequestTypeDef, request))[
+            "ImageId"
+        ]
 
     ec2.get_waiter("image_available").wait(ImageIds=[image_id])
     deprecate_at = (datetime.datetime.now() + datetime.timedelta(days=90)).strftime(
@@ -352,6 +367,7 @@ def copy_image_to_regions(
 
 def upload_ami(
     image_info: ImageInfo,
+    register_image: dict[str, Any] | None,
     s3_bucket: str | None,
     copy_to_regions: bool,
     prefix: str,
@@ -391,7 +407,11 @@ def upload_ami(
         )
 
     image_id = register_image_if_not_exists(
-        ec2, image_name, image_info, snapshot_id, public, enable_tpm
+        ec2,
+        image_name,
+        register_image or default_register_image(image_info, enable_tpm),
+        snapshot_id,
+        public,
     )
 
     image_ids: dict[str, str] = {}
@@ -446,7 +466,7 @@ def main() -> None:
         "--enable-tpm",
         action="store_true",
         default=False,
-        help="Enable TPM 2.0 support for UEFI x86_64 images",
+        help="Enable TPM 2.0 support for UEFI x86_64 images without register-image.json",
     )
 
     parser.add_argument(
@@ -469,9 +489,18 @@ def main() -> None:
     with open(args.image_info, "r") as f:
         image_info = json.load(f)
 
+    # nixpkgs writes the RegisterImage arguments next to the image info.
+    register_image_file = Path(args.image_info).with_name("register-image.json")
+    register_image = (
+        json.loads(register_image_file.read_text())
+        if register_image_file.exists()
+        else None
+    )
+
     image_ids = {}
     image_ids = upload_ami(
         image_info,
+        register_image,
         args.s3_bucket,
         args.copy_to_regions,
         args.prefix,
