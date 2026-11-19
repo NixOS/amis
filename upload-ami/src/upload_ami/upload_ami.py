@@ -3,7 +3,7 @@ import json
 import hashlib
 import logging
 from pathlib import Path
-from typing import Any, Iterable, Literal, TypedDict, cast
+from typing import Any, Iterable, Literal, NotRequired, TypedDict, cast
 import boto3
 import boto3.ec2
 import boto3.ec2.createtags
@@ -26,7 +26,7 @@ class ImageInfo(TypedDict):
     label: str
     system: str
     boot_mode: BootModeValuesType
-    format: str
+    format: NotRequired[str]
 
 
 def upload_to_s3_if_not_exists(
@@ -395,6 +395,10 @@ def upload_ami(
 
     image_format = image_info.get("format") or "VHD"
     if ebs_direct:
+        # EBS direct uploads the file's bytes as the disk.
+        assert (
+            image_info.get("format", "RAW") == "RAW"
+        ), "--ebs-direct needs a raw image"
         snapshot_id = import_snapshot_ebs_direct(
             ec2, image_name, image_file, ec2.meta.region_name
         )
