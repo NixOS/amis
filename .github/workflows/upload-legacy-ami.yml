@@ -19,6 +19,7 @@ jobs:
         release:
           - release-25.11
           - release-26.05
+          - release-26.11
           # - nixos-unstable
         system:
           - x86_64-linux
